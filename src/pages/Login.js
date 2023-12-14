@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 // npm install axios
-import { Link, useNavigate } from "react-router-dom"; // npm install @reach/router
+import { useNavigate } from "react-router-dom";
+
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
-import TechaniLogo from "../assets/img/techani_blanco_nombre.png";
+import NavRegsitro from "../components/NavRegsitro";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -27,50 +28,130 @@ export default function Login() {
     //console.log(idpatient);
   };
 
+  const handleLoginGoogle = async (e) => {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    navigate("/dashboard");
+    console.log(data, error);
+  };
+
+  const handleLoginFacebook = async (e) => {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+    });
+    navigate("/dashboard");
+    console.log(data, error);
+  };
+
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
   }, [navigate, user]);
   return (
-    <div className="bg-azul">
-      <div
-        className="flex justify-center items-center h-screen w-full"
-        data-aos="fade-up"
-      >
-        <div className="flex flex-col items-center mr-20">
-          <img src={TechaniLogo} alt="Techani" className="w-64" />
-          <p className="font-fuentesec text-5xl text-white">
-            Tu salud en tus manos
-          </p>
+    <div className="h-screen" data-aos="fade-right">
+      <NavRegsitro />
+
+      <form className="flex flex-col justify-center items-center h-4/5">
+        <div className="flex flex-col items-center justify-center h-full w-full">
+          <h3 className="text-2xl font-semibold font-fuenteTechani mb-10">
+            Inicia Sesión en Techani
+          </h3>
+          <div className="flex w-full">
+            <div className="w-1/2 flex flex-col justify-center items-end pr-20">
+              <div>
+                <div className="flex flex-col ">
+                  <label className="text-sm">Correo Electrónico</label>
+                  <input
+                    type="text"
+                    name="email"
+                    placeholder="nombre@ejemplo.com"
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="border-b-2 focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 mb-5 w-72"
+                    autoComplete="off"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm">Contraseña</label>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Contraseña"
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="border-b-2 focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 mb-5 w-72"
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="flex ">
+                  <button
+                    className="bg-azul rounded-sm text-white w-full py-2 transition-all ease-in disabled:opacity-50 disabled:shadow-none hover:shadow-xl"
+                    onClick={(e) => userLogin(e, email, password)}
+                    disabled={!email || !password}
+                  >
+                    Iniciar Sesion
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-1/2 ">
+              <div className="flex flex-col pl-20 py-20 justify-center border-l-2 border-l-gray-400 w-7/12">
+                <button
+                  onClick={handleLoginGoogle}
+                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5"
+                >
+                  <img
+                    src="https://img.icons8.com/color/16/000000/google-logo.png"
+                    alt="Google Logo"
+                    class="mr-2"
+                  />
+                  <span>Continuar con Google</span>
+                </button>
+
+                <button
+                  onClick={handleLoginFacebook}
+                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    x="0px"
+                    y="0px"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 48 48"
+                    className="mr-2"
+                  >
+                    <linearGradient
+                      id="Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1"
+                      x1="9.993"
+                      x2="40.615"
+                      y1="9.993"
+                      y2="40.615"
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      <stop offset="0" stop-color="#2aa4f4"></stop>
+                      <stop offset="1" stop-color="#007ad9"></stop>
+                    </linearGradient>
+                    <path
+                      fill="url(#Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1)"
+                      d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"
+                    ></path>
+                    <path
+                      fill="#fff"
+                      d="M26.707,29.301h5.176l0.813-5.258h-5.989v-2.874c0-2.184,0.714-4.121,2.757-4.121h3.283V12.46 c-0.577-0.078-1.797-0.248-4.102-0.248c-4.814,0-7.636,2.542-7.636,8.334v3.498H16.06v5.258h4.948v14.452 C21.988,43.9,22.981,44,24,44c0.921,0,1.82-0.084,2.707-0.204V29.301z"
+                    ></path>
+                  </svg>
+                  <span>Continuar con Facebook</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col justify-center items-center bg-white h-4/6 w-3/12 rounded-lg ml-10">
-          <h2 className="font-fuenteTechani mb-8  text-2xl">INICIAR SESION</h2>
-          <form className="flex flex-col items-center">
-            <input
-              type="text"
-              name="email"
-              placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border-solid border-2 border-gray-300 py-2 px-2 mb-5 w-72"
-            />
-            <input
-              type="password"
-              name="email"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border-solid border-2 border-gray-300 py-2 px-2 mb-5 w-72"
-            />
-            <button
-              className="bg-amarillo px-7 py-1 rounded-lg w-44 disabled:opacity-50"
-              onClick={(e) => userLogin(e, email, password)}
-            >
-              Sign In
-            </button>
-            <Link to="/register">Sign Up</Link>
-          </form>
-        </div>
-      </div>
+      </form>
     </div>
   );
 }
