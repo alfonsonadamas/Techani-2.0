@@ -1,18 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../config/supabase";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../context/UserContext";
 import ReactApexChart from "react-apexcharts";
 
-import Nav from "../components/Nav";
-
 import "../dist/output.css";
+import SideBar from "../components/SideBar";
 
 export default function Main() {
   const navigate = useNavigate();
   const { user } = useUserContext();
-  const [data, setData] = useState({
+  const [data] = useState({
     series: [
       {
         name: "Desktops",
@@ -59,16 +57,95 @@ export default function Main() {
     },
   });
 
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      navigate("/login");
-      console.log(error);
-    } catch (error) {
-      console.log(error);
-    }
-    //navigate("/login");
-  };
+  const [data2] = useState({
+    series: [
+      {
+        name: "Net Profit",
+        data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+      },
+      {
+        name: "Revenue",
+        data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
+      },
+      {
+        name: "Free Cash Flow",
+        data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
+      },
+    ],
+    options: {
+      chart: {
+        type: "bar",
+        height: 350,
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "55%",
+          endingShape: "rounded",
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ["transparent"],
+      },
+      xaxis: {
+        categories: [
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+        ],
+      },
+      yaxis: {
+        title: {
+          text: "$ (thousands)",
+        },
+      },
+      fill: {
+        opacity: 1,
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return "$ " + val + " thousands";
+          },
+        },
+      },
+    },
+  });
+
+  const [data3] = useState({
+    series: [44, 55, 13, 43, 22],
+    options: {
+      chart: {
+        width: 380,
+        type: "pie",
+      },
+      labels: ["Team A", "Team B", "Team C", "Team D", "Team E"],
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    },
+  });
 
   useEffect(() => {
     if (!user) {
@@ -77,15 +154,38 @@ export default function Main() {
   }, [user, navigate]);
 
   return (
-    <div>
-      <Nav />
-      <ReactApexChart
-        options={data.options}
-        series={data.series}
-        type="line"
-        height={350}
-      />
-      <button onClick={handleSignOut}>Logout</button>
+    <div className="w-full h-screen">
+      <SideBar />
+      <div className="p-16 pt-20 sm:ml-64">
+        <div className="flex flex-col sm:flex sm:flex-row">
+          <div className="w-full sm:w-1/2">
+            <ReactApexChart
+              options={data.options}
+              series={data.series}
+              type="line"
+              height={350}
+            />
+          </div>
+          <div className="w-full sm:w-1/2">
+            <ReactApexChart
+              options={data2.options}
+              series={data2.series}
+              type="bar"
+              height={350}
+            />
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <div>
+            <ReactApexChart
+              options={data3.options}
+              series={data3.series}
+              type="pie"
+              width={380}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

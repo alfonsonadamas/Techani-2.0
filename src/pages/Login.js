@@ -9,11 +9,13 @@ import NavRegsitro from "../components/NavRegsitro";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setloading] = useState(false);
   const navigate = useNavigate();
   const { user } = useUserContext();
 
   const userLogin = async (e) => {
     e.preventDefault();
+    setloading(true);
     try {
       const user = await supabase.auth.signInWithPassword({
         email,
@@ -30,20 +32,28 @@ export default function Login() {
 
   const handleLoginGoogle = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-    navigate("/dashboard");
-    console.log(data, error);
+    setloading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+      });
+      console.log(data, error);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "facebook",
-    });
-    navigate("/dashboard");
-    console.log(data, error);
+    setloading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+      });
+      console.log(data, error);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -70,7 +80,7 @@ export default function Login() {
                     name="email"
                     placeholder="nombre@ejemplo.com"
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border-b-2 focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 mb-5 w-72"
+                    className="border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black focus:border-t-0 transition duration-300  border-gray-300 py-2 mb-5 w-72"
                     autoComplete="off"
                   />
                 </div>
@@ -82,7 +92,7 @@ export default function Login() {
                     name="password"
                     placeholder="Contraseña"
                     onChange={(e) => setPassword(e.target.value)}
-                    className="border-b-2 focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 mb-5 w-72"
+                    className="border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 mb-5 w-72"
                     autoComplete="off"
                   />
                 </div>
@@ -90,7 +100,7 @@ export default function Login() {
                   <button
                     className="bg-azul rounded-sm text-white w-full py-2 transition-all ease-in disabled:opacity-50 disabled:shadow-none hover:shadow-xl"
                     onClick={(e) => userLogin(e, email, password)}
-                    disabled={!email || !password}
+                    disabled={!email || !password || loading}
                   >
                     Iniciar Sesion
                   </button>
@@ -102,7 +112,8 @@ export default function Login() {
               <div className="flex flex-col pl-20 py-20 justify-center border-l-2 border-l-gray-400 w-7/12">
                 <button
                   onClick={handleLoginGoogle}
-                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5"
+                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5 disabled:opacity-20 disabled:cursor-default"
+                  disabled={loading}
                 >
                   <img
                     src="https://img.icons8.com/color/16/000000/google-logo.png"
@@ -114,7 +125,8 @@ export default function Login() {
 
                 <button
                   onClick={handleLoginFacebook}
-                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center"
+                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center disabled:opacity-20 disabled:cursor-default"
+                  disabled={loading}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

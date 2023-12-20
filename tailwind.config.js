@@ -4,7 +4,8 @@ module.exports = {
     "./src/**/*.{html,js}",
     "./public/index.html",
     "./src/pages/Login.js",
-    "./node_modules/flowbite/**/*.js",
+    "./src/components/Sidebar.js",
+    "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
     extend: {

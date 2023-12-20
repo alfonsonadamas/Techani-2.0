@@ -68,18 +68,19 @@ export default function Index() {
               tipo 1 y 2.
             </p>
             <div className="flex justify-around mt-10">
-              <a
+              <Link
+                to={"/"}
                 className="bg-azulFondo transition duration-300 ease-out hover:ease-out hover:bg-azulSecundario hover:shadow-2xl  px-7 py-1 rounded-lg text-white"
-                href="registroCorreo.php"
               >
                 Registrarse
-              </a>
-              <a
+              </Link>
+
+              <Link
+                to={"/login"}
                 className="bg-azulFondo transition duration-300 ease-out hover:ease-out hover:bg-azulSecundario hover:shadow-2xl  px-7 py-1 rounded-lg text-white"
-                href="login.php"
               >
                 Iniciar Sesión
-              </a>
+              </Link>
             </div>
           </div>
         </div>
