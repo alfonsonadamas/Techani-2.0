@@ -5,6 +5,7 @@ import LayoutPrivate from "../layout/LayoutPrivate";
 import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
+import Alimentos from "../pages/Alimentos";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,16 @@ export const router = createBrowserRouter([
             element: <Main />,
           },
         ],
+      },
+      {
+        path: "/alimentos",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Alimentos />,
+          },
+        ], 
       },
     ],
   },
