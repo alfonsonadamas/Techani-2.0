@@ -45,7 +45,7 @@ export default function SideBar() {
                 </svg>
               </button>
 
-              <Link class="flex ms-2 md:me-24">
+              <Link to={"/dashboard"} class="flex ms-2 md:me-24">
                 <img src={Logo} class="h-10 me-3" alt="FlowBite Logo" />
                 <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
                   Techani
@@ -122,9 +122,9 @@ export default function SideBar() {
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul class="space-y-2 font-medium">
             <li>
-              <a
-                href="/"
-                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              <Link
+                to={"/glucoseRegister"}
+                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <img
                   src={registro}
@@ -133,11 +133,11 @@ export default function SideBar() {
                 />
 
                 <span class="ms-3">Registro diario</span>
-              </a>
+              </Link>
             </li>
             <li>
               <a
-                href="#"
+                href="/"
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -157,7 +157,7 @@ export default function SideBar() {
             </li>
             <li>
               <a
-                href="#"
+                href="/"
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -177,7 +177,7 @@ export default function SideBar() {
             </li>
             <li>
               <a
-                href="#"
+                href="/"
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -194,7 +194,7 @@ export default function SideBar() {
             </li>
             <li>
               <a
-                href="#"
+                href="/"
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -211,7 +211,7 @@ export default function SideBar() {
             </li>
             <li>
               <a
-                href="#"
+                href="/"
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -234,7 +234,7 @@ export default function SideBar() {
             </li>
             <li>
               <a
-                href="#"
+                href="/"
                 class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
