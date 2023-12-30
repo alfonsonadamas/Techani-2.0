@@ -29,16 +29,16 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "/alimentos",
-        element: <LayoutPrivate />,
-        children: [
+       {
+         path: "/alimentos",
+         element: <LayoutPrivate />,
+         children: [
           {
             index: true,
             element: <Alimentos />,
-          },
-        ], 
-      },
+             },
+              ], 
+               },
     ],
   },
 ]);
