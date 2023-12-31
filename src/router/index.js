@@ -6,6 +6,8 @@ import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
 import Alimentos from "../pages/Alimentos";
+import Ejercicio from "../pages/Ejercicio";
+
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +41,16 @@ export const router = createBrowserRouter([
              },
               ], 
                },
+               {
+                path: "/ejercicio",
+                element: <LayoutPrivate />,
+                children: [
+                 {
+                   index: true,
+                   element: <Ejercicio />,
+                    },
+                     ], 
+                      },
     ],
   },
 ]);

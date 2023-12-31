@@ -64,12 +64,8 @@ export default function Alimentos() {
             className="border p-2 w-full"
           />
         </div>
-        <button
-          type="submit"
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Enviar
-        </button>
+        <button type="submit" className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800">Guardar</button>
+
 
       </form>
     </div>
