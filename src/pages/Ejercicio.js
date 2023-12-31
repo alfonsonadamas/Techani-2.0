@@ -28,7 +28,7 @@ function ExerciseForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Aquí puedes enviar los datos a tu backend o hacer lo que necesites con ellos
+    // Aquí puedes enviar los datos a tu backend 
     console.log('Día:', day);
     console.log('Actividad:', activity);
     console.log('Tiempo:', time);
@@ -41,11 +41,13 @@ function ExerciseForm() {
 
 
   return (
-    <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
+    <div>
+        <SideBar />
+        <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
     <div className="flex justify-center ...">
   
-    <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md mt-56 md:mt-75"> {/* Aumenta el valor de mt-32 y md:mt-64 */}
-      <h1 className="text-3xl font-bold mb-8 text-center mt-32 md:mt-64">Registro de Ejercicio</h1> {/* Aumenta el valor de mt-16 y md:mt-24 */}
+    <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md mt-56 md:mt-75"> 
+      <h1 className="text-3xl font-bold mb-8 text-center mt-32 md:mt-64">Registro de Ejercicio</h1> 
     <form onSubmit={handleSubmit}>
     <div className="mb-4">
           <label htmlFor="day" className="block mb-1">Día de la semana:</label>
@@ -64,10 +66,42 @@ function ExerciseForm() {
           <label htmlFor="activity" className="block mb-1">Actividad a realizar:</label>
           <input type="text" id="activity" value={activity} onChange={handleActivityChange} className="border rounded-md px-3 py-2 w-full" />
         </div>
+
+
         <div className="mb-4">
-          <label htmlFor="time" className="block mb-1">Tiempo de ejercicio:</label>
-          <input type="text" id="time" value={time} onChange={handleTimeChange} className="border rounded-md px-3 py-2 w-full" />
-        </div>
+  <label htmlFor="time" className="block mb-1">
+    Tiempo de ejercicio:
+  </label>
+  <div className="flex justify-between">
+    <button
+      className={`bg-blue-500 text-white px-4 py-2 rounded-md mr-2 ${
+        time === '20min' ? 'bg-blue-700' : ''
+      }`}
+      onClick={() => setTime('20min')}
+    >
+      20 min
+    </button>
+    <button
+      className={`bg-blue-500 text-white px-4 py-2 rounded-md mr-2 ${
+        time === '30min' ? 'bg-blue-700' : ''
+      }`}
+      onClick={() => setTime('30min')}
+    >
+      30 min
+    </button>
+    <button
+      className={`bg-blue-500 text-white px-4 py-2 rounded-md mr-2 ${
+        time === '1hr' ? 'bg-blue-700' : ''
+      }`}
+      onClick={() => setTime('1hr')}
+    >
+      1 hr
+    </button>
+    
+  </div>
+</div>
+
+
         <div className="mb-4">
           <label htmlFor="weight" className="block mb-1">¿Levantaste peso? (Cantidad o No)</label>
           <input type="text" id="weight" value={weight} onChange={handleWeightChange} className="border rounded-md px-3 py-2 w-full" />
@@ -80,9 +114,11 @@ function ExerciseForm() {
       Ver registros anteriores
     </Link>
   </div>
-  <SideBar />
+  
 </div>
 </div>
+    </div>
+    
   );
 }
 

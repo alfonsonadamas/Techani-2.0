@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import SideBar from '../components/SideBar';
+
 
 export default function Alimentos() {
   const [tipoComida, setTipoComida] = useState('');
@@ -25,7 +27,10 @@ export default function Alimentos() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+
+    <div>
+      <SideBar />
+      <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Registro de Alimentos</h1>
       <form onSubmit={handleSubmit} className="max-w-md mx-auto">
         <div className="mb-4">
@@ -69,5 +74,7 @@ export default function Alimentos() {
 
       </form>
     </div>
+    </div>
+    
   );
 }
