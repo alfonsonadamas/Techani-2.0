@@ -41,7 +41,9 @@ function ExerciseForm() {
 
 
   return (
+    <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
     <div className="flex justify-center ...">
+  
     <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md mt-56 md:mt-75"> {/* Aumenta el valor de mt-32 y md:mt-64 */}
       <h1 className="text-3xl font-bold mb-8 text-center mt-32 md:mt-64">Registro de Ejercicio</h1> {/* Aumenta el valor de mt-16 y md:mt-24 */}
     <form onSubmit={handleSubmit}>
@@ -80,7 +82,7 @@ function ExerciseForm() {
   </div>
   <SideBar />
 </div>
-
+</div>
   );
 }
 
