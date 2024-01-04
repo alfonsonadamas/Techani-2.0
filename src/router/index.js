@@ -7,6 +7,7 @@ import Main from "../pages/Main";
 import Index from "../pages/Index";
 import Alimentos from "../pages/Alimentos";
 import Ejercicio from "../pages/Ejercicio";
+import Citas from "../pages/Citas";
 
 
 export const router = createBrowserRouter([
@@ -50,6 +51,16 @@ export const router = createBrowserRouter([
                    element: <Ejercicio />,
                     },
                      ], 
+                      },
+                      {
+                        path: "/citas",
+                        element: <LayoutPrivate />,
+                        children: [
+                          {
+                            index: true,
+                            element: <Citas />,
+                          },
+                        ],
                       },
     ],
   },
