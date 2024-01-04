@@ -9,6 +9,7 @@ function ExerciseForm() {
   const [activity, setActivity] = useState('');
   const [time, setTime] = useState('');
   const [weight, setWeight] = useState('');
+  const [exerciseTime, setExerciseTime] = useState('');
 
   const handleDayChange = (event) => {
     setDay(event.target.value);
@@ -34,11 +35,6 @@ function ExerciseForm() {
     console.log('Tiempo:', time);
     console.log('Peso:', weight);
   };
-
-
-
-  
-
 
   return (
     <div>
@@ -69,37 +65,19 @@ function ExerciseForm() {
 
 
         <div className="mb-4">
-  <label htmlFor="time" className="block mb-1">
-    Tiempo de ejercicio:
-  </label>
-  <div className="flex justify-between">
-    <button
-      className={`bg-blue-500 text-white px-4 py-2 rounded-md mr-2 ${
-        time === '20min' ? 'bg-blue-700' : ''
-      }`}
-      onClick={() => setTime('20min')}
-    >
-      20 min
-    </button>
-    <button
-      className={`bg-blue-500 text-white px-4 py-2 rounded-md mr-2 ${
-        time === '30min' ? 'bg-blue-700' : ''
-      }`}
-      onClick={() => setTime('30min')}
-    >
-      30 min
-    </button>
-    <button
-      className={`bg-blue-500 text-white px-4 py-2 rounded-md mr-2 ${
-        time === '1hr' ? 'bg-blue-700' : ''
-      }`}
-      onClick={() => setTime('1hr')}
-    >
-      1 hr
-    </button>
-    
-  </div>
-</div>
+      <label htmlFor="exerciseTime" className="block mb-1">
+        ¿Cuánto tiempo dedicaste al ejercicio?
+      </label>
+      <input
+        type="text"
+        id="exerciseTime"
+        className="border rounded-md px-3 py-2"
+        placeholder="Escribe el tiempo aquí..."
+        value={exerciseTime}
+        onChange={(e) => setExerciseTime(e.target.value)}
+      />
+    </div>
+
 
 
         <div className="mb-4">
