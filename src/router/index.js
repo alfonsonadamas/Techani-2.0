@@ -8,6 +8,7 @@ import Index from "../pages/Index";
 import Alimentos from "../pages/Alimentos";
 import Ejercicio from "../pages/Ejercicio";
 import Citas from "../pages/Citas";
+import Estados from "../pages/Estados";
 
 
 export const router = createBrowserRouter([
@@ -59,6 +60,16 @@ export const router = createBrowserRouter([
                           {
                             index: true,
                             element: <Citas />,
+                          },
+                        ],
+                      },
+                      {
+                        path: "/estados",
+                        element: <LayoutPrivate />,
+                        children: [
+                          {
+                            index: true,
+                            element: <Estados />,
                           },
                         ],
                       },

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
     "@supabase/auth-ui-react": "^0.4.6",
     "@supabase/supabase-js": "^2.39.0",
     "@testing-library/jest-dom": "^5.17.0",
