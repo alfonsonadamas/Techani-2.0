@@ -60,7 +60,7 @@ export default function Login() {
     if (user) {
       navigate("/dashboard");
     }
-  }, [navigate, user]);
+  }, [user, navigate]);
   return (
     <div className="h-screen" data-aos="fade-right">
       <NavRegsitro />
@@ -112,20 +112,20 @@ export default function Login() {
               <div className="flex flex-col pl-20 py-20 justify-center border-l-2 border-l-gray-400 w-7/12">
                 <button
                   onClick={handleLoginGoogle}
-                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5 disabled:opacity-20 disabled:cursor-default"
+                  className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5 disabled:opacity-20 disabled:cursor-default"
                   disabled={loading}
                 >
                   <img
                     src="https://img.icons8.com/color/16/000000/google-logo.png"
                     alt="Google Logo"
-                    class="mr-2"
+                    className="mr-2"
                   />
                   <span>Continuar con Google</span>
                 </button>
 
                 <button
                   onClick={handleLoginFacebook}
-                  class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center disabled:opacity-20 disabled:cursor-default"
+                  className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center disabled:opacity-20 disabled:cursor-default"
                   disabled={loading}
                 >
                   <svg
@@ -145,8 +145,8 @@ export default function Login() {
                       y2="40.615"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop offset="0" stop-color="#2aa4f4"></stop>
-                      <stop offset="1" stop-color="#007ad9"></stop>
+                      <stop offset="0" stopColor="#2aa4f4"></stop>
+                      <stop offset="1" stopColor="#007ad9"></stop>
                     </linearGradient>
                     <path
                       fill="url(#Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1)"

@@ -13,9 +13,6 @@ export const router = createBrowserRouter([
     element: <LayoutRoot />,
     children: [
       { path: "/", element: <Index /> },
-      { path: "/about", element: <h1>About</h1> },
-      { path: "/contact", element: <h1>Contact</h1> },
-      //{ path: "/glucoseRegister", element: <GlucoseRegister /> },
       {
         path: "/login",
         element: <Login />,
