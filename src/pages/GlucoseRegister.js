@@ -2,8 +2,10 @@ import React from "react";
 import { useState } from "react";
 import { useUserContext } from "../context/UserContext";
 import { Formik } from "formik";
+import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import emailjs from "@emailjs/browser";
+import { Link } from "react-router-dom";
 
 export default function GlucoseRegister() {
   const { user } = useUserContext();
@@ -16,37 +18,83 @@ export default function GlucoseRegister() {
 
   const [stepForm, setStepForm] = useState(1);
 
-  const sendEmail = async (
-    glucose,
-    insulineType,
-    dose,
-    doseType,
-    water,
-    meditionType,
-    atipicDay,
-    observation
-  ) => {
-    await emailjs.send(
-      "service_gb8sr3f",
-      "template_jt5p6ui",
-      {
-        to_email: user.email,
-        from_name: "Techani",
-        to_name: user.user_metadata.full_name,
-        message: `Glucosa: ${glucose} mg/dl 
-                  Insulina:  ${dose} unidades de Insulina ${insulineType} 
-                  Tipo de dosis: ${doseType}
-                  Tipo de medición: ${meditionType}
-                  Dia atipico: ${atipicDay}
-                  Agua consumida: ${water} vasos de 250ml
-                  Observaciones: ${observation}
-                  `,
-      },
-      "RBjxGi8gd0qdpEToN"
-    );
+  // const sendEmail = async (
+  //   glucose,
+  //   insulineType,
+  //   dose,
+  //   doseType,
+  //   water,
+  //   meditionType,
+  //   atipicDay,
+  //   observation
+  // ) => {
+  //   await emailjs.send(
+  //     "service_gb8sr3f",
+  //     "template_jt5p6ui",
+  //     {
+  //       to_email: user.email,
+  //       from_name: "Techani",
+  //       to_name: user.user_metadata.full_name,
+  //       message: `Glucosa: ${glucose} mg/dl
+  //                 Insulina:  ${dose} unidades de Insulina ${insulineType}
+  //                 Tipo de dosis: ${doseType}
+  //                 Tipo de medición: ${meditionType}
+  //                 Dia atipico: ${atipicDay}
+  //                 Agua consumida: ${water} vasos de 250ml
+  //                 Observaciones: ${observation}
+  //                 `,
+  //     },
+  //     "RBjxGi8gd0qdpEToN"
+  //   );
+  // };
+
+  // const addGlucoseRegister = async (
+  //   glucose,
+  //   insulineType,
+  //   dose,
+  //   doseType,
+  //   water,
+  //   meditionType,
+  //   atipicDay,
+  //   observation
+  // ) => {
+  //   try {
+  //     await supabase.from("registroDiario").insert({
+  //       uid: user.id,
+  //       glucose: glucose,
+  //       dose: dose,
+  //       insulineType: insulineType,
+  //       doseType: doseType,
+  //       water: water,
+  //       meditionType: meditionType,
+  //       atipicDay: atipicDay,
+  //       observation: observation,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const handleStep = () => {
+    setStepForm(stepForm - 1);
+    switch (stepForm) {
+      case 2:
+        setStep1(true);
+        setStep2(true);
+        setStep3(true);
+        break;
+      case 3:
+        setStep1(false);
+        setStep2(true);
+        setStep3(true);
+        break;
+
+      default:
+        break;
+    }
   };
 
-  const onSubmit = (
+  const onSubmit = async (
     {
       glucose,
       insulineType,
@@ -62,37 +110,93 @@ export default function GlucoseRegister() {
   ) => {
     switch (stepForm) {
       case 1:
-        if (glucose < 1) {
+        if (glucose === "") {
           setErrors({ glucose: "Este campo no puede ir vacío" });
+          return;
+        } else if (!/^\d+$/.test(glucose)) {
+          setErrors({ glucose: "Este campo solo admite numeros" });
           return;
         }
         setStepForm(2);
         setStep1(false);
         setStep2(true);
         setStep3(true);
+        setSubmitting(false);
         break;
 
       case 2:
+        if (dose < 1) {
+          setErrors({ dose: "Este campo no puede ir vacío" });
+          return;
+        } else if (!/^\d+$/.test(dose)) {
+          setErrors({ dose: "Este campo solo admite numeros" });
+          return;
+        }
         setStepForm(3);
         setStep1(false);
         setStep2(false);
         setStep3(true);
+        setSubmitting(false);
         break;
 
       case 3:
+        if (water < 1) {
+          setErrors({ water: "Este campo no puede ir vacío" });
+          return;
+        } else if (!/^\d+$/.test(water)) {
+          setErrors({ water: "Este campo solo admite numeros" });
+          return;
+        }
+        setSubmitting(true);
         setStep1(false);
         setStep2(false);
         setStep3(false);
-        sendEmail(
-          glucose,
-          insulineType,
-          dose,
-          doseType,
-          water,
-          meditionType,
-          atipicDay,
-          observation
-        );
+
+        try {
+          await supabase.from("registroDiario").insert({
+            uid: user.id,
+            glucose: glucose,
+            dose: dose,
+            insulineType: insulineType,
+            doseType: doseType,
+            water: water,
+            meditionType: meditionType,
+            atipicDay: atipicDay,
+            observation: observation,
+          });
+
+          await emailjs.send(
+            "service_gb8sr3f",
+            "template_jt5p6ui",
+            {
+              to_email: user.email,
+              from_name: "Techani",
+              to_name: user.user_metadata.full_name,
+              message: `Glucosa: ${glucose} mg/dl
+                  Insulina:  ${dose} unidades de Insulina ${insulineType}
+                  Tipo de dosis: ${doseType}
+                  Tipo de medición: ${meditionType}
+                  Dia atipico: ${atipicDay}
+                  Agua consumida: ${water} vasos de 250ml
+                  Observaciones: ${observation}
+                  `,
+            },
+            "RBjxGi8gd0qdpEToN"
+          );
+          setStepForm(4);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setSubmitting(false);
+        }
+
+        break;
+
+      case 4:
+        setSubmitting(false);
+        setStep1(true);
+        setStep2(true);
+        setStep3(true);
         break;
 
       default:
@@ -107,21 +211,6 @@ export default function GlucoseRegister() {
   const handleLeave = () => {
     setMouseEnter(false);
   };
-
-  // const validationSchema = Yup.object().shape({
-  //   glucose: Yup.number()
-  //     .min(1, "La glucosa no puede ser menor a 0")
-  //     .max(500, "La glucosa no puede ser mayor a 500")
-  //     .required("La glucosa es requerida"),
-  //   dose: Yup.number()
-  //     .min(0, "La dosis no puede ser menor a 0")
-  //     .max(10, "La dosis no puede ser mayor a 10")
-  //     .required("La dosis es requerida"),
-  //   water: Yup.number()
-  //     .min(0, "El agua no puede ser menor a 0")
-  //     .max(10, "El agua no puede ser mayor a 10")
-  //     .required("El agua es requerida"),
-  // });
 
   return (
     <div>
@@ -228,10 +317,9 @@ export default function GlucoseRegister() {
                         siguiente campo.
                       </p>
                       <input
-                        type="number"
+                        type="text"
                         name="glucose"
-                        min={1}
-                        max={500}
+                        autoComplete="off"
                         onChange={handleChange}
                         onBlur={handleBlur}
                         value={values.glucose}
@@ -301,8 +389,13 @@ export default function GlucoseRegister() {
                       </label>
 
                       <input
-                        className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        type="number"
+                        className={
+                          errors.dose
+                            ? "bg-gray-50 mb-2 border border-red-500  text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                            : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                        }
+                        type="text"
+                        autoComplete="off"
                         placeholder="Ingresa la cantidad de insulina en unidades"
                         name="dose"
                         onChange={handleChange}
@@ -311,6 +404,9 @@ export default function GlucoseRegister() {
                         min={1}
                         max={10}
                       ></input>
+                      <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.dose && touched.dose && errors.dose}
+                      </p>
 
                       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Tipo de dosis
@@ -356,32 +452,60 @@ export default function GlucoseRegister() {
                         </option>
                         <option value="Nocturna">Nocturna</option>
                       </select>
-                      <button
-                        className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
-                        type="submit"
-                        onMouseEnter={handleEnter}
-                        onMouseLeave={handleLeave}
-                      >
-                        Siguiente
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class={
-                            mouseEnter
-                              ? "ml-3 w-4 h-4 translate-x-1 duration-300 ease-out"
-                              : "ml-3 w-4 h-4 duration-300 ease-out"
-                          }
+                      <div className=" flex justify-between">
+                        <button
+                          onMouseEnter={handleEnter}
+                          onMouseLeave={handleLeave}
+                          onClick={handleStep}
+                          className="flex items-center justify-between bg-gray-400 transition duration-300 ease-out hover:ease-out hover:bg-gray-500  px-7 py-1 rounded-lg text-white"
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                          />
-                        </svg>
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            className={
+                              mouseEnter
+                                ? "rotate-180 mr-3 w-4 h-4 -translate-x-1 duration-300 ease-out"
+                                : "rotate-180 mr-3 w-4 h-4 duration-300 ease-out"
+                            }
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                            />
+                          </svg>
+                          Regresar
+                        </button>
+                        <button
+                          className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
+                          type="submit"
+                          onMouseEnter={handleEnter}
+                          onMouseLeave={handleLeave}
+                        >
+                          Siguiente
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class={
+                              mouseEnter
+                                ? "ml-3 w-4 h-4 translate-x-1 duration-300 ease-out"
+                                : "ml-3 w-4 h-4 duration-300 ease-out"
+                            }
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   )}
                   {stepForm === 3 && (
@@ -413,8 +537,13 @@ export default function GlucoseRegister() {
                       </label>
 
                       <input
-                        className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        type="number"
+                        className={
+                          errors.water
+                            ? "bg-gray-50 mb-2 border border-red-500  text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                            : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                        }
+                        type="text"
+                        autoComplete="off"
                         name="water"
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -423,6 +552,10 @@ export default function GlucoseRegister() {
                         min={1}
                         max={10}
                       ></input>
+
+                      <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.water && touched.water && errors.water}
+                      </p>
 
                       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Observaciones
@@ -435,12 +568,86 @@ export default function GlucoseRegister() {
                         name="observation"
                         className="bg-gray-50 mb-5 h-32 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   resize-none"
                       ></textarea>
-                      <button
-                        type="submit"
-                        className="bg-azulFondo transition duration-300 ease-out hover:ease-out  px-7 py-1 rounded-lg text-white"
-                      >
-                        Registrar
-                      </button>
+                      <div className=" flex justify-between">
+                        <button
+                          onMouseEnter={handleEnter}
+                          onMouseLeave={handleLeave}
+                          onClick={handleStep}
+                          className="flex items-center justify-between bg-gray-400 transition duration-300 ease-out hover:ease-out hover:bg-gray-500  px-7 py-1 rounded-lg text-white"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            className={
+                              mouseEnter
+                                ? "rotate-180 mr-3 w-4 h-4 -translate-x-1 duration-300 ease-out"
+                                : "rotate-180 mr-3 w-4 h-4 duration-300 ease-out"
+                            }
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                            />
+                          </svg>
+                          Regresar
+                        </button>
+                        {isSubmitting ? (
+                          <button
+                            disabled={true}
+                            type="button"
+                            className="text-white disabled:opacity-55 bg-blue-700 font-medium rounded-lg text-sm px-7 py-2 text-center me-2 flex items-center"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              role="status"
+                              class="inline w-4 h-4 me-3 text-white animate-spin"
+                              viewBox="0 0 100 101"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="#E5E7EB"
+                              />
+                              <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentColor"
+                              />
+                            </svg>
+                            Guardando...
+                          </button>
+                        ) : (
+                          <button
+                            type="submit"
+                            className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
+                          >
+                            Guardar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {stepForm === 4 && (
+                    <div
+                      class="flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
+                      role="alert"
+                    >
+                      <span className="sr-only">Info</span>
+                      <div className="text-green-400">
+                        <span class="font-medium ">Felicidades! </span>
+                        Se ha registrado tu medición de glucosa correctamente.{" "}
+                        <br />
+                        Para consultar tus registros ve a la sección de{" "}
+                        <span className="font-medium">"Mis registros"</span> o
+                        haciendo click aqui:{" "}
+                        <Link to={"/my-records"} className="text-blue-500">
+                          Mis registros
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </form>

@@ -144,7 +144,7 @@ export default function SideBar() {
                 />
               </svg>
 
-              <span className="ml-3">Ver Registros</span>
+              <span className="ml-3">Mis Registros</span>
             </Link>
           </div>
         </div>
