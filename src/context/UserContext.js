@@ -4,7 +4,7 @@ import { supabase } from "../config/supabase";
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {

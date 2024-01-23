@@ -1,15 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useUserContext } from "../context/UserContext";
+import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 
 import "../dist/output.css";
 import SideBar from "../components/SideBar";
 
 export default function Main() {
-  const navigate = useNavigate();
-  const { user } = useUserContext();
   const [data] = useState({
     series: [
       {
@@ -146,12 +142,6 @@ export default function Main() {
       ],
     },
   });
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   return (
     <div className="w-full h-screen">

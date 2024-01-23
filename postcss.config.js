@@ -1,5 +1,3 @@
-/** @type {import('tailwindcss').Config} */
-
 module.exports = {
   content: [
     "./src/**/*.{html,js}",
@@ -7,7 +5,7 @@ module.exports = {
     "./src/pages/Login.js",
     "./src/components/Sidebar.js",
     "./src/pages/GlucoseRegister.js",
-    "./node_modules/flowbite-react/lib/esm/**/*.js",
+    "node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
     extend: {
@@ -21,7 +19,6 @@ module.exports = {
         amarillo: "#FFE08C",
         fondoGris: "#F6F6F6",
         azulFondo: "#18578B",
-        azulHover: "#2B8EDE",
       },
     },
   },

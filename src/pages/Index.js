@@ -46,9 +46,9 @@ export default function Index() {
               </Link>
             </li>
             <li>
-              <a href="login.php">
+              <Link to={"/login"}>
                 <img src={perfil} alt="" width="60" height="" />
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
