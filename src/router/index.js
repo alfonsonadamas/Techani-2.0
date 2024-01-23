@@ -6,6 +6,8 @@ import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
 import GlucoseRegister from "../pages/GlucoseRegister";
+import AllGlucoseRegister from "../pages/AllGlucoseRegister";
+import SignUp from "../pages/SignUp";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +20,10 @@ export const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: "/signup",
+        element: <SignUp />,
+      },
+      {
         path: "/dashboard",
         element: <LayoutPrivate />,
         children: [
@@ -27,6 +33,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
+
       {
         path: "*",
         element: <h1>Not Found</h1>,
@@ -38,6 +45,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <GlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/myRecords",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AllGlucoseRegister />,
           },
         ],
       },
