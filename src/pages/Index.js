@@ -90,9 +90,9 @@ const Index = () => {
               </Link>
             </li>
             <li>
-              <a href="login.php">
+              <Link to={"/login"}>
                 <img src={perfil} alt="" width="60" height="" />
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -112,19 +112,21 @@ const Index = () => {
               una experiencia integral en el control y monitoreo de la diabetes
               tipo 1 y 2.
             </p>
+
             <div className="flex flex-col justify-around sm:flex sm:flex-row mt-10">
-              <a
+              <Link
+                to={"/"}
                 className="bg-azulFondo mb-[7px] sm:mb-0 lg:mr-[7px] text-center transition duration-300 ease-out hover:ease-out hover:bg-azulSecundario hover:shadow-2xl  px-7 py-1 rounded-lg text-white"
-                href="registroCorreo.php"
               >
                 Registrarse
-              </a>
-              <a
+              </Link>
+
+              <Link
+                to={"/login"}
                 className="bg-azulFondo transition text-center duration-300 ease-out hover:ease-out hover:bg-azulSecundario hover:shadow-2xl  px-7 py-1 rounded-lg text-white"
-                href="login.php"
               >
                 Iniciar Sesión
-              </a>
+              </Link>
             </div>
           </div>
         </div>

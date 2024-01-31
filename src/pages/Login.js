@@ -10,11 +10,13 @@ import fondo from "../assets/img/fondo-login.jpg";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setloading] = useState(false);
   const navigate = useNavigate();
   const { user } = useUserContext();
 
   const userLogin = async (e) => {
     e.preventDefault();
+    setloading(true);
     try {
       const user = await supabase.auth.signInWithPassword({
         email,
@@ -31,27 +33,35 @@ export default function Login() {
 
   const handleLoginGoogle = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-    navigate("/dashboard");
-    console.log(data, error);
+    setloading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+      });
+      console.log(data, error);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "facebook",
-    });
-    navigate("/dashboard");
-    console.log(data, error);
+    setloading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+      });
+      console.log(data, error);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
-  }, [navigate, user]);
+  }, [user, navigate]);
   return (
     <div
       className="h-screen bg-cover bg-center"
