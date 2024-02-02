@@ -29,7 +29,7 @@ function ExerciseForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Aquí puedes enviar los datos a tu backend 
+    // enviar los datos a  backend 
     console.log('Día:', day);
     console.log('Actividad:', activity);
     console.log('Tiempo:', time);
@@ -38,66 +38,49 @@ function ExerciseForm() {
 
   return (
     <div>
-        <SideBar />
-        <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-    <div className="flex justify-center ...">
+      <SideBar />
+      <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Registro de Ejercicio
+        </label>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="day" className="block mb-1">Día de la semana:</label>
+            <select id="day" value={day} onChange={handleDayChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <option value="">Selecciona un día</option>
+              <option value="Lunes">Lunes</option>
+              <option value="Martes">Martes</option>
+              <option value="Miércoles">Miércoles</option>
+              <option value="Jueves">Jueves</option>
+              <option value="Viernes">Viernes</option>
+              <option value="Sábado">Sábado</option>
+              <option value="Domingo">Domingo</option>
+            </select>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="activity" className="block mb-1">Actividad a realizar:</label>
+            <input type="text" id="activity" value={activity} onChange={handleActivityChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="exerciseTime" className="block mb-1">¿Cuánto tiempo dedicaste al ejercicio?</label>
+            <input type="text" id="exerciseTime" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Escribe el tiempo aquí..." value={exerciseTime} onChange={(e) => setExerciseTime(e.target.value)} />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="weight" className="block mb-1">¿Levantaste peso? (Cantidad o No)</label>
+            <input type="text" id="weight" value={weight} onChange={handleWeightChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+          </div>
+          <button type="submit" className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 mt-4 w-full">
+            Guardar
+          </button>
+        </form>
+        <Link to="/registros-anteriores" className="block text-center mt-4 text-blue-500">
+          Ver registros anteriores
+        </Link>
+      </div>
   
-    <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md mt-56 md:mt-75"> 
-      <h1 className="text-3xl font-bold mb-8 text-center mt-32 md:mt-64">Registro de Ejercicio</h1> 
-    <form onSubmit={handleSubmit}>
-    <div className="mb-4">
-          <label htmlFor="day" className="block mb-1">Día de la semana:</label>
-          <select id="day" value={day} onChange={handleDayChange} className="border rounded-md px-3 py-2 w-full">
-            <option value="">Selecciona un día</option>
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Miércoles">Miércoles</option>
-            <option value="Miércoles">Jueves</option>
-            <option value="Miércoles">Viernes</option>
-            <option value="Miércoles">Sabado</option>
-            <option value="Miércoles">Domingo</option>
-          </select>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="activity" className="block mb-1">Actividad a realizar:</label>
-          <input type="text" id="activity" value={activity} onChange={handleActivityChange} className="border rounded-md px-3 py-2 w-full" />
-        </div>
-
-
-        <div className="mb-4">
-      <label htmlFor="exerciseTime" className="block mb-1">
-        ¿Cuánto tiempo dedicaste al ejercicio?
-      </label>
-      <input
-        type="text"
-        id="exerciseTime"
-        className="border rounded-md px-3 py-2"
-        placeholder="Escribe el tiempo aquí..."
-        value={exerciseTime}
-        onChange={(e) => setExerciseTime(e.target.value)}
-      />
     </div>
-
-
-
-        <div className="mb-4">
-          <label htmlFor="weight" className="block mb-1">¿Levantaste peso? (Cantidad o No)</label>
-          <input type="text" id="weight" value={weight} onChange={handleWeightChange} className="border rounded-md px-3 py-2 w-full" />
-        </div>
-      <button type="submit" className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800 mt-4 w-full">
-        Guardar
-      </button>
-    </form>
-    <Link to="/registros-anteriores" className="block text-center mt-4 text-blue-500">
-      Ver registros anteriores
-    </Link>
-  </div>
-  
-</div>
-</div>
-    </div>
-    
   );
+  
 }
 
 export default ExerciseForm;
