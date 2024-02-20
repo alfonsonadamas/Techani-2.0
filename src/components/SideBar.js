@@ -9,11 +9,13 @@ export default function SideBar() {
   const { user } = useUserContext();
   const [isHidden, setIsHidden] = useState(true);
   const [name, setName] = useState("");
+  const [picture, setPicture] = useState("");
 
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       navigate("/login");
+      setPicture("");
       console.log(error);
     } catch (error) {
       console.log(error);
@@ -26,6 +28,14 @@ export default function SideBar() {
 
   useEffect(() => {
     if (user) {
+      if (user.user_metadata.avatar_url) {
+        setPicture(user.user_metadata.avatar_url);
+      } else {
+        setPicture(
+          "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
+        );
+      }
+
       setName(user.user_metadata.full_name);
     }
   }, [user]);
@@ -33,8 +43,8 @@ export default function SideBar() {
     <div>
       <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 ">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center justify-start rtl:justify-end">
+          <div className=" flex items-center justify-between">
+            <div className="  flex items-center justify-start rtl:justify-end">
               <Link to={"/dashboard"} className="flex ms-2 md:me-24">
                 <img src={Logo} alt="techanilogo" className="h-10 me-3" />
                 <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
@@ -43,10 +53,19 @@ export default function SideBar() {
               </Link>
               <h2 className="hidden sm:block">Bienvenido, {name}</h2>
             </div>
+            <Link to={"/profile"}>
+              <img
+                className="rounded-full"
+                src={picture}
+                alt="perfil"
+                width={40}
+              />
+            </Link>
           </div>
         </div>
       </nav>
       <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[250px] overflow-y-auto text-center border-r border-gray-200">
+        {/* Aqui empieza el menu desplegable */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg
             className="w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -148,6 +167,7 @@ export default function SideBar() {
             </Link>
           </div>
         </div>
+        {/* Aqui acaba */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"

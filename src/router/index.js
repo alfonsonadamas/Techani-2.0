@@ -8,6 +8,8 @@ import Index from "../pages/Index";
 import GlucoseRegister from "../pages/GlucoseRegister";
 import AllGlucoseRegister from "../pages/AllGlucoseRegister";
 import SignUp from "../pages/SignUp";
+import Profile from "../pages/Profile";
+import Food from "../pages/Food";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +57,26 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AllGlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/profile",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Profile />,
+          },
+        ],
+      },
+      {
+        path: "/food",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Food />,
           },
         ],
       },
