@@ -167,7 +167,7 @@ export default function GlucoseRegister() {
           //     },
           //     "RBjxGi8gd0qdpEToN"
           //   );
-          //   setStepForm(4);
+          setStepForm(4);
         } catch (error) {
           console.log(error);
         } finally {
@@ -512,7 +512,7 @@ export default function GlucoseRegister() {
                         <option value="Otro">Otro...</option>
                       </select>
 
-                      {values.atipicDay === "otro" && (
+                      {values.atipicDay === "Otro" && (
                         <input
                           type="text"
                           name="otherAtipicDay"
@@ -651,7 +651,7 @@ export default function GlucoseRegister() {
                         Para consultar tus registros ve a la sección de{" "}
                         <span className="font-medium">"Mis registros"</span> o
                         haciendo click aqui:{" "}
-                        <Link to={"/my-records"} className="text-blue-500">
+                        <Link to={"/myRecords"} className="text-blue-500">
                           Mis registros
                         </Link>
                       </div>
