@@ -12,68 +12,13 @@ export default function GlucoseRegister() {
 
   const [mouseEnter, setMouseEnter] = useState(false);
 
+  const [caracteres, setCaracteres] = useState(200);
+
   const [step1, setStep1] = useState(true);
   const [step2, setStep2] = useState(true);
   const [step3, setStep3] = useState(true);
 
   const [stepForm, setStepForm] = useState(1);
-
-  // const sendEmail = async (
-  //   glucose,
-  //   insulineType,
-  //   dose,
-  //   doseType,
-  //   water,
-  //   meditionType,
-  //   atipicDay,
-  //   observation
-  // ) => {
-  //   await emailjs.send(
-  //     "service_gb8sr3f",
-  //     "template_jt5p6ui",
-  //     {
-  //       to_email: user.email,
-  //       from_name: "Techani",
-  //       to_name: user.user_metadata.full_name,
-  //       message: `Glucosa: ${glucose} mg/dl
-  //                 Insulina:  ${dose} unidades de Insulina ${insulineType}
-  //                 Tipo de dosis: ${doseType}
-  //                 Tipo de medición: ${meditionType}
-  //                 Dia atipico: ${atipicDay}
-  //                 Agua consumida: ${water} vasos de 250ml
-  //                 Observaciones: ${observation}
-  //                 `,
-  //     },
-  //     "RBjxGi8gd0qdpEToN"
-  //   );
-  // };
-
-  // const addGlucoseRegister = async (
-  //   glucose,
-  //   insulineType,
-  //   dose,
-  //   doseType,
-  //   water,
-  //   meditionType,
-  //   atipicDay,
-  //   observation
-  // ) => {
-  //   try {
-  //     await supabase.from("registroDiario").insert({
-  //       uid: user.id,
-  //       glucose: glucose,
-  //       dose: dose,
-  //       insulineType: insulineType,
-  //       doseType: doseType,
-  //       water: water,
-  //       meditionType: meditionType,
-  //       atipicDay: atipicDay,
-  //       observation: observation,
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const handleStep = () => {
     setStepForm(stepForm - 1);
@@ -94,6 +39,18 @@ export default function GlucoseRegister() {
     }
   };
 
+  const handleCount = () => {
+    const textArea = document.getElementById("textArea");
+    const maxLength = textArea.getAttribute("maxlength");
+    const currentLength = textArea.value.length;
+
+    if (currentLength >= maxLength) {
+      setCaracteres(0);
+    } else {
+      setCaracteres(maxLength - currentLength);
+    }
+  };
+
   const onSubmit = async (
     {
       glucose,
@@ -103,6 +60,7 @@ export default function GlucoseRegister() {
       water,
       meditionType,
       atipicDay,
+      otherAtipicDay,
       observation,
     },
 
@@ -125,7 +83,7 @@ export default function GlucoseRegister() {
         break;
 
       case 2:
-        if (dose < 1) {
+        if (dose === "") {
           setErrors({ dose: "Este campo no puede ir vacío" });
           return;
         } else if (!/^\d+$/.test(dose)) {
@@ -140,6 +98,11 @@ export default function GlucoseRegister() {
         break;
 
       case 3:
+        if (atipicDay === "Otro" && otherAtipicDay === "") {
+          setErrors({ otherAtipicDay: "Este campo no puede ir vacío" });
+          console.log(atipicDay);
+          return;
+        }
         if (water < 1) {
           setErrors({ water: "Este campo no puede ir vacío" });
           return;
@@ -151,38 +114,59 @@ export default function GlucoseRegister() {
         setStep1(false);
         setStep2(false);
         setStep3(false);
+        const fecha = new Date();
+        const año = fecha.getFullYear();
+        const mes = fecha.getMonth() + 1;
+        const dia = fecha.getDate();
+        const fechaActual = `${año}-${mes < 10 ? "0" : ""}${mes}-${dia}`;
 
         try {
-          await supabase.from("registroDiario").insert({
-            uid: user.id,
-            glucose: glucose,
-            dose: dose,
-            insulineType: insulineType,
-            doseType: doseType,
-            water: water,
-            meditionType: meditionType,
-            atipicDay: atipicDay,
-            observation: observation,
-          });
+          if (atipicDay !== "otro") {
+            await supabase.from("registroDiario").insert({
+              uid: user.id,
+              glucose: glucose,
+              dose: dose,
+              insulineType: insulineType,
+              doseType: doseType,
+              water: water,
+              meditionType: meditionType,
+              atipicDay: atipicDay,
+              observation: observation,
+              created_at: fechaActual,
+            });
+          } else {
+            await supabase.from("registroDiario").insert({
+              uid: user.id,
+              glucose: glucose,
+              dose: dose,
+              insulineType: insulineType,
+              doseType: doseType,
+              water: water,
+              meditionType: meditionType,
+              atipicDay: otherAtipicDay,
+              observation: observation,
+              created_at: fechaActual,
+            });
+          }
 
-          await emailjs.send(
-            "service_gb8sr3f",
-            "template_jt5p6ui",
-            {
-              to_email: user.email,
-              from_name: "Techani",
-              to_name: user.user_metadata.full_name,
-              message: `Glucosa: ${glucose} mg/dl
-                  Insulina:  ${dose} unidades de Insulina ${insulineType}
-                  Tipo de dosis: ${doseType}
-                  Tipo de medición: ${meditionType}
-                  Dia atipico: ${atipicDay}
-                  Agua consumida: ${water} vasos de 250ml
-                  Observaciones: ${observation}
-                  `,
-            },
-            "RBjxGi8gd0qdpEToN"
-          );
+          //   await emailjs.send(
+          //     "service_gb8sr3f",
+          //     "template_jt5p6ui",
+          //     {
+          //       to_email: user.email,
+          //       from_name: "Techani",
+          //       to_name: user.user_metadata.full_name,
+          //       message: `Glucosa: ${glucose} mg/dl
+          //            Insulina:  ${dose} unidades de Insulina ${insulineType}
+          //            Tipo de dosis: ${doseType}
+          //            Tipo de medición: ${meditionType}
+          //            Dia atipico: ${atipicDay}
+          //            Agua consumida: ${water} vasos de 250ml
+          //            Observaciones: ${observation}
+          //            `,
+          //     },
+          //     "RBjxGi8gd0qdpEToN"
+          //   );
           setStepForm(4);
         } catch (error) {
           console.log(error);
@@ -291,8 +275,9 @@ export default function GlucoseRegister() {
                 doseType: "Para Alimentos",
                 water: "",
                 meditionType: "Prepandrial - Desayuno",
-                atipicDay: "ninguno",
+                atipicDay: "Ninguno",
                 observation: "",
+                otherAtipicDay: "",
               }}
               onSubmit={onSubmit}
               // validationSchema={validationSchema}
@@ -322,7 +307,6 @@ export default function GlucoseRegister() {
                         autoComplete="off"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.glucose}
                         aria-describedby="helper-text-explanation"
                         className={
                           errors.glucose
@@ -377,7 +361,6 @@ export default function GlucoseRegister() {
                       <select
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.insulineType}
                         className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
                         <option value="Lenta">Lenta</option>
@@ -400,7 +383,6 @@ export default function GlucoseRegister() {
                         name="dose"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.dose}
                         min={1}
                         max={10}
                       ></input>
@@ -415,7 +397,6 @@ export default function GlucoseRegister() {
                       <select
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.doseType}
                         className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
                         <option value="Para Alimentos">Para Alimentos</option>
@@ -429,7 +410,6 @@ export default function GlucoseRegister() {
                       <select
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.meditionType}
                         className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
                         <option value="Prepandrial - Desayuno">
@@ -509,7 +489,7 @@ export default function GlucoseRegister() {
                     </div>
                   )}
                   {stepForm === 3 && (
-                    <div>
+                    <div className="pt-28">
                       <p className="mt-52 mb-4 text-sm text-gray-900 dark:text-white w-full">
                         Por ultimo es necesario que registres la cantidad de
                         agua y como te sentiste en el dia asi como algunas
@@ -521,16 +501,38 @@ export default function GlucoseRegister() {
                       <select
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.atipicDay}
+                        name="atipicDay"
                         className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       >
-                        <option value="ninguno">Ninguno</option>
-                        <option value="menstruacion">Menstruación</option>
-                        <option value="vacuna">Vacuna</option>
-                        <option value="enfermedad">Enfermedad</option>
-                        <option value="examen">Examen</option>
-                        <option value="otro">Otro...</option>
+                        <option value="Ninguno">Ninguno</option>
+                        <option value="Menstruacion">Menstruación</option>
+                        <option value="Vacuna">Vacuna</option>
+                        <option value="Enfermedad">Enfermedad</option>
+                        <option value="Examen">Examen</option>
+                        <option value="Otro">Otro...</option>
                       </select>
+
+                      {values.atipicDay === "Otro" && (
+                        <input
+                          type="text"
+                          name="otherAtipicDay"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          autoComplete="off"
+                          aria-describedby="helper-text-explanation"
+                          className={
+                            errors.otherAtipicDay
+                              ? "bg-gray-50 mb-2 border border-red-500  text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                              : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                          }
+                          placeholder="Ingresa el motivo de tu dia atipico aquí"
+                        />
+                      )}
+                      <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.otherAtipicDay &&
+                          touched.otherAtipicDay &&
+                          errors.otherAtipicDay}
+                      </p>
 
                       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Agua consumida en vasos de 250ml
@@ -547,7 +549,6 @@ export default function GlucoseRegister() {
                         name="water"
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        value={values.water}
                         placeholder="Ingresa la cantidad de agua consumida en vasos de 250ml"
                         min={1}
                         max={10}
@@ -564,16 +565,22 @@ export default function GlucoseRegister() {
                       <textarea
                         onChange={handleChange}
                         onBlur={handleBlur}
+                        onInput={handleCount}
                         value={values.observation}
+                        id="textArea"
+                        maxLength="200"
+                        placeholder="Ingresa tus observaciones aquí"
                         name="observation"
-                        className="bg-gray-50 mb-5 h-32 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   resize-none"
+                        className="bg-gray-50 mb-2 h-32 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   resize-none"
                       ></textarea>
+                      <p className="mb-5">Caracteres restantes: {caracteres}</p>
                       <div className=" flex justify-between">
                         <button
                           onMouseEnter={handleEnter}
                           onMouseLeave={handleLeave}
                           onClick={handleStep}
-                          className="flex items-center justify-between bg-gray-400 transition duration-300 ease-out hover:ease-out hover:bg-gray-500  px-7 py-1 rounded-lg text-white"
+                          disabled={isSubmitting}
+                          className="flex disabled:opacity-30 items-center justify-between bg-gray-400 transition duration-300 ease-out hover:ease-out hover:bg-gray-500  px-7 py-1 rounded-lg text-white"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -644,7 +651,7 @@ export default function GlucoseRegister() {
                         Para consultar tus registros ve a la sección de{" "}
                         <span className="font-medium">"Mis registros"</span> o
                         haciendo click aqui:{" "}
-                        <Link to={"/my-records"} className="text-blue-500">
+                        <Link to={"/myRecords"} className="text-blue-500">
                           Mis registros
                         </Link>
                       </div>
