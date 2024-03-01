@@ -121,12 +121,12 @@ export default function PdfGlucose({ datos }) {
             {doseType}.{" "}
             {atipicDay === "Ninguno"
               ? "No tuvo un día atípico"
-              : `Las mediciones se pueden ver afectadas por el siguiente
-            dia atipico: {atipicDay}`}
+              : "Las mediciones se pueden ver afectadas por el siguiente dia atipico: " +
+                atipicDay}
             . Se registró una ingesta de
-            {water} {water === 1 ? "vaso" : "vasos"} de agua como parte integral
-            del control. Cualquier observación adicional señalada incluye:{" "}
-            {observation !== "" ? `{observation}` : "Ninguna"}.
+            {water} {water === 1 ? " vaso" : " vasos"} de agua como parte
+            integral del control. Cualquier observación adicional señalada
+            incluye: {observation !== "" ? observation : "Ninguna"}.
           </Text>
           <Text style={styles.textoDatos}>
             Este análisis detallado del registro diario de glucosa en sangre se
