@@ -14,6 +14,7 @@ import Alimentos from "../pages/Alimentos";
 import Ejercicio from "../pages/Ejercicio";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
+import MyDates from "../pages/MyDates";
 
 export const router = createBrowserRouter([
   {
@@ -111,6 +112,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Citas />,
+          },
+        ],
+      },
+      {
+        path: "/myDates",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyDates />,
           },
         ],
       },

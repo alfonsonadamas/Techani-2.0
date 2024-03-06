@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import SideBar from '../components/SideBar';
 
+
 function Citas() {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [appointmentType, setAppointmentType] = useState('');
   const [location, setLocation] = useState('');
   const [citas, setCitas] = useState([]); // Aquí inicializamos citas como un array vacío
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -88,9 +90,26 @@ function Citas() {
         onChange={(e) => setLocation(e.target.value)}
       />
     </div>
+
+    <div className="mb-4">
+      <label htmlFor="location" className="block mb-1">
+        Nombre del Doctor:
+      </label>
+      <input
+        type="text"
+        id="location"
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+      />
+    </div>
+
     <button type="submit" className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800">Guardar Cita</button>
   </form>
 </div>
+
+
+
 </div>
     
   );
