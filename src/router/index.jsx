@@ -11,9 +11,14 @@ import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
-import Ejercicio from "../pages/Ejercicio";
+import Exercise from "../pages/Exercise";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
+import Activities from "../pages/Activities";
+import GlucoseRegisterMain from "../pages/DailyRecord";
+import InsulineRegister from "../pages/InsulineRegister";
+import WaterRegister from "../pages/WaterRegister";
+import AtipicDay from "../pages/AtipicDayRegister";
 
 export const router = createBrowserRouter([
   {
@@ -95,12 +100,12 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/ejercicio",
+        path: "/exercise",
         element: <LayoutPrivate />,
         children: [
           {
             index: true,
-            element: <Ejercicio />,
+            element: <Exercise />,
           },
         ],
       },
@@ -121,6 +126,51 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Estados />,
+          },
+        ],
+      },
+      {
+        path: "/newActivitie",
+        children: [
+          {
+            index: true,
+            element: <Activities />,
+          },
+        ],
+      },
+      {
+        path: "/dailyRecord",
+        children: [
+          {
+            index: true,
+            element: <GlucoseRegisterMain />,
+          },
+        ],
+      },
+      {
+        path: "/insulineRegister",
+        children: [
+          {
+            index: true,
+            element: <InsulineRegister />,
+          },
+        ],
+      },
+      {
+        path: "/waterRegister",
+        children: [
+          {
+            index: true,
+            element: <WaterRegister />,
+          },
+        ],
+      },
+      {
+        path: "/atipicDayRegister",
+        children: [
+          {
+            index: true,
+            element: <AtipicDay />,
           },
         ],
       },
