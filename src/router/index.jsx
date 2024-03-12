@@ -11,6 +11,9 @@ import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
+import AlimentosRegister from "../pages/AllAlimentosRegister";
+import AlimentosView from "../pages/AlimentosView";
+
 import Ejercicio from "../pages/Ejercicio";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
@@ -94,6 +97,26 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/AlimentosRegister",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/AlimentosView",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AlimentosView />,
+          },
+        ],
+      },
       {
         path: "/ejercicio",
         element: <LayoutPrivate />,

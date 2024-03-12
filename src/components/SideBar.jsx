@@ -239,7 +239,7 @@ export default function SideBar() {
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
             <Link
-              to={"/glucoseRegister"}
+              to={"/AlimentosRegister"}
               className="flex items-center cursor-pointer p-2 "
             >
               <img
