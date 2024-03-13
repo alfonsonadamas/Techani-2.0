@@ -9,7 +9,7 @@ function MyDates({ citas }) {
       <ul>
         {Array.isArray(citas) && citas.map((cita, index) => (
           <li key={index}>
-            {/* Aquí puedes mostrar cada cita */}
+            
             <p>Fecha: {cita.date}</p>
             <p>Hora: {cita.time}</p>
             <p>Tipo de cita: {cita.appointmentType}</p>
