@@ -3,11 +3,36 @@ import SideBar from '../components/SideBar';
 import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import * as Yup from "yup";
+import { useUserContext } from '../context/UserContext';
 
 
 function Citas() {
   // Aquí inicializamos citas como un array vacío
-  const handleFormSubmit = () => {
+  const {user} = useUserContext();
+  const handleFormSubmit = async ({ date,
+  time,
+  appointmentType,
+  location,
+  doctorName },
+    { setSubmitting, setErrors, resetForm }) => {
+
+
+      try {
+        setSubmitting(true)
+        const {data,error} = await supabase.from("citasMedicas").insert([{
+          typecites:appointmentType, 
+          date:date,
+          time:time,
+          place:location,
+          doctorName:doctorName,
+          uid:user.id
+        }]) 
+        console.log(data,error)
+      } catch (error) {
+        console.log(error)
+      }finally{
+        setSubmitting(false)
+      }
   };
 
   const validationSchema = Yup.object().shape({
@@ -35,7 +60,6 @@ function Citas() {
           time: "",
           appointmentType: "",
           location: "",
-          citas: "",
           doctorName: "",
         }}
   onSubmit={handleFormSubmit}
