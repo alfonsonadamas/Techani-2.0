@@ -6,7 +6,7 @@ export default function NavRegsitro(props) {
   const { data } = props;
   return (
     <div>
-      <div className="flex justify-between items-center px-20 py-3">
+      <div className="flex justify-between items-center px-20  py-3">
         <img src={TechaniLogo} alt="techaniLogo" width="80px" height="80px" />
         <Link
           to={data === "login" ? "/signup" : "/login"}
