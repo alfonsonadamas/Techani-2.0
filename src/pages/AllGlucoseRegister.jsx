@@ -32,79 +32,6 @@ export default function AllGlucoseRegister() {
     }
   };
 
-  const getRecords = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("registroGlucosa")
-        .select("id, created_at, glucosa, medicion(measurement)")
-        .eq("uid", user.id);
-
-      console.log(data);
-
-      if (error) throw error;
-      setRecords(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRecordsInsuline = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("registroInsulina")
-        .select(
-          "id, created_at, dosis, tipoInsulina(insulin), tipoDosis(tipoDosis)"
-        )
-        .eq("uid", user.id);
-
-      if (error) throw error;
-      setInsulineRecords(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRecordsAtipicDay = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("registroDiaAtipico")
-        .select("id, created_at, diaAtipico(typeDay)")
-        .eq("uid", user.id);
-
-      if (error) throw error;
-      setAtipicDayRecords(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRecordsWater = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("registroAgua")
-        .select("created_at, agua")
-        .eq("uid", user.id);
-
-      if (error) throw error;
-      console.log("Agua: ", data);
-      setWaterRecords(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDate1 = (e) => {
     const date = e.target.value;
     var parts = date.split("-");
@@ -179,11 +106,83 @@ export default function AllGlucoseRegister() {
 
   useEffect(() => {
     getMicroService();
+    const getRecords = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("registroGlucosa")
+          .select("id, created_at, glucosa, medicion(measurement)")
+          .eq("uid", user.id);
+
+        console.log(data);
+
+        if (error) throw error;
+        setRecords(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const getRecordsInsuline = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("registroInsulina")
+          .select(
+            "id, created_at, dosis, tipoInsulina(insulin), tipoDosis(tipoDosis)"
+          )
+          .eq("uid", user.id);
+
+        if (error) throw error;
+        setInsulineRecords(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const getRecordsAtipicDay = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("registroDiaAtipico")
+          .select("id, created_at, diaAtipico(typeDay)")
+          .eq("uid", user.id);
+
+        if (error) throw error;
+        setAtipicDayRecords(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const getRecordsWater = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("registroAgua")
+          .select("created_at, agua")
+          .eq("uid", user.id);
+
+        if (error) throw error;
+        console.log("Agua: ", data);
+        setWaterRecords(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getRecordsAtipicDay();
     getRecords();
     getRecordsInsuline();
-    getRecordsAtipicDay();
     getRecordsWater();
-  }, []);
+  }, [user.id]);
 
   return (
     <div>
