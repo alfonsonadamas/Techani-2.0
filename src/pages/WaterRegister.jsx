@@ -3,7 +3,6 @@ import { useUserContext } from "../context/UserContext";
 import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
-import emailjs from "@emailjs/browser";
 import * as Yup from "yup";
 
 export default function WaterRegister() {
@@ -13,8 +12,18 @@ export default function WaterRegister() {
     { water },
     { setSubmitting, setErrors, resetForm }
   ) => {
+    setSubmitting(true);
+    const date = new Date().toLocaleDateString();
+
+    var parts = date.split("/");
+    var year = parts[2];
+    var month = parts[1];
+    var day = parts[0];
+    var formatDate = `${year}-${month}-${day}`;
+
     const { data, error } = await supabase.from("registroAgua").insert([
       {
+        created_at: formatDate,
         agua: water,
         uid: user.id,
       },
@@ -22,20 +31,6 @@ export default function WaterRegister() {
 
     if (error) throw error;
     console.log(data);
-
-    await emailjs.send(
-      "service_gb8sr3f",
-      "template_jt5p6ui",
-      {
-        to_email: user.email,
-        from_name: "Techani",
-        to_name: user.user_metadata.full_name,
-        message: `
-        Agua consumida: ${water} vasos de 250ml
-            `,
-      },
-      "RBjxGi8gd0qdpEToN"
-    );
   };
 
   const validationSchema = Yup.object().shape({

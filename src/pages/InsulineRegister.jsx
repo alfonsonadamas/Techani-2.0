@@ -37,8 +37,15 @@ export default function InsulineRegister() {
       setErrors({ insulineType: "Selecciona un tipo de medición" });
       return;
     }
+    const date = new Date().toLocaleDateString();
+    var parts = date.split("/");
+    var year = parts[2];
+    var month = parts[1];
+    var day = parts[0];
+    var formatDate = `${year}-${month}-${day}`;
     const { data, error } = await supabase.from("registroInsulina").insert([
       {
+        created_at: formatDate,
         uid: user.id,
         dosis: dose,
         tipoInsulina: insulineType,

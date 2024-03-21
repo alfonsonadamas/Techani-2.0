@@ -26,9 +26,17 @@ export default function GlucoseRegister() {
       setErrors({ meditionType: "Selecciona un tipo de medición" });
       return;
     }
+    const date = new Date().toLocaleDateString();
+
+    var parts = date.split("/");
+    var year = parts[2];
+    var month = parts[1];
+    var day = parts[0];
+    var formatDate = `${year}-${month}-${day}`;
     await supabase.from("registroGlucosa").insert([
       {
         uid: user.id,
+        created_at: formatDate,
         glucosa: glucose,
         idMedicion: meditionType,
       },

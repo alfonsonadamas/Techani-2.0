@@ -20,8 +20,16 @@ export default function AtipicDay() {
     { atipicDay, otherAtipicDay },
     { setSubmitting, setErrors, resetForm }
   ) => {
+    const date = new Date().toLocaleDateString();
+
+    var parts = date.split("/");
+    var year = parts[2];
+    var month = parts[1];
+    var day = parts[0];
+    var formatDate = `${year}-${month}-${day}`;
     const { data, error } = await supabase.from("registroDiaAtipico").insert([
       {
+        created_at: formatDate,
         diaAtipico: atipicDay,
         otherAtipicDay: otherAtipicDay,
         uid: user.id,
