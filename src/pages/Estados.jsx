@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import { supabase } from "../config/supabase";
-import {useUserContext} from "../context/UserContext";
+import { useUserContext } from "../context/UserContext";
 
 export default function Estados() {
   const [estados, setEstados] = useState({ idEmocion: null, value: null });
   const [error, setError] = useState("");
   const [SaveSuccessfully, setSaveSuccessfully] = useState(false);
-  const {user} = useUserContext();
+  const { user } = useUserContext();
 
   const handleMoodChange = (idEmocion, value) => {
     setEstados({ idEmocion, value });
@@ -38,8 +38,8 @@ export default function Estados() {
       const { data, error } = await supabase.from("emociones").insert([
         {
           idEmocion: idEmocion,
-          Intencidad: valor, 
-          uid: user.id,// Asumiendo que el campo en la tabla de Supabase es 'valorIntensidad'
+          Intencidad: valor,
+          uid: user.id, // Asumiendo que el campo en la tabla de Supabase es 'valorIntensidad'
         },
       ]);
 
@@ -169,12 +169,6 @@ export default function Estados() {
             >
               Guardar
             </button>
-            <Link
-              to="/"
-              className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-            >
-              Volver
-            </Link>
           </div>
         </form>
       </div>
