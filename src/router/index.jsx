@@ -19,6 +19,8 @@ import GlucoseRegisterMain from "../pages/DailyRecord";
 import InsulineRegister from "../pages/InsulineRegister";
 import WaterRegister from "../pages/WaterRegister";
 import AtipicDay from "../pages/AtipicDayRegister";
+import Files from "../pages/Files";
+import AllFiles from "../pages/AllFiles";
 
 export const router = createBrowserRouter([
   {
@@ -171,6 +173,24 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AtipicDay />,
+          },
+        ],
+      },
+      {
+        path: "/files",
+        children: [
+          {
+            index: true,
+            element: <Files />,
+          },
+        ],
+      },
+      {
+        path: "/myFiles",
+        children: [
+          {
+            index: true,
+            element: <AllFiles />,
           },
         ],
       },
