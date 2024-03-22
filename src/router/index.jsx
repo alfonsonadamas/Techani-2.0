@@ -11,6 +11,9 @@ import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
+import AlimentosRegister from "../pages/AlimentosRegister";
+import AllAlimentosRegister from "../pages/AllAlimentosRegister";
+
 import Exercise from "../pages/Exercise";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
@@ -103,7 +106,27 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/exercise",
+        path: "/AlimentosRegister",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/myAliments",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AllAlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/ejercicio",
         element: <LayoutPrivate />,
         children: [
           {
