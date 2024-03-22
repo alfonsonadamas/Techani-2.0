@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import LayoutRoot from "../layout/LayoutRoot";
 import LayoutPrivate from "../layout/LayoutPrivate";
-
+import ViewEstados from "../pages/ViewEstados";
 import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
@@ -62,6 +62,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <GlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/viewEstados",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <ViewEstados />,
           },
         ],
       },

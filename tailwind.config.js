@@ -5,6 +5,7 @@ module.exports = {
     "./src/**/*.{html,js}",
     "./public/index.html",
     "./src/pages/Login.jsx",
+    "./src/pages/ViewEstados.jsx",
     "./src/components/Sidebar.jsx",
     "./src/pages/GlucoseRegister.jsx",
     "./src/pages/AllGlucoseRegister.jsx",

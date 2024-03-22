@@ -513,7 +513,7 @@ export default function SideBar() {
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/myRecords"} className="flex cursor-pointer p-2 ">
+            <Link to={"/viewEstados"} className="flex cursor-pointer p-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
