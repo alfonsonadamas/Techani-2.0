@@ -38,7 +38,7 @@ export default function Login() {
 
   const handleLoginGoogle = async (e) => {
     e.preventDefault();
-    // setloading(true);
+    setloading(true);
     // try {
     //   const { data, error } = await supabase.auth.signInWithOAuth({
     //     provider: "google",
@@ -51,7 +51,7 @@ export default function Login() {
 
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
-    // setloading(true);
+    setloading(true);
     // try {
     //   const { data, error } = await supabase.auth.signInWithOAuth({
     //     provider: "facebook",

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
@@ -32,7 +31,7 @@ export default function Estados() {
 
     try {
       // Obtener el idEmocion y value del estado de ánimo seleccionado
-      const { idEmocion, value } = estados;
+      const { idEmocion } = estados;
 
       // Realizar la lógica para guardar en la tabla 'emociones' en la base de datos
       const { data, error } = await supabase.from("emociones").insert([

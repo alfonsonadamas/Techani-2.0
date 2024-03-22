@@ -8,23 +8,6 @@ export default function ViewEstados() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const emotions = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("emociones")
-        .select()
-        .eq("uid", user.id);
-      console.log(data);
-      if (error) console.log("error", error);
-
-      setRecords(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
   const mapEmotionToEmoji = (idEmocion) => {
     switch (idEmocion) {
       case 1:
@@ -44,8 +27,25 @@ export default function ViewEstados() {
   };
 
   useEffect(() => {
+    const emotions = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("emociones")
+          .select()
+          .eq("uid", user.id);
+        console.log(data);
+        if (error) console.log("error", error);
+
+        setRecords(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
     emotions();
-  }, []);
+  }, [user.id]);
 
   return (
     <div>

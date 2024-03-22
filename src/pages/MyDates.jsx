@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 

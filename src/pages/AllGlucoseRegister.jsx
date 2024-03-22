@@ -42,6 +42,11 @@ export default function AllGlucoseRegister() {
   };
 
   const filterRecords = () => {
+    console.log(insulineRecordsAux);
+    console.log(waterRecordsAux);
+    console.log(atipicDayRecordsAux);
+    console.log(recordsAux);
+    console.log(totalRecords);
     setLoading(true);
     const recordsFiltered = records.filter((record) => {
       const date = new Date(record.created_at);

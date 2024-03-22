@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import SideBar from "../components/SideBar";
 import { Formik } from "formik";
 import { supabase } from "../config/supabase";
