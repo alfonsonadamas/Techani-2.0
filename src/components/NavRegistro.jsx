@@ -9,7 +9,7 @@ export default function NavRegsitro(props) {
       <div className="flex justify-between items-center px-20  py-3">
         <img src={TechaniLogo} alt="techaniLogo" width="80px" height="80px" />
         <Link
-          to={data === "login" ? "/signup" : "/login"}
+          to={data === "login" ? "/" : "/login"}
           className="relative inline-block transition-all duration-300 hover:text-azulSecundario"
         >
           {data === "login" ? "Crear Cuenta" : "Iniciar Sesión"}
