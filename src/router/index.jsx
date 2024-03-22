@@ -21,6 +21,7 @@ import WaterRegister from "../pages/WaterRegister";
 import AtipicDay from "../pages/AtipicDayRegister";
 import Files from "../pages/Files";
 import AllFiles from "../pages/AllFiles";
+import MyDates from "../pages/MyDates";
 
 export const router = createBrowserRouter([
   {
@@ -118,6 +119,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Citas />,
+          },
+        ],
+      },
+      {
+        path: "/myDates",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyDates />,
           },
         ],
       },

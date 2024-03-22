@@ -1,55 +1,88 @@
 import React, { useState } from 'react';
 import SideBar from '../components/SideBar';
+import { Formik } from "formik";
+import { supabase } from "../config/supabase";
+import * as Yup from "yup";
+import { useUserContext } from '../context/UserContext';
+
 
 function Citas() {
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [appointmentType, setAppointmentType] = useState('');
-  const [location, setLocation] = useState('');
-  const [citas, setCitas] = useState([]); // Aquí inicializamos citas como un array vacío
+  // Aquí inicializamos citas como un array vacío
+  const {user} = useUserContext();
+  const handleFormSubmit = async ({ date,
+  time,
+  appointmentType,
+  location,
+  doctorName },
+    { setSubmitting, setErrors, resetForm }) => {
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Aquí puedes manejar la lógica para enviar los datos del formulario
-    console.log('Fecha:', date);
-    console.log('Hora:', time);
-    console.log('Tipo de cita:', appointmentType);
-    console.log('Lugar:', location);
 
-    const newCita = { date, time, appointmentType, location };
-    setCitas([...citas, newCita]);
-    
-    setDate('');
-    setTime('');
-    setAppointmentType('');
-    setLocation('');
-    // También puedes enviar los datos a una API o realizar otras operaciones
+      try {
+        setSubmitting(true)
+        const {data,error} = await supabase.from("citasMedicas").insert([{
+          typecites:appointmentType, 
+          date:date,
+          time:time,
+          place:location,
+          doctorName:doctorName,
+          uid:user.id
+        }]) 
+        console.log(data,error)
+      } catch (error) {
+        console.log(error)
+      }finally{
+        setSubmitting(false)
+      }
   };
 
-  const handleDeleteAll = () => {
-    setCitas([]);
-  };
-
-  const maxCitasToShow = 20; // Máximo número de citas a mostrar
-
-
+  const validationSchema = Yup.object().shape({
+    appointmentType: Yup.string()
+      .max(50, 'El tipo de cita no puede tener más de 50 caracteres')
+      .required('El tipo de cita es requerido'),
+    location: Yup.string()
+      .max(50, 'El lugar no puede tener más de 50 caracteres')
+      .required('El lugar es requerido'),
+    doctorName: Yup.string()
+      .max(50, 'El nombre del doctor no puede tener más de 50 caracteres')
+      .required('El nombre del doctor es requerido'),
+  });
+  
   return (
-    <div className="flex">
+    <div>
       <SideBar />
-
-      <div className="container mx-auto p-4">
-  <h1 className="text-2xl font-bold mb-4">Agendar Cita</h1>
-  <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+      <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
+      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Agendar citas
+        </label>
+        <Formik
+        initialValues={{
+          date: "",
+          time: "",
+          appointmentType: "",
+          location: "",
+          doctorName: "",
+        }}
+  onSubmit={handleFormSubmit}
+  validationSchema={validationSchema}
+>
+  {({
+    values,
+    handleSubmit,
+    handleChange,
+    errors,
+    touched,
+    handleBlur,
+    isSubmitting,
+  }) => (
+    <form onSubmit={handleSubmit} className="mx-auto w-full ">
     <div className="mb-4">
-      <label htmlFor="date" className="block mb-1">
-        Fecha:
-      </label>
+    <label htmlFor="day" className="block mb-1">Fecha:</label>
       <input
         type="date"
         id="date"
-        className="border rounded-md px-3 py-2 w-full h-10"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        
+        onChange={handleChange}
       />
     </div>
     <div className="mb-4">
@@ -59,9 +92,9 @@ function Citas() {
       <input
         type="time"
         id="time"
-        className="border rounded-md px-3 py-2 w-full h-10"
-        value={time}
-        onChange={(e) => setTime(e.target.value)}
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        
+        onChange={handleChange}
       />
     </div>
     <div className="mb-4">
@@ -71,10 +104,15 @@ function Citas() {
       <input
         type="text"
         id="appointmentType"
-        className="border rounded-md px-3 py-2 w-full h-10"
-        value={appointmentType}
-        onChange={(e) => setAppointmentType(e.target.value)}
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        value={values.appointmentType}
+        onChange={handleChange}
       />
+       <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                      {errors.appointmentType &&
+                        touched.appointmentType &&
+                        errors.appointmentType}{" "}
+                    </p>
     </div>
     <div className="mb-4">
       <label htmlFor="location" className="block mb-1">
@@ -83,35 +121,37 @@ function Citas() {
       <input
         type="text"
         id="location"
-        className="border rounded-md px-3 py-2 w-full h-10"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        onChange={handleChange}
       />
+      <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                      {errors.location &&
+                        touched.location &&
+                        errors.location}{" "}
+                    </p>
     </div>
-    <button type="submit" className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800">Guardar Cita</button>
-  </form>
-</div>
-
-
-<div className="w-1/2 p-4">
-        <h1 className="text-2xl font-bold mb-4">Calendario de Citas</h1>
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Todas las Citas:</h2>
-          <ul>
-            {citas.slice(0, maxCitasToShow).map((cita, index) => (
-              <li key={index}>
-                Fecha: {cita.date} - Hora: {cita.time} - Tipo: {cita.appointmentType} - Lugar: {cita.location}
-              </li>
-            ))}
-          </ul>
-          {citas.length > maxCitasToShow && (
-            <button onClick={handleDeleteAll} className="bg-red-500 text-white py-2 px-4 rounded-md mt-2">
-              Borrar Todas las Citas
-            </button>
-          )}
+    <div className="mb-4">
+      <label htmlFor="doctorName" className="block mb-1">
+        Nombre del Doctor:
+      </label>
+      <input
+        type="text"
+        id="doctorName"
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        onChange={handleChange}
+      />
+      <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                      {errors.doctorName &&
+                        touched.doctorName &&
+                        errors.doctorName}{" "}
+                    </p>
         </div>
-      </div>
-    </div>
+        <button type="submit" className="bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800">Guardar Cita</button>
+  </form>
+  )}
+  </Formik>
+  </div>
+</div>  
   );
 }
 
