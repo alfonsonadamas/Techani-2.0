@@ -19,18 +19,6 @@ export default function AllGlucoseRegister() {
   const [loading, setLoading] = useState(false);
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
-  const [microService, setMicroService] = useState([{}]);
-
-  const getMicroService = async () => {
-    try {
-      const response = await fetch("http://localhost:4000/");
-      const data = await response.json();
-      console.log(data);
-      setMicroService(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleDate1 = (e) => {
     const date = e.target.value;
@@ -101,11 +89,11 @@ export default function AllGlucoseRegister() {
       recordsFilteredWater
     );
     setTotalRecords(recordsFilteredAux);
+    console.log(recordsFilteredAux);
     setLoading(false);
   };
 
   useEffect(() => {
-    getMicroService();
     const getRecords = async () => {
       try {
         setLoading(true);
@@ -213,150 +201,124 @@ export default function AllGlucoseRegister() {
         </div>
 
         <div className="flex flex-row justify-center items-center w-full h-full flex-wrap">
-          {recordsAux.length === 0 &&
-          insulineRecordsAux.length === 0 &&
-          waterRecordsAux.length === 0 &&
-          atipicDayRecordsAux.length === 0 ? (
-            <div className="relative flex justify-center items-center h-24 border-2 mt-10 shadow-2xl rounded-lg w-4/5">
-              {loading && (
-                <div
-                  role="status"
-                  className="opacity-30 absolute flex justify-center items-center h-full bg-gray-400 w-full"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="opacity-100 w-8 h-8 text-gray-200 animate-spin  fill-blue-600"
-                    viewBox="0 0 100 101"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                      fill="currentFill"
-                    />
-                  </svg>
-                  <span class="sr-only">Loading...</span>
-                </div>
-              )}
-
-              <p className=" text-gray-400">Sin registros</p>
-            </div>
-          ) : (
-            <div className="mt-10 w-full">
-              <p className="text-center mb-5 font-medium">
-                Se encontraron {totalRecords.length} registro(s)
-              </p>
-              <h3 className="font-semibold text-xl">Registros de glucosa</h3>
-              {recordsAux.length > 0 ? (
-                <div className="flex w-full flex-wrap mt-5 ">
-                  {recordsAux.map((record) => {
-                    return (
-                      <div
-                        className="w-1/4 mr-10 px-10 pt-5 h-48 shadow-2xl rounded-lg"
-                        key={record.id}
-                      >
-                        <p className="text-lg font-medium">
-                          Numero de registro: {record.id}
-                        </p>
-                        <p>Fecha: {record.created_at}</p>
-                        <p>Glucosa: {record.glucosa}</p>
-                        <p>Tipo de medicion: {record.medicion.measurement}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="relative flex justify-center items-center h-24 border-2 mt-10 shadow-2xl rounded-lg w-4/5">
-                  <p className=" text-gray-400">Sin registros</p>
-                </div>
-              )}
-
-              <h3 className="font-semibold text-xl mt-10">
-                Registros de insulina
-              </h3>
-              {insulineRecordsAux.length > 0 ? (
-                <div className="flex w-full flex-wrap mt-5 ">
-                  {insulineRecordsAux.map((record) => {
-                    return (
-                      <div
-                        className="w-1/4 mr-10 px-10 pt-3 h-48 shadow-2xl rounded-lg"
-                        key={record.id}
-                      >
-                        <p className="text-lg font-medium">
-                          Numero de registro: {record.id}
-                        </p>
-                        <p>Fecha: {record.created_at}</p>
-                        <p>Dosis de insulina: {record.dosis}</p>
-                        <p>Tipo de dosis: {record.tipoDosis.tipoDosis}</p>
-                        <p>Tipo de insulina: {record.tipoInsulina.insulin}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="relative flex justify-center items-center h-24 border-2 mt-10 shadow-2xl rounded-lg w-4/5">
-                  <p className=" text-gray-400">Sin registros</p>
-                </div>
-              )}
-              <h3 className="font-semibold text-xl mt-10">
-                Registros de dia atipico
-              </h3>
-              {atipicDayRecordsAux.length > 0 ? (
-                <div className="flex w-full flex-wrap mt-5 ">
-                  {atipicDayRecordsAux.map((record) => {
-                    return (
-                      <div
-                        className="w-1/4 mr-10 px-10 pt-3 h-48 shadow-2xl rounded-lg"
-                        key={record.id}
-                      >
-                        <p className="text-lg font-medium">
-                          Numero de registro: {record.id}
-                        </p>
-                        <p>Fecha: {record.created_at}</p>
-                        <p>
-                          Dia atipico:{" "}
-                          {record.otherAtipicDay
-                            ? record.otherAtipicDay
-                            : record.diaAtipico.typeDay}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="relative flex justify-center items-center h-24 border-2 mt-10 shadow-2xl rounded-lg w-4/5">
-                  <p className=" text-gray-400">Sin registros</p>
-                </div>
-              )}
-              <h3 className="font-semibold text-xl mt-10">Registros de agua</h3>
-              {waterRecordsAux.length > 0 ? (
-                <div className="flex w-full flex-wrap mt-5 ">
-                  {waterRecordsAux.map((record) => {
-                    return (
-                      <div
-                        className="w-1/4 mr-10 px-10 pt-3 h-48 shadow-2xl rounded-lg"
-                        key={record.id}
-                      >
-                        <p className="text-lg font-medium">
-                          Numero de registro: {record.id}
-                        </p>
-                        <p>Fecha: {record.created_at}</p>
-                        <p>Vasos consumidos: {record.agua} </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="relative flex justify-center items-center h-24 border-2 mt-10 shadow-2xl rounded-lg w-4/5">
-                  <p className=" text-gray-400">Sin registros</p>
-                </div>
-              )}
-            </div>
-          )}
+          <table className="mt-10">
+            <thead className="border-2">
+              <tr>
+                <th className="border-2 px-10">Fecha</th>
+                <th className="border-2 px-10">Desayuno</th>
+                <th className="border-2 px-10">Colacion</th>
+                <th className="border-2 px-10">Comida</th>
+                <th className="border-2 px-10">Ejercicio</th>
+                <th className="border-2 px-10">Cena</th>
+                <th className="border-2 px-10">Madrugada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border-2">
+                  <div className="flex justify-center border-b-2">
+                    <span>21/03/2024</span>
+                  </div>
+                  <div className="flex justify-center">
+                    <span>Glucosa</span>
+                  </div>
+                </td>
+                <td className="border-2">
+                  <div className="flex">
+                    <div className="flex flex-col border-r-2 px-8">
+                      <span>Pre</span>
+                      <span>120</span>
+                    </div>
+                    <div className="flex flex-col px-8">
+                      <span>Pos</span>
+                      <span>120</span>
+                    </div>
+                  </div>
+                </td>
+                <td className="border-2">
+                  <div className="flex">
+                    <div className="flex flex-col border-r-2 px-8">
+                      <span>Pre</span>
+                      <span>120</span>
+                    </div>
+                    <div className="flex flex-col px-8">
+                      <span>Pos</span>
+                      <span>120</span>
+                    </div>
+                  </div>
+                </td>
+                <td className="border-2">
+                  <div className="flex">
+                    <div className="flex flex-col border-r-2 px-8">
+                      <span>Pre</span>
+                      <span>120</span>
+                    </div>
+                    <div className="flex flex-col px-8">
+                      <span>Pos</span>
+                      <span>120</span>
+                    </div>
+                  </div>
+                </td>
+                <td className="border-2 text-center">
+                  <span>120</span>
+                </td>
+                <td className="border-2">
+                  <div className="flex">
+                    <div className="flex flex-col border-r-2 px-8">
+                      <span>Pre</span>
+                      <span>120</span>
+                    </div>
+                    <div className="flex flex-col px-8">
+                      <span>Pos</span>
+                      <span>120</span>
+                    </div>
+                  </div>
+                </td>
+                <td className="border-2 text-center">
+                  <span>120</span>
+                </td>
+              </tr>
+              <tr>
+                <td className="border-2 ">
+                  <div className="flex justify-center">
+                    <span>Dosis insulina</span>
+                  </div>
+                </td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+              </tr>
+              <tr>
+                <td className="border-2">
+                  <div className="flex justify-center">
+                    <span>Agua</span>
+                  </div>
+                </td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+                <td className="border-2 text-center">10</td>
+              </tr>
+              <tr>
+                <td className="border-2">
+                  <div className="flex justify-center">
+                    <span>Dia atipico</span>
+                  </div>
+                </td>
+                <td className="border-2 text-center">Ninguno</td>
+                <td className="border-2 text-center">Ninguno</td>
+                <td className="border-2 text-center">Ninguno</td>
+                <td className="border-2 text-center">Ninguno</td>
+                <td className="border-2 text-center">Ninguno</td>
+                <td className="border-2 text-center">Ninguno</td>
+              </tr>
+            </tbody>
+          </table>
           {/* <PDFDownloadLink
                   document={
                     <PdfGlucose
@@ -407,20 +369,6 @@ export default function AllGlucoseRegister() {
                   } 
                 </PDFDownloadLink>*/}
         </div>
-        <h3 className="text-center mt-10">
-          Listado de registros con microservicios
-        </h3>
-
-        {microService.map((micro) => {
-          return (
-            <div key={micro.id} className="w-2/5 h-36 shadow-2xl mt-5">
-              <p className="text-center">Fecha: {micro.fecha}</p>
-              <p className="text-center">Hora: {micro.hora}</p>
-              <p className="text-center">Glucosa: {micro.glucosa}</p>
-              <p className="text-center">Insulina: {micro.insulina}</p>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

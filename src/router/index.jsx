@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import LayoutRoot from "../layout/LayoutRoot";
 import LayoutPrivate from "../layout/LayoutPrivate";
-
+import ViewEstados from "../pages/ViewEstados";
 import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
@@ -11,6 +11,9 @@ import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
+import AlimentosRegister from "../pages/AlimentosRegister";
+import AllAlimentosRegister from "../pages/AllAlimentosRegister";
+
 import Exercise from "../pages/Exercise";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
@@ -19,6 +22,9 @@ import GlucoseRegisterMain from "../pages/DailyRecord";
 import InsulineRegister from "../pages/InsulineRegister";
 import WaterRegister from "../pages/WaterRegister";
 import AtipicDay from "../pages/AtipicDayRegister";
+import Files from "../pages/Files";
+import AllFiles from "../pages/AllFiles";
+import MyDates from "../pages/MyDates";
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +62,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <GlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/viewEstados",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <ViewEstados />,
           },
         ],
       },
@@ -100,7 +116,27 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/exercise",
+        path: "/AlimentosRegister",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/myAliments",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AllAlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/ejercicio",
         element: <LayoutPrivate />,
         children: [
           {
@@ -116,6 +152,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Citas />,
+          },
+        ],
+      },
+      {
+        path: "/myDates",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyDates />,
           },
         ],
       },
@@ -171,6 +217,24 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AtipicDay />,
+          },
+        ],
+      },
+      {
+        path: "/files",
+        children: [
+          {
+            index: true,
+            element: <Files />,
+          },
+        ],
+      },
+      {
+        path: "/myFiles",
+        children: [
+          {
+            index: true,
+            element: <AllFiles />,
           },
         ],
       },
