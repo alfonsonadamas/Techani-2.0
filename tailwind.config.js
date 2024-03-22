@@ -5,6 +5,7 @@ module.exports = {
     "./src/**/*.{html,js}",
     "./public/index.html",
     "./src/pages/Login.js",
+    "./src/pages/ViewEstados.jsx",
     "./src/components/Sidebar.js",
     "./src/pages/GlucoseRegister.js",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
