@@ -14,15 +14,6 @@ export default function SideBar() {
   const [name, setName] = useState("");
   const [picture, setPicture] = useState("");
 
-  // try {
-  //   const { error } = await supabase.auth.signOut();
-  //   navigate("/login");
-  //   setPicture("");
-  //   console.log(error);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-
   const dropDown = () => {
     setIsHidden(!isHidden);
   };
@@ -60,32 +51,91 @@ export default function SideBar() {
       setName(user.user_metadata.full_name);
     }
   }, [user]);
+
+  const [responsive,setResponsive]=useState(false);
+  const toogleResponsive = () =>{
+    setResponsive(!responsive);
+
+  };
+
+  
+
   return (
-    <div>
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 ">
-        <div className="px-3 py-3 lg:px-5 lg:pl-3">
-          <div className=" flex items-center justify-between">
-            <div className="  flex items-center justify-start rtl:justify-end">
-              <Link to={"/dashboard"} className="flex ms-2 md:me-24">
-                <img src={Logo} alt="techanilogo" className="h-10 me-3" />
-                <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                  Techani
-                </span>
-              </Link>
-              <h2 className="hidden sm:block">Bienvenido, {name}</h2>
+
+
+    <div className="bg-white py-3 fixed top-0 left-0 right-0 shadow-md">
+    
+            <div className=" flex items-center justify-between">
+              <div className="  flex items-center justify-start rtl:justify-end">
+
+                <button className="ml-5" onClick={toogleResponsive}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  </svg>
+                </button>
+
+
+                <div className="ml-5">
+                <Link to={"/dashboard"} className="flex ms-2 md:me-24">
+                  <img src={Logo} alt="techanilogo" className="h-10 me-3" />
+                  <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+                    Techani
+                  </span>
+                </Link>
+                </div>
+
+                <h2 className="hidden sm:block">Bienvenido, {name}</h2>
+              </div>
+
+              <div className="mr-5">
+                <Link to={"/profile"}>
+                  <img
+                    className="rounded-full"
+                    src={picture}
+                    alt="perfil"
+                    width={40}
+                  />
+                </Link>
+
+              </div>
+
+              
             </div>
-            <Link to={"/profile"}>
-              <img
-                className="rounded-full"
-                src={picture}
-                alt="perfil"
-                width={40}
-              />
-            </Link>
-          </div>
-        </div>
-      </nav>
-      <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[275px] overflow-y-auto text-center border-r border-gray-200">
+
+          
+
+
+          <div style={{backgroundColor: '#ffff',border: '2px solid #C2C2C2', minHeight: '100vh', width: '18rem', position: 'fixed', top: 0, left: 0 }} className={`${responsive ? "hidden" : "flex"}`} >
+            <div style={{paddingTop:'3px'}}>
+
+                <div className="  flex items-center justify-start rtl:justify-end">
+
+                  <div className="md:block lg:hidden">
+                    <button style={{margin:'10px'}} onClick={toogleResponsive}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                    </button>
+                  </div>
+
+                
+                
+                <div className="ml-5 mt-3">
+                  <Link to={"/dashboard"} className="flex ms-2 md:me-24">
+                    <img src={Logo} alt="techanilogo" className="h-10 me-3" />
+                    <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+                      Techani
+                    </span>
+                  </Link>
+                </div>
+                </div>
+                
+
+             
+             
+             
+                {/*SIDE BAR */}
+      <div className=" fixed top-14 bottom-0 p-2 w-[275px] overflow-y-auto text-center">
         {/* Aqui empieza el menu desplegable */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg
@@ -298,6 +348,7 @@ export default function SideBar() {
                 fill="none"
                 viewBox="0 0 10 6"
               >
+
                 <path
                   stroke="currentColor"
                   stroke-linecap="round"
@@ -305,6 +356,8 @@ export default function SideBar() {
                   stroke-width="2"
                   d="m1 1 4 4 4-4"
                 />
+
+
               </svg>
             </span>
           </div>
@@ -607,6 +660,24 @@ export default function SideBar() {
         </div>
         {/* Aqui acaba */}
       </div>
-    </div>
+             
+             
+            
+        
+        
+        
+            </div>
+
+        
+
+        
+        
+          </div>
+      </div>
+    
+
+    
+    
+
   );
 }
