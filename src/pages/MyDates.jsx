@@ -6,17 +6,37 @@ import SideBar from "../components/SideBar";
 
 function MyDates() {
   const [citas, setCitas] = useState([]);
+  const [eliminada, setEliminada] = useState(false);
+  const { user } = useUserContext(); 
 
   // Función para manejar la eliminación de una cita
-  const handleEliminarCita = async (id) => {
+  const handleEliminarCita = async (idCita) => {
     try {
-      await supabase.from('citasMedicas').delete().match({ id });
-      setCitas(citas.filter(cita => cita.id !== id));
-      console.log("Cita eliminada con ID:", id);
+      console.log("ID de la cita a eliminar:", idCita);
+
+      const { data, error } = await supabase
+        .from('citasMedicas')
+        .delete()
+        .match({ idCita });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        // Eliminar la cita del estado local
+        setCitas(prevCitas => prevCitas.filter(cita => cita.idCita !== idCita));
+        console.log("Cita eliminada con ID:", idCita);
+        setEliminada(true); // Mostrar el mensaje de eliminación
+        setTimeout(() => setEliminada(false), 3000);
+      }
+      
     } catch (error) {
       console.error('Error al eliminar la cita:', error.message);
     }
   };
+  
+
 
   // Función para manejar la edición de una cita
   const handleEditarCita = (cita) => {
@@ -60,15 +80,15 @@ function MyDates() {
             <div className="mb-4">
               <p>Fecha: <span className="font-semibold">{cita.date}</span></p>
               <p>Hora: <span className="font-semibold">{cita.time}</span></p>
-              <p>Tipo de cita: <span className="font-semibold">{cita.appointmentType}</span></p>
-              <p>Lugar: <span className="font-semibold">{cita.location}</span></p>
+              <p>Tipo de cita: <span className="font-semibold">{cita.typecites}</span></p>
+              <p>Lugar: <span className="font-semibold">{cita.place}</span></p>
               <p>Nombre del Doctor: <span className="font-semibold">{cita.doctorName}</span></p>
             </div>
             <div className="flex justify-end space-x-2">
-              <button className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition ease-in duration-200" onClick={() => handleEliminarCita(cita.id)}>
+              <button className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition ease-in duration-200" onClick={() => handleEliminarCita(cita.idCita)}>
                 Eliminar
               </button>
-              <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition ease-in duration-200" onClick={() => handleEditarCita(cita)}>
+              <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition ease-in duration-200" onClick={() => handleEditarCita(cita.idCita)}>
                 Editar
               </button>
             </div>
