@@ -7,20 +7,24 @@ import SideBar from "../components/SideBar";
 function MyDates() {
   const [citas, setCitas] = useState([]);
 
-
   // Función para manejar la eliminación de una cita
-  const handleEliminarCita = (id) => {
-    // Lógica para eliminar la cita con el ID proporcionado
-    console.log("Eliminar cita con ID:", id);
+  const handleEliminarCita = async (id) => {
+    try {
+      await supabase.from('citasMedicas').delete().match({ id });
+      setCitas(citas.filter(cita => cita.id !== id));
+      console.log("Cita eliminada con ID:", id);
+    } catch (error) {
+      console.error('Error al eliminar la cita:', error.message);
+    }
   };
 
   // Función para manejar la edición de una cita
   const handleEditarCita = (cita) => {
-    // Lógica para editar la cita proporcionada
+    // Aquí debes implementar la lógica para abrir un formulario de edición
+    // y luego actualizar la cita tanto en la lista como en la base de datos.
     console.log("Editar cita:", cita);
   };
 
-  
   useEffect(() => {
     async function obtenerCitas() {
       try {
@@ -44,30 +48,38 @@ function MyDates() {
 
   return (
     <div>
-      <SideBar />
-      <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Mis citas
-        </label>
-        <ul className="mt-4">
-          {Array.isArray(citas) && citas.map((cita, index) => (
-            <li key={index} className="mb-4">
-              <div className="border border-gray-300 p-4 rounded-md">
-                <p>Fecha: {cita.date}</p>
-                <p>Hora: {cita.time}</p>
-                <p>Tipo de cita: {cita.appointmentType}</p>
-                <p>Lugar: {cita.location}</p>
-                <p>Nombre del Doctor: {cita.doctorName}</p>
-                <div className="mt-4 flex justify-end">
-                  <button className="mr-2 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md" onClick={() => handleEliminarCita(cita.id)}>Eliminar</button>
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md" onClick={() => handleEditarCita(cita)}>Editar</button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+  <SideBar />
+  <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
+    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+      Mis citas
+    </label>
+    <ul className="mt-4">
+      {Array.isArray(citas) && citas.map((cita, index) => (
+        <li key={index} className="mb-4">
+          <div className="bg-white shadow-lg rounded-lg p-4 mb-4 dark:bg-gray-800">
+            <div className="mb-4">
+              <p>Fecha: <span className="font-semibold">{cita.date}</span></p>
+              <p>Hora: <span className="font-semibold">{cita.time}</span></p>
+              <p>Tipo de cita: <span className="font-semibold">{cita.appointmentType}</span></p>
+              <p>Lugar: <span className="font-semibold">{cita.location}</span></p>
+              <p>Nombre del Doctor: <span className="font-semibold">{cita.doctorName}</span></p>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <button className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition ease-in duration-200" onClick={() => handleEliminarCita(cita.id)}>
+                Eliminar
+              </button>
+              <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition ease-in duration-200" onClick={() => handleEditarCita(cita)}>
+                Editar
+              </button>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+  
   );
   
 }  
