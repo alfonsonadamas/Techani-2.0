@@ -3,11 +3,34 @@ import { createClient } from '@supabase/supabase-js';
 import { useUserContext } from "../context/UserContext";
 import { supabase } from '../config/supabase'; 
 import SideBar from "../components/SideBar";
+import { useNavigate } from 'react-router-dom';
 
 function MyDates() {
   const [citas, setCitas] = useState([]);
   const [eliminada, setEliminada] = useState(false);
   const { user } = useUserContext(); 
+  const navigate = useNavigate();
+
+
+  async function obtenerCitas() {
+    try {
+      const { data, error } = await supabase
+        .from('citasMedicas')
+        .select('*');
+      
+      if (error) {
+        console.error('Error al obtener citas:', error.message);
+        return;
+      }
+      
+      setCitas(data);
+    } catch (error) {
+      console.error('Error al obtener citas:', error.message);
+    }
+  }
+
+
+
 
   // Función para manejar la eliminación de una cita
   const handleEliminarCita = async (idCita) => {
@@ -22,14 +45,7 @@ function MyDates() {
       if (error) {
         throw error;
       }
-
-      if (data) {
-        // Eliminar la cita del estado local
-        setCitas(prevCitas => prevCitas.filter(cita => cita.idCita !== idCita));
-        console.log("Cita eliminada con ID:", idCita);
-        setEliminada(true); // Mostrar el mensaje de eliminación
-        setTimeout(() => setEliminada(false), 3000);
-      }
+      obtenerCitas();
       
     } catch (error) {
       console.error('Error al eliminar la cita:', error.message);
@@ -46,23 +62,7 @@ function MyDates() {
   };
 
   useEffect(() => {
-    async function obtenerCitas() {
-      try {
-        const { data, error } = await supabase
-          .from('citasMedicas')
-          .select('*');
-        
-        if (error) {
-          console.error('Error al obtener citas:', error.message);
-          return;
-        }
-        
-        setCitas(data);
-      } catch (error) {
-        console.error('Error al obtener citas:', error.message);
-      }
-    }
-
+    
     obtenerCitas();
   }, []);
 
