@@ -55,9 +55,6 @@ export default function Comidas() {
       const Indexfoodtypes = foodTypes.find(type => type.food === foodType);
       setFoodType(Indexfoodtypes.idTipoalimento);
 
-      const Indexmeasuringunit = measuringunits.find(type => type.name === measuringunit);
-      setMeasuringunit(Indexmeasuringunit.idUnidadMedida);
-
       // Insertamos el alimento en la tabla 'BancoAlimentos'
       const { data, error } = await supabase
         .from("BancoAlimentos")
@@ -65,7 +62,7 @@ export default function Comidas() {
           uid: user.id,
           food: foodName,
           idTipoAlimento: Indexfoodtypes.idTipoalimento, 
-          idUnidadMedida: Indexmeasuringunit.idUnidadMedida,
+          idUnidadMedida: measuringunit,
           portionamount: portionAmount,
           carbohydrates: carbohydratesAmount,
           created_at: fechaActual,
@@ -125,7 +122,7 @@ export default function Comidas() {
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
         {!sendForm ? (
           <>
-          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
             Registro Alimento
           </label>
           
@@ -134,7 +131,7 @@ export default function Comidas() {
               foodName: "",
               foodType: "",
               portionAmount: 1,
-              measuringunit: "gramos",
+              measuringunit: 1,
               carbohydratesAmount: 1,
             }}
             validationSchema={validationSchema}

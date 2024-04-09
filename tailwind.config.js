@@ -6,6 +6,7 @@ module.exports = {
     "./public/index.html",
     "./src/pages/Login.js",
     "./src/components/Sidebar.js",
+    "./src/pages/Alimentos.jsx",
     "./src/pages/GlucoseRegister.js",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],

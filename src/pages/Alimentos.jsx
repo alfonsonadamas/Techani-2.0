@@ -37,9 +37,9 @@ export default function Alimentos() {
     <div>
       <SideBar />
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white ">
           Registro de Alimentos
-        </label>
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
