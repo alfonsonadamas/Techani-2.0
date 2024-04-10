@@ -4,9 +4,12 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import * as Yup from "yup";
 import { useUserContext } from '../context/UserContext';
-
+import { useNavigate } from 'react-router-dom';
 
 function Citas() {
+  const navigate = useNavigate();
+  // Estados para manejar el envío del formulario y mostrar el mensaje de éxito
+  const [sendForm, setSendForm] = useState(false);
   // Aquí inicializamos citas como un array vacío
   const {user} = useUserContext();
   const handleFormSubmit = async ({ date,
@@ -26,14 +29,27 @@ function Citas() {
           place:location,
           doctorName:doctorName,
           uid:user.id
-        }]) 
-        console.log(data,error)
-      } catch (error) {
-        console.log(error)
-      }finally{
-        setSubmitting(false)
-      }
-  };
+        }]);
+        if (error) {
+          throw error;
+        }
+        
+        console.log(data);
+        setSendForm(true); // Actualiza el estado para mostrar el mensaje de éxito
+
+        // Restablecer el formulario para dejar los campos en blanco
+        resetForm();
+
+        // Redirigir al usuario a la misma página para actualizarla automáticamente
+        window.location.reload();
+        } catch (error) {
+        console.error(error);
+        } finally {
+        setSubmitting(false);
+        }
+        };
+  
+  
 
   const validationSchema = Yup.object().shape({
     appointmentType: Yup.string()
@@ -150,8 +166,21 @@ function Citas() {
   </form>
   )}
   </Formik>
-  </div>
-</div>  
+  
+{sendForm && (
+          <div
+            className="flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
+            role="alert"
+          >
+            <span className="sr-only">Info</span>
+            <div className="text-green-400">
+              <span className="font-medium">¡Listo! </span>
+              Su cita se ha registrado correctamente.
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
