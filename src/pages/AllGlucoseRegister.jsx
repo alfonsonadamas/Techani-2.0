@@ -81,20 +81,27 @@ export default function AllGlucoseRegister() {
     setInsulineRecordsAux(recordsFilteredInsuline);
     setAtipicDayRecordsAux(recordsFilteredAtipicDay);
     setWaterRecordsAux(recordsFilteredWater);
-    console.log(
-      recordsFiltered,
-      recordsFilteredInsuline,
-      recordsFilteredAtipicDay,
-      recordsFilteredWater
-    );
 
     const recordsFilteredAux = recordsFiltered.concat(
       recordsFilteredInsuline,
       recordsFilteredAtipicDay,
       recordsFilteredWater
     );
-    setTotalRecords(recordsFilteredAux);
-    console.log(recordsFilteredAux);
+
+    const objetosAgrupados = {};
+
+    recordsFilteredAux.forEach((record) => {
+      const fecha = record.created_at;
+      if (!objetosAgrupados[fecha]) {
+        objetosAgrupados[fecha] = [];
+      }
+      objetosAgrupados[fecha].push(record);
+    });
+
+    setTotalRecords(objetosAgrupados);
+
+    console.log("Objetos agrupados", objetosAgrupados);
+
     setLoading(false);
   };
 
@@ -110,7 +117,19 @@ export default function AllGlucoseRegister() {
         console.log(data);
 
         if (error) throw error;
-        setRecords(data);
+
+        const newData = data.map((record) => {
+          const object = {
+            id: record.id,
+            created_at: record.created_at,
+            measurement: record.medicion.measurement,
+            glucose: record.glucosa,
+          };
+          return object;
+        });
+
+        console.log("New Data: ", newData);
+        setRecords(newData);
       } catch (error) {
         console.log(error);
       } finally {
@@ -129,7 +148,21 @@ export default function AllGlucoseRegister() {
           .eq("uid", user.id);
 
         if (error) throw error;
-        setInsulineRecords(data);
+
+        const newData = data.map((record) => {
+          const object = {
+            id: record.id,
+            dose: record.dosis,
+            created_at: record.created_at,
+            insulineType: record.tipoInsulina.insulin,
+            doseType: record.tipoDosis.tipoDosis,
+          };
+          return object;
+        });
+
+        console.log("Insulina: ", newData);
+
+        setInsulineRecords(newData);
       } catch (error) {
         console.log(error);
       } finally {
@@ -146,7 +179,19 @@ export default function AllGlucoseRegister() {
           .eq("uid", user.id);
 
         if (error) throw error;
-        setAtipicDayRecords(data);
+
+        const newData = data.map((record) => {
+          const object = {
+            id: record.id,
+            created_at: record.created_at,
+            atipicDay: record.diaAtipico.typeDay,
+          };
+          return object;
+        });
+
+        console.log("Dia atipico: ", newData);
+
+        setAtipicDayRecords(newData);
       } catch (error) {
         console.log(error);
       } finally {
@@ -175,7 +220,7 @@ export default function AllGlucoseRegister() {
     getRecords();
     getRecordsInsuline();
     getRecordsWater();
-  }, [user.id]);
+  }, []);
 
   return (
     <div>
@@ -206,124 +251,144 @@ export default function AllGlucoseRegister() {
         </div>
 
         <div className="flex flex-row justify-center items-center w-full h-full flex-wrap">
-          <table className="mt-10">
-            <thead className="border-2">
-              <tr>
-                <th className="border-2 px-10">Fecha</th>
-                <th className="border-2 px-10">Desayuno</th>
-                <th className="border-2 px-10">Colacion</th>
-                <th className="border-2 px-10">Comida</th>
-                <th className="border-2 px-10">Ejercicio</th>
-                <th className="border-2 px-10">Cena</th>
-                <th className="border-2 px-10">Madrugada</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border-2">
-                  <div className="flex justify-center border-b-2">
-                    <span>21/03/2024</span>
-                  </div>
-                  <div className="flex justify-center">
-                    <span>Glucosa</span>
-                  </div>
-                </td>
-                <td className="border-2">
-                  <div className="flex">
-                    <div className="flex flex-col border-r-2 px-8">
-                      <span>Pre</span>
+          {Object.keys(totalRecords).map((key) => {
+            return (
+              <table className="mt-10">
+                <thead className="border-2">
+                  <tr>
+                    <th className="border-2 px-10">Fecha</th>
+                    <th className="border-2 px-10">Desayuno</th>
+                    <th className="border-2 px-10">Colacion</th>
+                    <th className="border-2 px-10">Comida</th>
+                    <th className="border-2 px-10">Ejercicio</th>
+                    <th className="border-2 px-10">Cena</th>
+                    <th className="border-2 px-10">Madrugada</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="border-2">
+                      <div className="flex justify-center border-b-2">
+                        <span>{key}</span>
+                      </div>
+                      <div className="flex justify-center">
+                        <span>Glucosa</span>
+                      </div>
+                    </td>
+                    <td className="border-2">
+                      <div className="flex">
+                        <div className="flex flex-col items-center border-r-2 px-8">
+                          <span>Pre</span>
+
+                          {totalRecords[key].map((record, index) => (
+                            <span key={index}>
+                              {record.measurement ===
+                                "Prepandrial - Desayuno" && record.glucose}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex flex-col px-8">
+                          <span>Pos</span>
+                          {totalRecords[key].map((record, index) => (
+                            <span key={index}>
+                              {record.measurement ===
+                                "Postpandrial - Desayuno" && record.glucose}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="border-2">
+                      <div className="flex">
+                        <div className="flex flex-col border-r-2 px-8">
+                          <span>Pre</span>
+                          {totalRecords[key].map((record, index) => (
+                            <span key={index}>
+                              {record.measurement ===
+                                "Postpandrial - Desayuno" && record.glucose}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex flex-col px-8">
+                          <span>Pos</span>
+                          <span>120</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="border-2">
+                      <div className="flex">
+                        <div className="flex flex-col border-r-2 px-8">
+                          <span>Pre</span>
+                          <span>120</span>
+                        </div>
+                        <div className="flex flex-col px-8">
+                          <span>Pos</span>
+                          <span>120</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="border-2 text-center">
+                      <div className="flex">
+                        <div className="flex flex-col border-r-2 px-8">
+                          <span>Pre</span>
+                          <span>120</span>
+                        </div>
+                        <div className="flex flex-col px-8">
+                          <span>Pos</span>
+                          <span>120</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="border-2">
+                      <div className="flex">
+                        <div className="flex flex-col border-r-2 px-8">
+                          <span>Pre</span>
+                          <span>120</span>
+                        </div>
+                        <div className="flex flex-col px-8">
+                          <span>Pos</span>
+                          <span>120</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="border-2 text-center">
                       <span>120</span>
-                    </div>
-                    <div className="flex flex-col px-8">
-                      <span>Pos</span>
-                      <span>120</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="border-2">
-                  <div className="flex">
-                    <div className="flex flex-col border-r-2 px-8">
-                      <span>Pre</span>
-                      <span>120</span>
-                    </div>
-                    <div className="flex flex-col px-8">
-                      <span>Pos</span>
-                      <span>120</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="border-2">
-                  <div className="flex">
-                    <div className="flex flex-col border-r-2 px-8">
-                      <span>Pre</span>
-                      <span>120</span>
-                    </div>
-                    <div className="flex flex-col px-8">
-                      <span>Pos</span>
-                      <span>120</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="border-2 text-center">
-                  <span>120</span>
-                </td>
-                <td className="border-2">
-                  <div className="flex">
-                    <div className="flex flex-col border-r-2 px-8">
-                      <span>Pre</span>
-                      <span>120</span>
-                    </div>
-                    <div className="flex flex-col px-8">
-                      <span>Pos</span>
-                      <span>120</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="border-2 text-center">
-                  <span>120</span>
-                </td>
-              </tr>
-              <tr>
-                <td className="border-2 ">
-                  <div className="flex justify-center">
-                    <span>Dosis insulina</span>
-                  </div>
-                </td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-              </tr>
-              <tr>
-                <td className="border-2">
-                  <div className="flex justify-center">
-                    <span>Agua</span>
-                  </div>
-                </td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-                <td className="border-2 text-center">10</td>
-              </tr>
-              <tr>
-                <td className="border-2">
-                  <div className="flex justify-center">
-                    <span>Dia atipico</span>
-                  </div>
-                </td>
-                <td className="border-2 text-center">Ninguno</td>
-                <td className="border-2 text-center">Ninguno</td>
-                <td className="border-2 text-center">Ninguno</td>
-                <td className="border-2 text-center">Ninguno</td>
-                <td className="border-2 text-center">Ninguno</td>
-                <td className="border-2 text-center">Ninguno</td>
-              </tr>
-            </tbody>
-          </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="border-2 ">
+                      <div className="flex justify-center">
+                        <span>Dosis insulina</span>
+                      </div>
+                    </td>
+                    <td className="border-2 text-center">10</td>
+                    <td className="border-2 text-center">10</td>
+                    <td className="border-2 text-center">10</td>
+                    <td className="border-2 text-center">10</td>
+                    <td className="border-2 text-center">10</td>
+                    <td className="border-2 text-center">10</td>
+                  </tr>
+                  <tr>
+                    <td className="border-2">
+                      <div className="flex justify-center">
+                        <span>Agua</span>
+                      </div>
+                    </td>
+                    <td className="border-2 text-center">10</td>
+                  </tr>
+                  <tr>
+                    <td className="border-2">
+                      <div className="flex justify-center">
+                        <span>Dia atipico</span>
+                      </div>
+                    </td>
+                    <td className="border-2 text-center">Ninguno</td>
+                  </tr>
+                </tbody>
+              </table>
+            );
+          })}
+
           {/* <PDFDownloadLink
                   document={
                     <PdfGlucose

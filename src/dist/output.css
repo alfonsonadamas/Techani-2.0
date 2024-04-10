@@ -1712,8 +1712,8 @@ input:checked + .toggle-bg{
   width: 2.25rem;
 }
 
-.w-\[275px\]{
-  width: 275px;
+.w-\[270px\]{
+  width: 270px;
 }
 
 .w-auto{
@@ -1728,6 +1728,14 @@ input:checked + .toggle-bg{
 
 .w-full{
   width: 100%;
+}
+
+.w-\[250px\]{
+  width: 250px;
+}
+
+.w-\[230px\]{
+  width: 230px;
 }
 
 .max-w-2xl{
