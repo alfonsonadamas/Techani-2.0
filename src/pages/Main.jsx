@@ -5,6 +5,7 @@ import ReactApexChart from "react-apexcharts";
 import "../dist/output.css";
 import SideBar from "../components/SideBar";
 
+
 export default function Main() {
   const [data] = useState({
     series: [
@@ -119,34 +120,10 @@ export default function Main() {
     },
   });
 
-  const [data3] = useState({
-    series: [44, 55, 13, 43, 22],
-    options: {
-      chart: {
-        width: 380,
-        type: "pie",
-      },
-      labels: ["Team A", "Team B", "Team C", "Team D", "Team E"],
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200,
-            },
-            legend: {
-              position: "bottom",
-            },
-          },
-        },
-      ],
-    },
-  });
-
   return (
     <div className="w-full h-screen">
       <SideBar />
-      <div className="p-16 pt-20 sm:ml-64">
+      <div className="p-16 pt-20 sm:ml-64 ">
         <div className="flex flex-col sm:flex sm:flex-row">
           <div className="w-full sm:w-1/2">
             <ReactApexChart
@@ -162,16 +139,6 @@ export default function Main() {
               series={data2.series}
               type="bar"
               height={350}
-            />
-          </div>
-        </div>
-        <div className="flex justify-center">
-          <div>
-            <ReactApexChart
-              options={data3.options}
-              series={data3.series}
-              type="pie"
-              width={380}
             />
           </div>
         </div>
