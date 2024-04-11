@@ -488,6 +488,7 @@ export default function GlucoseRegister() {
                       </div>
                     </div>
                   )}
+
                   {stepForm === 3 && (
                     <div className="pt-28">
                       <p className="mt-52 mb-4 text-sm text-gray-900 dark:text-white w-full">

@@ -8,6 +8,8 @@ import Index from "../pages/Index";
 import GlucoseRegister from "../pages/GlucoseRegister";
 import AllGlucoseRegister from "../pages/AllGlucoseRegister";
 import SignUp from "../pages/SignUp";
+import Files from "../pages/Files";
+import MyFiles from "../pages/MyFiles";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +57,26 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AllGlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/files",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Files />,
+          },
+        ],
+      },
+      {
+        path: "/myFiles",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyFiles />,
           },
         ],
       },

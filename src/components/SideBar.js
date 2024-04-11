@@ -8,6 +8,7 @@ export default function SideBar() {
   const navigate = useNavigate();
   const { user } = useUserContext();
   const [isHidden, setIsHidden] = useState(true);
+  const [isHidden1, setIsHidden1] = useState(true);
   const [name, setName] = useState("");
 
   const handleSignOut = async () => {
@@ -22,6 +23,9 @@ export default function SideBar() {
 
   const dropDown = () => {
     setIsHidden(!isHidden);
+  };
+  const dropDown1 = () => {
+    setIsHidden1(!isHidden1);
   };
 
   useEffect(() => {
@@ -47,6 +51,7 @@ export default function SideBar() {
         </div>
       </nav>
       <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[250px] overflow-y-auto text-center border-r border-gray-200">
+        {/* Aqui inicia */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg
             className="w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -145,6 +150,107 @@ export default function SideBar() {
               </svg>
 
               <span className="ml-3">Mis Registros</span>
+            </Link>
+          </div>
+        </div>
+        {/* Aqui termina */}
+        <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+            />
+          </svg>
+
+          <div
+            className="flex justify-between w-full items-center"
+            onClick={dropDown1}
+          >
+            <span className="text-[15px] ml-2 font-semibold">
+              Analisis Clinicos
+            </span>
+            <span
+              className={
+                isHidden1
+                  ? "text-sm duration-300"
+                  : "text-sm rotate-180 duration-300 "
+              }
+            >
+              <svg
+                class="w-3 h-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div
+          className={
+            isHidden1
+              ? "hidden text-left text-sm  mt-2 w-4/5 mx-auto"
+              : " text-left text-sm  mt-2 w-4/5 mx-auto"
+          }
+        >
+          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+            <Link
+              to={"/files"}
+              className="flex items-center cursor-pointer p-2 "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                />
+              </svg>
+
+              <span className="ml-3">Subir Archivos</span>
+            </Link>
+          </div>
+          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+            <Link to={"/myFiles"} className="flex cursor-pointer p-2 ">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"
+                />
+              </svg>
+
+              <span className="ml-3">Mis Archivos</span>
             </Link>
           </div>
         </div>
