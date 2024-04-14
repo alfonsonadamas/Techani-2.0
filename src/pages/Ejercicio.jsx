@@ -19,9 +19,9 @@ function ExerciseForm() {
     setActivity(event.target.value);
   };
 
-  const handleTimeChange = (event) => {
-    setTime(event.target.value);
-  };
+  // const handleTimeChange = (event) => {
+  //   setTime(event.target.value);
+  // };
 
   const handleWeightChange = (event) => {
     setWeight(event.target.value);

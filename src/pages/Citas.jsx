@@ -12,42 +12,39 @@ function Citas() {
   const [sendForm, setSendForm] = useState(false);
   // Aquí inicializamos citas como un array vacío
   const {user} = useUserContext();
-  const handleFormSubmit = async ({ date,
-  time,
-  appointmentType,
-  location,
-  doctorName },
-    { setSubmitting, setErrors, resetForm }) => {
 
 
-      try {
-        setSubmitting(true)
-        const {data,error} = await supabase.from("citasMedicas").insert([{
-          typecites:appointmentType, 
-          date:date,
-          time:time,
-          place:location,
-          doctorName:doctorName,
-          uid:user.id
-        }]);
-        if (error) {
-          throw error;
-        }
-        
-        console.log(data);
-        setSendForm(true); // Actualiza el estado para mostrar el mensaje de éxito
+  const handleFormSubmit = async (
+  { date, time, appointmentType, location, doctorName },
+  { setSubmitting, setErrors, resetForm }
+) => {
+  try {
+    setSubmitting(true);
+    const { data, error } = await supabase.from("citasMedicas").insert([
+      {
+        typecites: appointmentType,
+        date: date,
+        time: time,
+        place: location,
+        doctorName: doctorName,
+        uid: user.id,
+      },
+    ]);
+    if (error) {
+      throw error;
+    }
 
-        // Restablecer el formulario para dejar los campos en blanco
-        resetForm();
+    console.log(data);
+    setSendForm(true); // Actualiza el estado para mostrar el mensaje de éxito
+    setSubmitting(false);
 
-        // Redirigir al usuario a la misma página para actualizarla automáticamente
-        window.location.reload();
-        } catch (error) {
-        console.error(error);
-        } finally {
-        setSubmitting(false);
-        }
-        };
+    // Restablecer el formulario para dejar los campos en blanco
+    resetForm();
+  } catch (error) {
+    console.error(error);
+    setSubmitting(false);
+  }
+};
   
   
 
@@ -121,7 +118,6 @@ function Citas() {
         type="text"
         id="appointmentType"
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        value={values.appointmentType}
         onChange={handleChange}
       />
        <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
@@ -166,19 +162,6 @@ function Citas() {
   </form>
   )}
   </Formik>
-  
-{sendForm && (
-          <div
-            className="flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
-            role="alert"
-          >
-            <span className="sr-only">Info</span>
-            <div className="text-green-400">
-              <span className="font-medium">¡Listo! </span>
-              Su cita se ha registrado correctamente.
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
