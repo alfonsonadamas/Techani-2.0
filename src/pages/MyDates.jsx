@@ -73,7 +73,7 @@ function MyDates() {
           date: values.date,
           time: values.time,
           typecites: values.typecites,
-          place: values.location,
+          place: values.place,
           doctorName: values.doctorName,
         })
         .eq('idCita', editingCita.idCita);
