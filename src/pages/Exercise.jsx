@@ -37,7 +37,7 @@ function ExerciseForm() {
     setActivity([]);
     if (event.target.value.trim() === "") return setDataAuxActivities([]);
     const newData = activities.filter((item) => {
-      return item.name_activity
+      return item.nameActivity
         .toLowerCase()
         .includes(event.target.value.toLowerCase());
     });
@@ -185,11 +185,11 @@ function ExerciseForm() {
                         key={item.idActividades}
                         className="cursor-pointer"
                         onClick={() =>
-                          activitySearch(item.name_activity, item.idActividades)
+                          activitySearch(item.nameActivity, item.idActividades)
                         }
                       >
                         <div className="p-4 border-b-2 hover:bg-gray-100 transition-all ease-in">
-                          <p>{item.name_activity}</p>
+                          <p>{item.nameActivity}</p>
                         </div>
                       </div>
                     );

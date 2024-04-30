@@ -91,7 +91,7 @@ export default function SideBar() {
           </div>
         </div>
       </nav>
-      <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[250px] overflow-y-auto text-center border-r border-gray-200">
+      <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[230px] overflow-y-auto text-center border-r border-gray-200">
         {/* Aqui empieza el menu desplegable */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg

@@ -14,9 +14,6 @@ export default function Profile() {
 
   // const conseguirUrl = async () => {
   //   try {
-  //     // const { data, error } = await supabase.storage
-  //     //   .from("analisis_archivos")
-  //     //   .list("123");
   //     const { data, error } = await supabase.storage
   //       .from("analisis_archivos")
   //       .download(`123/folder.svg`);

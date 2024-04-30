@@ -135,16 +135,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "/ejercicio",
-        element: <LayoutPrivate />,
-        children: [
-          {
-            index: true,
-            element: <Exercise />,
-          },
-        ],
-      },
+
       {
         path: "/citas",
         element: <LayoutPrivate />,
@@ -235,6 +226,15 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AllFiles />,
+          },
+        ],
+      },
+      {
+        path: "/exercise",
+        children: [
+          {
+            index: true,
+            element: <Exercise />,
           },
         ],
       },

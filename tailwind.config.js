@@ -29,6 +29,7 @@ module.exports = {
     "./src/pages/Main.jsx",
     "./src/pages/Index.jsx",
     "./src/components/NavRegistro.jsx",
+    "./src/components/Modal.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
