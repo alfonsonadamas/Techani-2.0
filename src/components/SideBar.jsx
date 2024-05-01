@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Logo from "../assets/img/Techani (1).png";
 import { useUserContext } from "../context/UserContext";
 
@@ -53,6 +53,24 @@ export default function SideBar() {
   }, [user]);
 
   const [responsive,setResponsive]=useState(false);
+
+
+  useEffect(() => {
+
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setResponsive(false);
+      } else {
+        setResponsive(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const toogleResponsive = () =>{
     setResponsive(!responsive);
 
@@ -110,7 +128,7 @@ export default function SideBar() {
 
                 <div className="  flex items-center justify-start rtl:justify-end">
 
-                  <div className="md:block lg:hidden">
+                  <div className=" md:hidden">
                     <button style={{margin:'10px'}} onClick={toogleResponsive}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -135,7 +153,7 @@ export default function SideBar() {
              
              
                 {/*SIDE BAR */}
-      <div className=" fixed top-14 bottom-0 p-2 w-[275px] overflow-y-auto text-center">
+      <div className={`${responsive ? "hidden" : "block"} fixed top-14 bottom-0 p-2 w-[275px] overflow-y-auto text-center`}>
         {/* Aqui empieza el menu desplegable */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg
@@ -660,19 +678,8 @@ export default function SideBar() {
         </div>
         {/* Aqui acaba */}
       </div>
-             
-             
-            
-        
-        
-        
-            </div>
-
-        
-
-        
-        
-          </div>
+      </div>  
+      </div>
       </div>
     
 
