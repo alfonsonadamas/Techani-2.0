@@ -41,119 +41,48 @@ export default function SideBar() {
   useEffect(() => {
     if (user) {
       if (user.user_metadata.avatar_url) {
+        if (user.app_metadata.provider === "facebook") {
+          return setPicture(
+            "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
+          );
+        }
         setPicture(user.user_metadata.avatar_url);
       } else {
         setPicture(
           "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
         );
       }
-
+      console.log();
       setName(user.user_metadata.full_name);
+      console.log(name);
     }
-  }, [user]);
-
-  const [responsive,setResponsive]=useState(false);
-
-
-  useEffect(() => {
-
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setResponsive(false);
-      } else {
-        setResponsive(true);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const toogleResponsive = () =>{
-    setResponsive(!responsive);
-
-  };
-
-  
-
+  }, [user, name]);
   return (
-
-
-    <div className="bg-white py-3 fixed top-0 left-0 right-0 shadow-md">
-    
-            <div className=" flex items-center justify-between">
-              <div className="  flex items-center justify-start rtl:justify-end">
-
-                <button className="ml-5" onClick={toogleResponsive}>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                  </svg>
-                </button>
-
-
-                <div className="ml-5">
-                <Link to={"/dashboard"} className="flex ms-2 md:me-24">
-                  <img src={Logo} alt="techanilogo" className="h-10 me-3" />
-                  <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                    Techani
-                  </span>
-                </Link>
-                </div>
-
-                <h2 className="hidden sm:block">Bienvenido, {name}</h2>
-              </div>
-
-              <div className="mr-5">
-                <Link to={"/profile"}>
-                  <img
-                    className="rounded-full"
-                    src={picture}
-                    alt="perfil"
-                    width={40}
-                  />
-                </Link>
-
-              </div>
-
-              
+    <div>
+      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 ">
+        <div className="px-3 py-3 lg:px-5 lg:pl-3">
+          <div className=" flex items-center justify-between">
+            <div className="  flex items-center justify-start rtl:justify-end">
+              <Link to={"/dashboard"} className="flex ms-2 md:me-24">
+                <img src={Logo} alt="techanilogo" className="h-10 me-3" />
+                <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+                  Techani
+                </span>
+              </Link>
+              <h2 className="hidden sm:block">Bienvenido, {name}</h2>
             </div>
-
-          
-
-
-          <div style={{backgroundColor: '#ffff',border: '2px solid #C2C2C2', minHeight: '100vh', width: '18rem', position: 'fixed', top: 0, left: 0 }} className={`${responsive ? "hidden" : "flex"}`} >
-            <div style={{paddingTop:'3px'}}>
-
-                <div className="  flex items-center justify-start rtl:justify-end">
-
-                  <div className=" md:hidden">
-                    <button style={{margin:'10px'}} onClick={toogleResponsive}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                    </button>
-                  </div>
-
-                
-                
-                <div className="ml-5 mt-3">
-                  <Link to={"/dashboard"} className="flex ms-2 md:me-24">
-                    <img src={Logo} alt="techanilogo" className="h-10 me-3" />
-                    <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                      Techani
-                    </span>
-                  </Link>
-                </div>
-                </div>
-                
-
-             
-             
-             
-                {/*SIDE BAR */}
-      <div className={`${responsive ? "hidden" : "block"} fixed top-14 bottom-0 p-2 w-[275px] overflow-y-auto text-center`}>
+            <Link to={"/profile"}>
+              <img
+                className="rounded-full"
+                src={picture}
+                alt="perfil"
+                width={40}
+              />
+            </Link>
+          </div>
+        </div>
+      </nav>
+      <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[230px] overflow-y-auto text-center border-r border-gray-200">
         {/* Aqui empieza el menu desplegable */}
         <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
           <svg
@@ -213,7 +142,7 @@ export default function SideBar() {
         >
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
             <Link
-              to={"/glucoseRegister"}
+              to={"/dailyRecord"}
               className="flex items-center cursor-pointer p-2 "
             >
               <img
@@ -307,7 +236,7 @@ export default function SideBar() {
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
             <Link
-              to={"/glucoseRegister"}
+              to={"/AlimentosRegister"}
               className="flex items-center cursor-pointer p-2 "
             >
               <img
@@ -320,7 +249,7 @@ export default function SideBar() {
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/myRecords"} className="flex cursor-pointer p-2 ">
+            <Link to={"/myAliments"} className="flex cursor-pointer p-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -390,7 +319,7 @@ export default function SideBar() {
         >
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
             <Link
-              to={"/ejercicio"}
+              to={"/exercise"}
               className="flex items-center cursor-pointer p-2 "
             >
               <img
@@ -400,6 +329,17 @@ export default function SideBar() {
               />
 
               <span className="ml-3">Nuevo Registro</span>
+            </Link>
+          </div>
+          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+            <Link to={"/newActivitie"} className="flex cursor-pointer p-2 ">
+              <img
+                alt="exercise"
+                className="w-5 h-5"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADIklEQVR4nO2ZXYhMYRjHf8taZFfJR3Jhdyk3tMlHaeXGZ3EhpJQLJNkLCWG5lNYiF0L7cUOE5EKZUYpyo8TaRAl31q4pVmLWxxrt7uit/6m348yM3T0z+x7Nv97OnPM+857nP8/7fL0DRRQco4gwSoDtwAsgDXQAu4kYZgMPRMCMPuvzTiKAUuAQ8FNKfwS2AmXALj17jeOYD7Rbv/xlYLI1PxroB3pxFOOAE8BvEXgLrAnwl3rNP8dBLAPeSMF+4CxQ7pOpBu5ZvrIehzARaAYGpOBLYIlPxmylfcB3yXwCNuAQ1gLvpJzZTieBsT6ZecBjy19uAlNxBNOAK5Zyj4C5Ppkx8oVfkkkM1QrrgDYgZb0w7PEN2BuQrWuBV5a/XAAqhkoiX8p7ysWBSt97jbLnNZ8WmaUMA0+1UL0S0Ej4y/EAfxk0erSgP/zlA8Zxr1rWMtu5JqzF27To0TxbxJQc3XrXD+CAQm2oZg7DFx5mecc1S+4+MCs89f8m8ySEqJUJXgLcobLDWaSzECnRnCHjPNI5LJJr3sYcYA8QAz4rOTYWKqIOxyKTgE1AqyrgTNvWVMpOESlVNj+mcqXPp3C3gsM2YIZkvbLFCSJm3AK++hRPqb09AiwIKGFWSO6DC0S8qOUN04ucU3k0wSc/Xg3WGeCSVcIcLgCPnM58Crih/rsygGgNcFCNVK+13oAsWEeBMJioZDAF2CwH7wwoMtvVr6wMowYLk4gJncul3LOArfYeuAhsEckRQzYiG3VwYCtuaq27wP6AJgvXiBhfuGPNmc+ntV3MCYqTSPuI1FmHB1905GnCapX8okt9iLm26LmTRLzi8zowXc9WW72Pf/QAq3CQiP++2iJxG1ik/GGuMT1PBoRm54i0WiSCENO8OfNymkiX7hdm+P5izZs+3mkiqRznAhWaN+daThPp/EeLdOA4kRbdG18IQlzzTThOpMqKWnFZoFzXuBW1ZuI4EZQnkhnySFIZnygQQXmiWdEppWuTC5YYLBHnkS4ScQz/jUUSUrxW/3F4XV/k0BgQUhuIIMpEJiFLNBTwT6MiiiBk/AElsZmxUBZWTAAAAABJRU5ErkJggg=="
+              ></img>
+
+              <span className="ml-3">Nueva Actividad</span>
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
@@ -485,7 +425,7 @@ export default function SideBar() {
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/myRecords"} className="flex cursor-pointer p-2 ">
+            <Link to={"/myDates"} className="flex cursor-pointer p-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -567,7 +507,7 @@ export default function SideBar() {
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/myRecords"} className="flex cursor-pointer p-2 ">
+            <Link to={"/viewEstados"} className="flex cursor-pointer p-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -634,7 +574,7 @@ export default function SideBar() {
         >
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
             <Link
-              to={"/glucoseRegister"}
+              to={"/files"}
               className="flex items-center cursor-pointer p-2 "
             >
               <svg
@@ -656,7 +596,7 @@ export default function SideBar() {
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/myRecords"} className="flex cursor-pointer p-2 ">
+            <Link to={"/myFiles"} className="flex cursor-pointer p-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

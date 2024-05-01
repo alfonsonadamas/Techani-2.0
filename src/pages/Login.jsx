@@ -40,12 +40,23 @@ export default function Login() {
 
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "facebook",
-    });
-    navigate("/dashboard");
-    console.log(data, error);
+    setloading(true);
+    // try {
+    //   const { data, error } = await supabase.auth.signInWithOAuth({
+    //     provider: "facebook",
+    //   });
+    //   console.log(data, error);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
+
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Correo electrónico inválido")
+      .required("El correo electrónico es requerido"),
+    password: Yup.string().required("La contraseña es requerida"),
+  });
 
   useEffect(() => {
     if (user) {
