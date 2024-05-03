@@ -14,9 +14,6 @@ export default function Profile() {
 
   // const conseguirUrl = async () => {
   //   try {
-  //     // const { data, error } = await supabase.storage
-  //     //   .from("analisis_archivos")
-  //     //   .list("123");
   //     const { data, error } = await supabase.storage
   //       .from("analisis_archivos")
   //       .download(`123/folder.svg`);
@@ -89,6 +86,11 @@ export default function Profile() {
       setEmail(user.email);
 
       if (user.user_metadata.avatar_url) {
+        if (user.app_metadata.provider === "facebook") {
+          return setPicture(
+            "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
+          );
+        }
         setPicture(user.user_metadata.avatar_url);
       } else {
         setPicture(

@@ -5,6 +5,7 @@ import ReactApexChart from "react-apexcharts";
 import "../dist/output.css";
 import SideBar from "../components/SideBar";
 
+
 export default function Main() {
   const [data] = useState({
     series: [

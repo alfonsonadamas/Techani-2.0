@@ -52,14 +52,14 @@ export default function Login() {
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
     setloading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "facebook",
-      });
-      console.log(data, error);
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   const { data, error } = await supabase.auth.signInWithOAuth({
+    //     provider: "facebook",
+    //   });
+    //   console.log(data, error);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const validationSchema = Yup.object({

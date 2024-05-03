@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import LayoutRoot from "../layout/LayoutRoot";
 import LayoutPrivate from "../layout/LayoutPrivate";
-
+import ViewEstados from "../pages/ViewEstados";
 import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
@@ -14,9 +14,17 @@ import Alimentos from "../pages/Alimentos";
 import AlimentosRegister from "../pages/AlimentosRegister";
 import AllAlimentosRegister from "../pages/AllAlimentosRegister";
 
-import Ejercicio from "../pages/Ejercicio";
+import Exercise from "../pages/Exercise";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
+import Activities from "../pages/Activities";
+import GlucoseRegisterMain from "../pages/DailyRecord";
+import InsulineRegister from "../pages/InsulineRegister";
+import WaterRegister from "../pages/WaterRegister";
+import AtipicDay from "../pages/AtipicDayRegister";
+import Files from "../pages/Files";
+import AllFiles from "../pages/AllFiles";
+import MyDates from "../pages/MyDates";
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +62,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <GlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/viewEstados",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <ViewEstados />,
           },
         ],
       },
@@ -115,18 +133,9 @@ export const router = createBrowserRouter([
             index: true,
             element: <AllAlimentosRegister />,
           },
-        ],
-      },
-      {
-        path: "/ejercicio",
-        element: <LayoutPrivate />,
-        children: [
-          {
-            index: true,
-            element: <Ejercicio />,
-          },
         ],
       },
+
       {
         path: "/citas",
         element: <LayoutPrivate />,
@@ -138,12 +147,94 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "/myDates",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyDates />,
+          },
+        ],
+      },
+      {
         path: "/estados",
         element: <LayoutPrivate />,
         children: [
           {
             index: true,
             element: <Estados />,
+          },
+        ],
+      },
+      {
+        path: "/newActivitie",
+        children: [
+          {
+            index: true,
+            element: <Activities />,
+          },
+        ],
+      },
+      {
+        path: "/dailyRecord",
+        children: [
+          {
+            index: true,
+            element: <GlucoseRegisterMain />,
+          },
+        ],
+      },
+      {
+        path: "/insulineRegister",
+        children: [
+          {
+            index: true,
+            element: <InsulineRegister />,
+          },
+        ],
+      },
+      {
+        path: "/waterRegister",
+        children: [
+          {
+            index: true,
+            element: <WaterRegister />,
+          },
+        ],
+      },
+      {
+        path: "/atipicDayRegister",
+        children: [
+          {
+            index: true,
+            element: <AtipicDay />,
+          },
+        ],
+      },
+      {
+        path: "/files",
+        children: [
+          {
+            index: true,
+            element: <Files />,
+          },
+        ],
+      },
+      {
+        path: "/myFiles",
+        children: [
+          {
+            index: true,
+            element: <AllFiles />,
+          },
+        ],
+      },
+      {
+        path: "/exercise",
+        children: [
+          {
+            index: true,
+            element: <Exercise />,
           },
         ],
       },
