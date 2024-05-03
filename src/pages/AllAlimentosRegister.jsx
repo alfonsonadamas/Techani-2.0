@@ -12,6 +12,7 @@ import { type } from '@testing-library/user-event/dist/type';
 export default function AllAlimentosRegister () {
     const { user } = useUserContext();
     const [records, setRecords] = useState([]);
+    const [originalRecords, setOriginalRecords] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [editRecord,setEditRecord] = useState(null);
@@ -20,6 +21,10 @@ export default function AllAlimentosRegister () {
     const [foodTypes, setFoodTypes] = useState([]);
     const [measuringunits, setMeasuringunits] = useState([]);
     const [measuringunit, setMeasuringunit] = useState('');
+
+    const [carbohydratesSelect,setCarbohydratesSelect] = useState('');
+    const [foodTypeSelect,setFoodTypeSelect] = useState('');
+    const [portionAmountSelect,setPortionAmountSelect] = useState('');
 
     const openModal = (record) => {
       setEditRecord(record);
@@ -41,8 +46,6 @@ export default function AllAlimentosRegister () {
     const getRecords = async () => {
         try {
           setLoading(true);
-          // unidadesMedida ( idUnidadMedida, name )
-          // idUnidadMedida, food,portionamount, carbohydrates,    BancoAlimentos
           const { data, error } = await supabase
             .from("BancoAlimentos")
             .select("idBancoAlimentos,food,tipoAlimento(idTipoalimento,food), portionamount, carbohydrates, unidadesMedida(idUnidadMedida,name)")
@@ -52,11 +55,54 @@ export default function AllAlimentosRegister () {
           if (error) console.log("error", error);
     
           setRecords(data);
+          setOriginalRecords(data);
         } catch (error) {
           console.log(error);
         } finally {
           setLoading(false);
         }
+    };
+
+    const getFiltercarbohydrates = async (carbohydratesOpcion) => {
+      // Filtrar por tipo de alimento
+      let filteredRecords = [...records];
+      if (carbohydratesOpcion === 'asc') {
+        // Ordenar de menor a mayor
+        filteredRecords.sort((a, b) => b.carbohydrates - a.carbohydrates);
+      } else if (carbohydratesOpcion === 'des') {
+        // Ordenar de mayor a menor
+        filteredRecords.sort((a, b) => a.carbohydrates - b.carbohydrates);
+      }else if(carbohydratesOpcion === ""){
+        filteredRecords.sort((a, b) => a.idBancoAlimentos - b.idBancoAlimentos);
+      }
+      setPortionAmountSelect('');
+      setRecords(filteredRecords);
+    };
+
+    const getFilterPortionAmount = async (portionAmountOption) =>{
+      let filteredRecords = [...records];
+      if (portionAmountOption === 'asc') {
+        // Ordenar de menor a mayor
+        filteredRecords.sort((a, b) => b.portionamount - a.portionamount);
+      } else if (portionAmountOption === 'des') {
+        // Ordenar de mayor a menor
+        filteredRecords.sort((a, b) => a.portionamount - b.portionamount);
+      }else if(portionAmountOption === ""){
+        filteredRecords.sort((a, b) => a.idBancoAlimentos - b.idBancoAlimentos);
+      }
+      setCarbohydratesSelect('');
+      setRecords(filteredRecords);
+    };
+
+    const getFilterfoodTyple = async (foodTypeOption) => {
+      if (foodTypeOption) {
+        const filteredRecords = originalRecords.filter(record => record.tipoAlimento.food === foodTypeOption);
+        setRecords(filteredRecords);
+      }else{
+        setRecords(originalRecords);
+      }
+      setCarbohydratesSelect('');
+      setPortionAmountSelect('');
     };
 
     const deletefood = async (id) => {
@@ -132,6 +178,9 @@ export default function AllAlimentosRegister () {
         console.log(error);
       } finally {
         setLoading(false);
+        setCarbohydratesSelect('');
+        setFoodTypeSelect('');
+        setPortionAmountSelect('');
         getRecords();//actualiza
       }
     };
@@ -145,8 +194,28 @@ export default function AllAlimentosRegister () {
       carbohydratesAmount: Yup.string().required("Este campo es requerido")
     })
 
+    const changefilter_portionAmount = (e) =>{
+      const portionAmountOption = e.target.value;
+      setPortionAmountSelect(portionAmountOption);
+      getFilterPortionAmount(portionAmountOption);
+    }
+
+    const changefilter_carbohydrates = (e) =>{
+      const carbohydratesOption = e.target.value;
+      setCarbohydratesSelect(carbohydratesOption);
+      getFiltercarbohydrates(carbohydratesOption);
+    }
+
+    const changefilter_foodTyple = (e) =>{
+      const foodTypeOpcion = e.target.value;
+      setFoodTypeSelect(foodTypeOpcion);
+      getFilterfoodTyple(foodTypeOpcion);
+    }
+
     useEffect(() => {
       getRecords();
+      getFiltercarbohydrates();
+      getFilterfoodTyple();
       fetchTipoAlimento();
       fetchMedidas();
     }, []);
@@ -156,6 +225,60 @@ export default function AllAlimentosRegister () {
             <SideBar/>
             <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
                 <h2 className="text-2xl font-semibold mb-4">Tus Alimentos</h2>
+                <div className="flex items-center mb-3 px-2 space-x-2">
+                  {/* filtrados */}
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    Tipo de alimento:
+                  </label>
+                  <select 
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    name="filterfoodtype" 
+                    id="filterfoodtype"
+                    value={foodTypeSelect}
+                    onChange={changefilter_foodTyple}
+                  >  
+                    <option value="">Seleccione un filtrado</option>
+                    {foodTypes.map((type) => (
+                      <option 
+                        key={type.idTipoAlimento} 
+                        value={type.idTipoAlimento} // Usamos el índice como valor
+                      >
+                        {type.food}
+                      </option>
+                    ))}
+                  </select>
+
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    Cantidad por porción:
+                  </label>
+                  <select 
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    name="filterportionAmount" 
+                    id="filterportionAmount"
+                    value={portionAmountSelect}
+                    onChange={changefilter_portionAmount}
+                  >  
+                    <option value="">Seleccione un filtrado</option>
+                    <option value="asc">Mayor a menor</option>
+                    <option value="des">Menor a mayor</option>
+                  </select>
+
+                  <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                    Carbohidratos:
+                  </label>
+                  <select 
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    name="filtercarbohidrates" 
+                    id="filtercarbohidrates"
+                    value={carbohydratesSelect}
+                    onChange={changefilter_carbohydrates}
+                  >  
+                    <option value="">Seleccione un filtrado</option>
+                    <option value="asc">Mayor a menor</option>
+                    <option value="des">Menor a mayor</option>
+                  </select>
+                </div>
+                
                 <div className="w-full h-full">
                 {records && records.length === 0 && (
                   <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md ">
