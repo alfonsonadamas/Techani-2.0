@@ -98,76 +98,76 @@ export default function Profile() {
     }
   }, [user]);
 
-  return (
-    <div>
-      <SideBar></SideBar>
-      <div className="p-16 pt-16 sm:ml-64">
-        <Formik
-          initialValues={{
-            fullName: name,
-            email: email,
-            birthday: "",
-            phone: "",
-          }}
-          onSubmit={onSubmit}
-        >
-          {({ handleSubmit, handleChange, values }) => (
-            <form className="flex" onSubmit={handleSubmit}>
-              <div className="flex flex-col items-center">
-                <img
-                  src={picture}
-                  alt="img_perfil"
-                  className="rounded-full"
-                  width={200}
-                />
-                <div className="flex flex-col ">
-                  <span className="font-semibold mb-3">
-                    Nueva Foto de Perfil
-                  </span>
-                  <input
-                    name="file"
-                    onChange={(e) => {
-                      setFile(e.target.files[0]);
-                    }}
-                    type="file"
-                    accept="image/*"
-                  ></input>
+    return (
+      <div>
+        <SideBar></SideBar>
+        <div className="p-16 pt-16 sm:ml-64">
+          <Formik
+            initialValues={{
+              fullName: name,
+              email: email,
+              birthday: "",
+              phone: "",
+            }}
+            onSubmit={onSubmit}
+          >
+            {({ handleSubmit, handleChange, values }) => (
+              <form className="flex" onSubmit={handleSubmit}>
+                <div className="flex flex-col items-center">
+                  <img
+                    src={picture}
+                    alt="img_perfil"
+                    className="rounded-full"
+                    width={200}
+                  />
+                  <div className="flex flex-col ">
+                    <span className="font-semibold mb-3">
+                      Nueva Foto de Perfil
+                    </span>
+                    <input
+                      name="file"
+                      onChange={(e) => {
+                        setFile(e.target.files[0]);
+                      }}
+                      type="file"
+                      accept="image/*"
+                    ></input>
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col w-full">
-                <span>Nombre Completo</span>
-                <input
-                  type="text"
-                  disabled
-                  name="fullName"
-                  value={name}
-                  onChange={handleChange}
-                  className="bg-gray-50 disabled:text-gray-500 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <span>Correo Electrónico</span>
-                <input
-                  type="text"
-                  disabled
-                  name="email"
-                  value={email}
-                  className="bg-gray-50 disabled:text-gray-500 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <span>Fecha de Nacimiento</span>
-                <input
-                  type="date"
-                  className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <span>Telefono</span>
-                <input
-                  type="text"
-                  className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <button type="submit">Enviar</button>
-              </div>
-            </form>
-          )}
-        </Formik>
+                <div className="flex flex-col w-full">
+                  <span>Nombre Completo</span>
+                  <input
+                    type="text"
+                    disabled
+                    name="fullName"
+                    value={name}
+                    onChange={handleChange}
+                    className="bg-gray-50 disabled:text-gray-500 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                  ></input>
+                  <span>Correo Electrónico</span>
+                  <input
+                    type="text"
+                    disabled
+                    name="email"
+                    value={email}
+                    className="bg-gray-50 disabled:text-gray-500 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                  ></input>
+                  <span>Fecha de Nacimiento</span>
+                  <input
+                    type="date"
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                  ></input>
+                  <span>Telefono</span>
+                  <input
+                    type="text"
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                  ></input>
+                  <button type="submit">Enviar</button>
+                </div>
+              </form>
+            )}
+          </Formik>
+        </div>
       </div>
-    </div>
-  );
+    );
 }
