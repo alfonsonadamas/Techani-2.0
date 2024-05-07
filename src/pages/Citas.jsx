@@ -4,10 +4,15 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import * as Yup from "yup";
 import { useUserContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Citas() {
+  const navigate = useNavigate();
+  // Estados para manejar el envío del formulario y mostrar el mensaje de éxito
+  const [sendForm, setSendForm] = useState(false);
   // Aquí inicializamos citas como un array vacío
   const { user } = useUserContext();
+
   const handleFormSubmit = async (
     { date, time, appointmentType, location, doctorName },
     { setSubmitting, setErrors, resetForm }
@@ -24,10 +29,18 @@ function Citas() {
           uid: user.id,
         },
       ]);
-      console.log(data, error);
+      if (error) {
+        throw error;
+      }
+
+      console.log(data);
+      setSendForm(true); // Actualiza el estado para mostrar el mensaje de éxito
+      setSubmitting(false);
+
+      // Restablecer el formulario para dejar los campos en blanco
+      resetForm();
     } catch (error) {
-      console.log(error);
-    } finally {
+      console.error(error);
       setSubmitting(false);
     }
   };
@@ -102,7 +115,6 @@ function Citas() {
                   type="text"
                   id="appointmentType"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  value={values.appointmentType}
                   onChange={handleChange}
                 />
                 <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
