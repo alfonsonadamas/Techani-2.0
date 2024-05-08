@@ -51,7 +51,7 @@ export default function ViewEstados() {
     <div>
       <SideBar />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
-        <h2 className="text-2xl font-semibold mt-10">Emociones anteriores</h2>
+        <h2 className="text-2xl font-semibold mt-5">Emociones anteriores</h2>
 
         {loading ? (
           <p className="bg-blue-500">Cargando registros...</p>
@@ -68,14 +68,14 @@ export default function ViewEstados() {
                 >
                   {records.map((record) => (
                     <div
-                      className="w-48 h-auto p-4 bg-white rounded-md shadow-md flex flex-col "
+                      className="w-48 h-auto p-4 mb-5 bg-white rounded-md border border-solid-2 border-gray-300  shadow-md flex flex-col "
                       key={record.idEmocion}
                     >
                       <div
                         style={{ marginTop: "10px" }}
                         className="items-center justify-center"
                       >
-                        <h1 className="text-4xl mt-5 text-center">
+                        <h1 className="text-4xl  text-center">
                           {mapEmotionToEmoji(record.idEmocion)}
                         </h1>
                         <h1 className="text-center mt-2">

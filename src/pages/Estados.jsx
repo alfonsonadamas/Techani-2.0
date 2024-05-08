@@ -68,7 +68,7 @@ export default function Estados() {
     <div>
       <SideBar />
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-        <label htmlFor="day" className="block mb-1">
+        <label htmlFor="day" className="block mb-2 text-xl font-semibold mt-10">
           Registro del estado de ánimo:
         </label>
 

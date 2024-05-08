@@ -126,7 +126,7 @@ const Index = () => {
                 className="bg-azulFondo transition text-center duration-300 ease-out hover:ease-out hover:bg-azulSecundario hover:shadow-2xl  px-7 py-1 rounded-lg text-white"
               >
                 Iniciar Sesión
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -134,7 +134,5 @@ const Index = () => {
     </div>
   );
 };
-
-export default Index;
 
 export default Index;

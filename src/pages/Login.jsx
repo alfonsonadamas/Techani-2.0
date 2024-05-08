@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 // npm install axios
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
 
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
@@ -8,6 +9,7 @@ import NavRegsitro from "../components/NavRegistro";
 import fondo from "../assets/img/fondo-login.jpg";
 
 export default function Login() {
+  const [loading, setloading]= useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -41,14 +43,14 @@ export default function Login() {
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
     setloading(true);
-    // try {
-    //   const { data, error } = await supabase.auth.signInWithOAuth({
-    //     provider: "facebook",
-    //   });
-    //   console.log(data, error);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+       const { data, error } = await supabase.auth.signInWithOAuth({
+         provider: "facebook",
+       });
+       console.log(data, error);
+     } catch (error) {
+       console.log(error);
+     }
   };
 
   const validationSchema = Yup.object({
