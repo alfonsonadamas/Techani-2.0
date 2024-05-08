@@ -1358,6 +1358,10 @@ input:checked + .toggle-bg{
   margin-left: 1.5rem;
 }
 
+.ml-8{
+  margin-left: 2rem;
+}
+
 .ml-auto{
   margin-left: auto;
 }
@@ -2373,6 +2377,11 @@ input:checked + .toggle-bg{
   background-color: rgb(0 0 0 / 0.2);
 }
 
+.bg-blue-500{
+  --tw-bg-opacity: 1;
+  background-color: rgb(63 131 248 / var(--tw-bg-opacity));
+}
+
 .bg-blue-600{
   --tw-bg-opacity: 1;
   background-color: rgb(28 100 242 / var(--tw-bg-opacity));
@@ -3018,6 +3027,10 @@ input:checked + .toggle-bg{
 
 .pr-10{
   padding-right: 2.5rem;
+}
+
+.pr-2{
+  padding-right: 0.5rem;
 }
 
 .pr-20{
@@ -3829,6 +3842,11 @@ input:checked + .toggle-bg{
 .hover\:bg-azul:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(39 123 192 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-blue-600:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(28 100 242 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-cyan-100:hover{

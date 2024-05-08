@@ -8,6 +8,7 @@ module.exports = {
     "./src/components/Sidebar.jsx",
     "./src/pages/GlucoseRegister.jsx",
     "./src/components/Modal.jsx",
+    "./src/pages/Profile.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
