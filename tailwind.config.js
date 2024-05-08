@@ -4,9 +4,10 @@ module.exports = {
   content: [
     "./src/**/*.{html,js}",
     "./public/index.html",
-    "./src/pages/Login.js",
-    "./src/components/Sidebar.js",
-    "./src/pages/GlucoseRegister.js",
+    "./src/pages/Login.jsx",
+    "./src/components/Sidebar.jsx",
+    "./src/pages/GlucoseRegister.jsx",
+    "./src/components/Modal.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
