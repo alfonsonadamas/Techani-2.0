@@ -218,7 +218,7 @@ export default function AllAlimentosRegister () {
       getFilterfoodTyple();
       fetchTipoAlimento();
       fetchMedidas();
-    }, []);
+    }, [user]);
     
     return(
         <div>

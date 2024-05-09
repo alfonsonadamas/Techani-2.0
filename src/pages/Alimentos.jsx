@@ -169,7 +169,7 @@ export default function Alimentos() {
     fetchTipoAlimento();
     getMealTypes();
     getRecords();
-  }, [alimentsSelect,carbohydratetotal]);
+  }, [user,alimentsSelect,carbohydratetotal]);
 
   return (
     <div>
