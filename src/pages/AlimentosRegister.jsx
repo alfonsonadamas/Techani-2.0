@@ -48,21 +48,18 @@ export default function Comidas() {
       const Indexfoodtypes = foodTypes.find((type) => type.food === foodType);
       setFoodType(Indexfoodtypes.idTipoalimento);
 
-      const Indexmeasuringunit = measuringunits.find(
-        (type) => type.name === measuringunit
-      );
-      setMeasuringunit(Indexmeasuringunit.idUnidadMedida);
-
       // Insertamos el alimento en la tabla 'BancoAlimentos'
-      const { data, error } = await supabase.from("BancoAlimentos").insert({
-        uid: user.id,
-        food: foodName,
-        idTipoAlimento: Indexfoodtypes.idTipoalimento,
-        idUnidadMedida: Indexmeasuringunit.idUnidadMedida,
-        portionamount: portionAmount,
-        carbohydrates: carbohydratesAmount,
-        created_at: fechaActual,
-      });
+      const { data, error } = await supabase
+        .from("BancoAlimentos")
+        .insert({
+          uid: user.id,
+          food: foodName,
+          idTipoAlimento: Indexfoodtypes.idTipoalimento, 
+          idUnidadMedida: measuringunit,
+          portionamount: portionAmount,
+          carbohydrates: carbohydratesAmount,
+          created_at: fechaActual,
+        });
 
       if (error) throw error;
       resetForm();
@@ -121,47 +118,46 @@ export default function Comidas() {
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
         {!sendForm ? (
           <>
+          <label className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+            Registro Alimento
+          </label>
+          
+          <Formik 
+            initialValues={{
+              foodName: "",
+              foodType: "",
+              portionAmount: 1,
+              measuringunit: 1,
+              carbohydratesAmount: 1,
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmitfood}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleBlur,
+              handleChange,
+              handleSubmit,
+              isSubmitting}) => (
+            <form onSubmit={handleSubmit}>
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-              Registro Alimento
+              Nombre alimentos
             </label>
-
-            <Formik
-              initialValues={{
-                foodName: "",
-                foodType: "",
-                portionAmount: 1,
-                measuringunit: "gramos",
-                carbohydratesAmount: 1,
-              }}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmitfood}
-            >
-              {({
-                values,
-                errors,
-                touched,
-                handleBlur,
-                handleChange,
-                handleSubmit,
-                isSubmitting,
-              }) => (
-                <form onSubmit={handleSubmit}>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Nombre alimentos
-                  </label>
-                  <input
-                    name="foodName"
-                    id="foodName"
-                    type="text"
-                    value={values.foodName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoComplete="off"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                    {errors.foodName && touched.foodName && errors.foodName}
-                  </p>
+            <input  
+              name="foodName"
+              id="foodName"        
+              type="text"
+              value={values.foodName}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              autoComplete='off'
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            />
+            <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+              {errors.foodName && touched.foodName && errors.foodName}
+            </p>
 
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Tipo alimento
