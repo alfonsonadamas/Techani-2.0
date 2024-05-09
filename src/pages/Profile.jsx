@@ -109,15 +109,20 @@ export default function Profile() {
       <div className="p-16 pt-16 sm:ml-64">
         <Formik
           initialValues={{
-            fullName: name,
-            email: email,
-            birthday: "",
-            phone: "",
+            firstName: '',
+            lastName: '',
+            birthday: '',
+            phone: '',
+            email: '',
+            location: '',
+            password: '',
+            verify: ''
           }}
           onSubmit={onSubmit}
         >
           {({ handleSubmit, handleChange, values }) => (
-            <form className="flex" onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
+              {/* Parte de Foto de Perfil */}
               <div className="flex flex-col items-center">
                 <img
                   src={picture}
@@ -125,9 +130,9 @@ export default function Profile() {
                   className="rounded-full"
                   width={200}
                 />
-                <div className="flex flex-col ">
+                <div className="flex flex-col mt-4">
                   <span className="font-semibold mb-3">
-                    Nueva Foto de Perfil
+                    Foto de Perfil
                   </span>
                   <input
                     name="file"
@@ -139,35 +144,96 @@ export default function Profile() {
                   ></input>
                 </div>
               </div>
-              <div className="flex flex-col w-full">
-                <span>Nombre Completo</span>
-                <input
-                  type="text"
-                  disabled
-                  name="fullName"
-                  value={name}
-                  onChange={handleChange}
-                  className="bg-gray-50 disabled:text-gray-500 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <span>Correo Electrónico</span>
-                <input
-                  type="text"
-                  disabled
-                  name="email"
-                  value={email}
-                  className="bg-gray-50 disabled:text-gray-500 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <span>Fecha de Nacimiento</span>
-                <input
-                  type="date"
-                  className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <span>Telefono</span>
-                <input
-                  type="text"
-                  className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                ></input>
-                <button type="submit">Enviar</button>
+              {/* Formulario */}
+              <div className="flex flex-wrap w-full ml-8">
+                <div className="flex flex-col w-1/2 pr-2">
+                  <span>Nombre</span>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={values.firstName}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pl-2">
+                  <span>Apellido</span>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={values.lastName}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pr-2">
+                  <span>Fecha de Nacimiento</span>
+                  <input
+                    type="date"
+                    name="birthday"
+                    value={values.birthday}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pl-2">
+                  <span>Telefono</span>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={values.phone}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pr-2">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="email"
+                    value={values.email}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pl-2">
+                  <span>Ubicación</span>
+                  <input
+                    type="text"
+                    name="location"
+                    value={values.location}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pr-2">
+                  <span>Contraseña</span>
+                  <input
+                    type="password"
+                    name="password"
+                    value={values.password}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="flex flex-col w-1/2 pl-2">
+                  <span>Verificar</span>
+                  <input
+                    type="password"
+                    name="verify"
+                    value={values.verify}
+                    onChange={handleChange}
+                    className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  ></input>
+                </div>
+                <div className="w-full">
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
+                  >
+                    Guardar
+                  </button>
+                </div>
               </div>
             </form>
           )}
@@ -175,4 +241,6 @@ export default function Profile() {
       </div>
     </div>
   );
+  
+  
 }
