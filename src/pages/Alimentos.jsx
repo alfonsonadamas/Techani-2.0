@@ -178,7 +178,7 @@ export default function Alimentos() {
       {!sendForm ? (
         <>
         <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white ">
-          Registro de Alimentos
+          Registro de Comidas
         </h2>
 
         <Formik
