@@ -10,6 +10,7 @@ export default function GlucoseRegister() {
   const { user } = useUserContext();
   const [meditionType, setMeditionType] = useState([]);
   const [submited, setSubmited] = useState(false);
+  const [records, setRecords] = useState([{}]);
 
   const getMeditionType = async () => {
     const { data, error } = await supabase.from("medicion").select("*");
@@ -26,6 +27,23 @@ export default function GlucoseRegister() {
     if (meditionType === "none") {
       setErrors({ meditionType: "Selecciona un tipo de medición" });
 
+      return;
+    }
+
+    if (records.length > 0) {
+      // if (records.idMedicion === parseInt(meditionType)) {
+      //   console.log("Ya existe un registro con este tipo de medición");
+      //   return;
+      // }
+      records.forEach((record) => {
+        if (record.idMedicion === parseInt(meditionType)) {
+          setErrors({
+            meditionType: "Ya existe un registro con este tipo de medición",
+          });
+          return;
+        }
+        return;
+      });
       return;
     }
 
@@ -81,7 +99,26 @@ export default function GlucoseRegister() {
 
   useEffect(() => {
     getMeditionType();
-  }, []);
+    const getRecords = async () => {
+      var today = new Date().toLocaleDateString();
+      today = today.split("/").reverse();
+      if (today[1].length === 1) {
+        today[1] = "0" + today[1];
+      }
+      today = today.join("-");
+
+      const { data, error } = await supabase
+        .from("registroGlucosa")
+        .select("*")
+        .eq("uid", user.id)
+        .eq("created_at", today);
+      if (error) throw error;
+      console.log(data);
+      console.log(today);
+      setRecords(data);
+    };
+    getRecords();
+  }, [user]);
 
   return (
     <div>
@@ -145,6 +182,12 @@ export default function GlucoseRegister() {
                           </option>
                         ))}
                       </select>
+
+                      <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.meditionType &&
+                          touched.meditionType &&
+                          errors.meditionType}
+                      </p>
 
                       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Medición de glucosa

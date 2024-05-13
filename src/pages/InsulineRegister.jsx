@@ -8,27 +8,27 @@ import * as Yup from "yup";
 
 export default function InsulineRegister() {
   const { user } = useUserContext();
-  const [insulineType, setinsulineType] = useState([]);
-  const [doseType, setdoseType] = useState([]);
+  const [insulineTypes, setinsulineTypes] = useState([]);
+  const [doseTypes, setdoseTypes] = useState([]);
   const [submited, setSubmited] = useState(false);
 
   const getInsulineType = async () => {
     const { data, error } = await supabase.from("insulina").select("*");
     if (error) throw error;
-    setinsulineType(data);
+    setinsulineTypes(data);
   };
 
   const getDoseType = async () => {
     const { data, error } = await supabase.from("tipoDosis").select("*");
     if (error) throw error;
-    setdoseType(data);
+    setdoseTypes(data);
   };
 
   const onSubmit = async (
-    { dose, doseType, insulineType },
+    { dose, doseType, insulineType, medition },
     { setSubmitting, setErrors, resetForm }
   ) => {
-    console.log(doseType);
+    console.log(medition);
     if (doseType === "none") {
       setErrors({ doseType: "Selecciona un tipo de insulina" });
       return;
@@ -37,6 +37,12 @@ export default function InsulineRegister() {
       setErrors({ insulineType: "Selecciona un tipo de dosis" });
       return;
     }
+
+    if (medition === "none" && doseType === "1") {
+      setErrors({ medition: "Selecciona un tipo de medición" });
+      return;
+    }
+
     const date = new Date().toLocaleDateString();
     var parts = date.split("/");
     var year = parts[2];
@@ -53,6 +59,7 @@ export default function InsulineRegister() {
           dosis: dose,
           tipoInsulina: insulineType,
           tipoDosis: doseType,
+          medicion: medition,
         },
       ]);
 
@@ -73,6 +80,7 @@ export default function InsulineRegister() {
       //   },
       //   "RBjxGi8gd0qdpEToN"
       // );
+      setSubmited(true);
     } catch (error) {
       console.log(error);
     } finally {
@@ -105,6 +113,7 @@ export default function InsulineRegister() {
                   dose: "",
                   doseType: "none",
                   insulineType: "none",
+                  medition: "none",
                 }}
                 onSubmit={onSubmit}
                 validationSchema={validationSchema}
@@ -142,7 +151,7 @@ export default function InsulineRegister() {
                         <option value="none">
                           Selecciona un tipo de insulina
                         </option>
-                        {insulineType.map((insuline) => (
+                        {insulineTypes.map((insuline) => (
                           <option
                             key={insuline.idTipoInsulina}
                             value={insuline.idTipoInsulina}
@@ -170,12 +179,43 @@ export default function InsulineRegister() {
                         <option value="none">
                           Selecciona el tipo de dosis
                         </option>
-                        {doseType.map((insuline) => (
+                        {doseTypes.map((insuline) => (
                           <option key={insuline.id} value={insuline.id}>
                             {insuline.tipoDosis}
                           </option>
                         ))}
                       </select>
+
+                      {values.doseType === "1" && (
+                        <div>
+                          <select
+                            name="medition"
+                            id="medition"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.medition}
+                          >
+                            <option value="none">Seleccione... </option>
+                            <option value="Desayuno">Desayuno</option>
+                            <option value="Colacion Matutina">
+                              Colación Matutina
+                            </option>
+                            <option value="Comida">Comida</option>
+                            <option value="Colacion Vespertina">
+                              Colación Vespertina
+                            </option>
+                            <option value="Ejercicio">Ejercicio</option>
+                            <option value="Cena">Cena</option>
+                            <option value="Nocturna">Nocturna</option>
+                          </select>
+                          <p className="mb-4 mt-3 text-sm text-red-500 dark:text-white w-full">
+                            {errors.medition &&
+                              touched.medition &&
+                              errors.medition}
+                          </p>
+                        </div>
+                      )}
 
                       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Dosis en unidades
@@ -183,9 +223,7 @@ export default function InsulineRegister() {
 
                       <input
                         className={
-                          errors.dose
-                            ? "bg-gray-50 mb-2 border border-red-500  text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-                            : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                          "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
                         }
                         type="text"
                         autoComplete="off"

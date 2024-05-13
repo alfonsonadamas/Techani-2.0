@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import React, { useState, useEffect } from "react";
 import { useUserContext } from "../context/UserContext";
-import { supabase } from '../config/supabase'; 
+import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import Modal from "../components/Modal"; // Asegúrate de tener el componente Modal creado
 import { Formik } from "formik";
@@ -10,39 +9,68 @@ import * as Yup from "yup";
 function MyDates() {
   //const [citas, setCitas] = useState([{ idCita: null }]);
   const [citas, setCitas] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editingCita, setEditingCita] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const { user } = useUserContext();
 
-
-  // Función para manejar la eliminación de una cita
-  const handleEliminarCita = (id) => {
-    // Lógica para eliminar la cita con el ID proporcionado
-    console.log("Eliminar cita con ID:", id);
-  };
-
-  // Función para manejar la edición de una cita
-  const handleEditarCita = (cita) => {
-    // Lógica para editar la cita proporcionada
-    console.log("Editar cita:", cita);
-  };
-
-  
-  useEffect(() => {
-    async function obtenerCitas() {
-      try {
-        const { data, error } = await supabase
-          .from('citasMedicas')
-          .select('*');
-        
-        if (error) {
-          console.error('Error al obtener citas:', error.message);
-          return;
-        }
-        
-        setCitas(data);
-      } catch (error) {
-        console.error('Error al obtener citas:', error.message);
-      }
+  async function obtenerCitas() {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("citasMedicas")
+        .select("*")
+        .eq("uid", user.id);
+      if (error) throw error;
+      console.log(data);
+      setCitas(data); // Establece el estado local con los datos obtenidos
+    } catch (error) {
+      console.error("Error al obtener citas:", error.message);
+      setError(error);
+    } finally {
+      setIsLoading(false);
     }
+  }
 
+  const handleEliminarCita = async (idCita) => {
+    try {
+      console.log("ID de la cita a eliminar:", idCita);
+      await supabase.from("citasMedicas").delete().match({ idCita });
+      if (error) throw error;
+      obtenerCitas();
+    } catch (error) {
+      console.error("Error al eliminar la cita:", error.message);
+    }
+  };
+
+  const handleAbrirModalEdicion = (cita) => {
+    setModalIsOpen(true);
+    setEditingCita({
+      idCita: cita.idCita,
+      date: cita.date,
+      time: cita.time,
+      typecites: cita.typecites,
+      place: cita.place,
+      doctorName: cita.doctorName,
+    });
+    console.log("Cita a editar", editingCita);
+  };
+
+  const handleGuardarCambios = async (values) => {
+    try {
+      await supabase
+        .from("citasMedicas")
+        .update(values)
+        .eq("idCita", editingCita.idCita);
+      setModalIsOpen(false);
+      obtenerCitas();
+    } catch (error) {
+      console.error("Error al guardar cambios:", error.message);
+    }
+  };
+
+  useEffect(() => {
     obtenerCitas();
   }, [user]);
 
@@ -54,17 +82,41 @@ function MyDates() {
           Mis citas
         </label>
         <ul className="mt-4">
-          {Array.isArray(citas) && citas.map((cita, index) => (
-            <li key={index} className="mb-4">
-              <div className="border border-gray-300 p-4 rounded-md">
-                <p>Fecha: {cita.date}</p>
-                <p>Hora: {cita.time}</p>
-                <p>Tipo de cita: {cita.appointmentType}</p>
-                <p>Lugar: {cita.location}</p>
-                <p>Nombre del Doctor: {cita.doctorName}</p>
-                <div className="mt-4 flex justify-end">
-                  <button className="mr-2 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md" onClick={() => handleEliminarCita(cita.id)}>Eliminar</button>
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md" onClick={() => handleEditarCita(cita)}>Editar</button>
+          {citas.map((cita) => (
+            <li key={cita.idCita} className="mb-4">
+              <div className="bg-white shadow-lg rounded-lg p-4 mb-4 dark:bg-gray-800">
+                <div className="mb-4">
+                  <p>
+                    Fecha: <span className="font-semibold">{cita.date}</span>
+                  </p>
+                  <p>
+                    Hora: <span className="font-semibold">{cita.time}</span>
+                  </p>
+                  <p>
+                    Tipo de cita:{" "}
+                    <span className="font-semibold">{cita.typecites}</span>
+                  </p>
+                  <p>
+                    Lugar: <span className="font-semibold">{cita.place}</span>
+                  </p>
+                  <p>
+                    Nombre del Doctor:{" "}
+                    <span className="font-semibold">{cita.doctorName}</span>
+                  </p>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition ease-in duration-200"
+                    onClick={() => handleEliminarCita(cita.idCita)}
+                  >
+                    Eliminar
+                  </button>
+                  <button
+                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition ease-in duration-200"
+                    onClick={() => handleAbrirModalEdicion(cita)}
+                  >
+                    Editar
+                  </button>
                 </div>
               </div>
             </li>

@@ -8,21 +8,27 @@ export default function Files() {
   const [caracteres, setCaracteres] = useState(200);
   const [file, setFile] = useState(null);
   const { user } = useUserContext();
+  const [url, setUrl] = useState("");
 
   const getUrl = async (filename) => {
-    const { data2, error2 } = supabase.storage
-      .from("analisis_archivos")
-      .download(
-        `analisis_archivos/8181e603-1925-4f40-90d5-22dc936b560f/Hola2.pdf`
-      );
-    console.log("Registro URL");
-    console.log(error2, data2);
+    try {
+      const { data, error } = supabase.storage
+        .from("analisis_archivos")
+        .getPublicUrl(
+          `${user.id}/${filename}${file.type === "image/png" ? ".png" : ".pdf"}`
+        );
+      console.log("link:");
+      console.log(data.publicUrl, error);
+      setUrl(data.publicUrl);
+    } catch (error) {}
   };
 
-  const onSubmit = async ({ filename, date, observation }) => {
-    console.log(filename, file, date, observation);
-
+  const onSubmit = async (
+    { filename, date, observation },
+    { setSubmitting, setErrors }
+  ) => {
     try {
+      setSubmitting(true);
       const { data, error } = await supabase.storage
         .from("analisis_archivos")
         .upload(
@@ -32,15 +38,22 @@ export default function Files() {
           file
         );
       getUrl(filename);
-      // const { data, error } = await supabase.from("analisis_archivos").insert({
-      //   type: filename,
-      //   date: date,
-      //   observations: observation,
-      //   uid: user.id,
-      // });
-      // console.log(data);
-      console.log(error, data);
-    } catch (error) {}
+      const { dataUpload, errorUpload } = await supabase
+        .from("analisisArchivos")
+        .insert({
+          title: filename,
+          date: date,
+          observations: observation,
+          uid: user.id,
+          file: url,
+        });
+      console.log("Archivo subido: ", dataUpload, errorUpload);
+      if (error) throw error;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCount = () => {
@@ -120,7 +133,7 @@ export default function Files() {
                 <input
                   type="file"
                   name="filename"
-                  accept="image/jpeg, application/pdf"
+                  accept="image/jpeg, application/pdf, image/png"
                   autoComplete="off"
                   onChange={(e) => {
                     setFile(e.target.files[0]);

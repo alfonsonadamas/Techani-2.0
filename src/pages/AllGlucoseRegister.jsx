@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
+import Modal from "../components/Modal";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 // import PdfGlucose from "../components/PdfGlucose";
+
+let totalRecords = [];
 
 export default function AllGlucoseRegister() {
   const { user } = useUserContext();
@@ -14,40 +17,130 @@ export default function AllGlucoseRegister() {
   const [atipicDayRecordsAux, setAtipicDayRecordsAux] = useState([]);
   const [waterRecords, setWaterRecords] = useState([]);
   const [waterRecordsAux, setWaterRecordsAux] = useState([]);
-  const [totalRecords, setTotalRecords] = useState([]);
   const [recordsAux, setRecordsAux] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
+  const [open, setOpen] = useState(false);
+  const [recordEdit, setRecordEdit] = useState([{}]);
+  const [update, setUpdate] = useState(false);
+  const [atipicDays, setAtipicDays] = useState([]);
 
-  const handleDate1 = (e) => {
-    const date = e.target.value;
-    var parts = date.split("-");
-    var day = parts[2];
-    var month = parts[1];
-    var year = parts[0];
-    const formatDate = new Date(year, month - 1, day);
-    setDate1(formatDate);
-    console.log(date);
+  const getAtipicDay = async () => {
+    const { data, error } = await supabase.from("diaAtipico").select("*");
+    if (error) throw error;
+    console.log(data);
+    setAtipicDays(data);
   };
 
-  const handleDate2 = (e) => {
-    const date = e.target.value;
-    var parts = date.split("-");
-    var day = parts[2];
-    var month = parts[1];
-    var year = parts[0];
-    const formatDate = new Date(year, month - 1, day);
-    setDate2(formatDate);
+  const getRecords = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroGlucosa")
+        .select("id, created_at, glucosa, medicion(measurement)")
+        .eq("uid", user.id);
+
+      if (error) throw error;
+
+      const newData = data.map((record) => {
+        const object = {
+          id: record.id,
+          created_at: record.created_at,
+          measurement: record.medicion.measurement,
+          glucose: record.glucosa,
+        };
+        return object;
+      });
+
+      setRecords(newData);
+      console.log("no editado", records);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRecordsInsuline = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroInsulina")
+        .select(
+          "id, created_at, dosis, tipoInsulina(insulin), tipoDosis(tipoDosis), medicion"
+        )
+        .eq("uid", user.id);
+
+      if (error) throw error;
+
+      const newData = data.map((record) => {
+        const object = {
+          id: record.id,
+          dose: record.dosis,
+          created_at: record.created_at,
+          insulineType: record.tipoInsulina.insulin,
+          doseType: record.tipoDosis.tipoDosis,
+          medition: record.medicion,
+        };
+        return object;
+      });
+
+      setInsulineRecords(newData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRecordsAtipicDay = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroDiaAtipico")
+        .select("id, created_at, diaAtipico(typeDay)")
+        .eq("uid", user.id);
+
+      if (error) throw error;
+
+      const newData = data.map((record) => {
+        const object = {
+          id: record.id,
+          created_at: record.created_at,
+          atipicDay: record.diaAtipico.typeDay,
+        };
+        return object;
+      });
+
+      setAtipicDayRecords(newData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRecordsWater = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroAgua")
+        .select("id, created_at, agua")
+        .eq("uid", user.id);
+
+      if (error) throw error;
+      setWaterRecords(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filterRecords = () => {
-    console.log(insulineRecordsAux);
-    console.log(waterRecordsAux);
-    console.log(atipicDayRecordsAux);
-    console.log(recordsAux);
-    console.log(totalRecords);
     setLoading(true);
+    setUpdate(false);
     const recordsFiltered = records.filter((record) => {
       const date = new Date(record.created_at);
       const newDate1 = new Date(date1);
@@ -77,158 +170,245 @@ export default function AllGlucoseRegister() {
       return date >= newDate1 && date <= newDate2;
     });
 
-    setRecordsAux(recordsFiltered);
-    setInsulineRecordsAux(recordsFilteredInsuline);
-    setAtipicDayRecordsAux(recordsFilteredAtipicDay);
-    setWaterRecordsAux(recordsFilteredWater);
+    const registerGlucose = {};
+    const registerInsuline = {};
+    const registerAtipicDay = {};
+    const registerWater = {};
 
-    const recordsFilteredAux = recordsFiltered.concat(
-      recordsFilteredInsuline,
-      recordsFilteredAtipicDay,
-      recordsFilteredWater
-    );
-
-    const objetosAgrupados = {};
-
-    recordsFilteredAux.forEach((record) => {
+    recordsFiltered.forEach((record) => {
       const fecha = record.created_at;
-      if (!objetosAgrupados[fecha]) {
-        objetosAgrupados[fecha] = [];
+      if (!registerGlucose[fecha]) {
+        registerGlucose[fecha] = [];
       }
-      objetosAgrupados[fecha].push(record);
+      registerGlucose[fecha].push(record);
     });
 
-    setTotalRecords(objetosAgrupados);
+    recordsFilteredInsuline.forEach((record) => {
+      const fecha = record.created_at;
+      if (!registerInsuline[fecha]) {
+        registerInsuline[fecha] = [];
+      }
+      registerInsuline[fecha].push(record);
+    });
 
-    console.log("Objetos agrupados", objetosAgrupados);
+    recordsFilteredAtipicDay.forEach((record) => {
+      const fecha = record.created_at;
+      if (!registerAtipicDay[fecha]) {
+        registerAtipicDay[fecha] = [];
+      }
+      registerAtipicDay[fecha].push(record);
+    });
+
+    recordsFilteredWater.forEach((record) => {
+      const fecha = record.created_at;
+      if (!registerWater[fecha]) {
+        registerWater[fecha] = [];
+      }
+      registerWater[fecha].push(record);
+    });
+
+    setRecordsAux(registerGlucose);
+    setInsulineRecordsAux(registerInsuline);
+    setAtipicDayRecordsAux(registerAtipicDay);
+    setWaterRecordsAux(registerWater);
+
+    const recordsTotal = Object.assign(
+      {},
+      registerGlucose,
+      registerInsuline,
+      registerAtipicDay,
+      registerWater
+    );
+
+    totalRecords = recordsTotal;
 
     setLoading(false);
   };
 
-  useEffect(() => {
-    const getRecords = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
+  const handleEdit = async () => {
+    try {
+      setLoading(true);
+      if (recordEdit.editType === "glucose") {
+        await supabase
           .from("registroGlucosa")
-          .select("id, created_at, glucosa, medicion(measurement)")
-          .eq("uid", user.id);
+          .update({ glucosa: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-        console.log(data);
-
-        if (error) throw error;
-
-        const newData = data.map((record) => {
-          const object = {
-            id: record.id,
-            created_at: record.created_at,
-            measurement: record.medicion.measurement,
-            glucose: record.glucosa,
-          };
-          return object;
-        });
-
-        console.log("New Data: ", newData);
-        setRecords(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        await getRecords();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
       }
-    };
-
-    const getRecordsInsuline = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
+      if (recordEdit.editType === "insuline") {
+        await supabase
           .from("registroInsulina")
-          .select(
-            "id, created_at, dosis, tipoInsulina(insulin), tipoDosis(tipoDosis)"
-          )
-          .eq("uid", user.id);
+          .update({ dosis: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-        if (error) throw error;
-
-        const newData = data.map((record) => {
-          const object = {
-            id: record.id,
-            dose: record.dosis,
-            created_at: record.created_at,
-            insulineType: record.tipoInsulina.insulin,
-            doseType: record.tipoDosis.tipoDosis,
-          };
-          return object;
-        });
-
-        console.log("Insulina: ", newData);
-
-        setInsulineRecords(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        await getRecordsInsuline();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
       }
-    };
+      if (recordEdit.editType === "water") {
+        await supabase
+          .from("registroInsulina")
+          .update({ dosis: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-    const getRecordsAtipicDay = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
+        await getRecordsInsuline();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
+      }
+      if (recordEdit.editType === "atipicDay") {
+        await supabase
           .from("registroDiaAtipico")
-          .select("id, created_at, diaAtipico(typeDay)")
-          .eq("uid", user.id);
+          .update({ diaAtipico: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-        if (error) throw error;
-
-        const newData = data.map((record) => {
-          const object = {
-            id: record.id,
-            created_at: record.created_at,
-            atipicDay: record.diaAtipico.typeDay,
-          };
-          return object;
-        });
-
-        console.log("Dia atipico: ", newData);
-
-        setAtipicDayRecords(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        await getRecordsAtipicDay();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
       }
-    };
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const getRecordsWater = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("registroAgua")
-          .select("created_at, agua")
-          .eq("uid", user.id);
+  // const handleDelete = async () => {
+  //   try {
+  //     if (recordEdit.editType === "glucose") {
+  //       await supabase.from("registroGlucosa").delete().eq("id", recordEdit.id);
+  //       await getRecords();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //     if (recordEdit.editType === "insuline") {
+  //       await supabase
+  //         .from("registroInsulina")
+  //         .delete()
+  //         .eq("id", recordEdit.id);
+  //       await getRecordsInsuline();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //     if (recordEdit.editType === "water") {
+  //       const { error } = await supabase
+  //         .from("registroAgua")
+  //         .delete()
+  //         .eq("id", recordEdit.id);
+  //       console.log(error);
+  //       await getRecordsWater();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //     if (recordEdit.editType === "atipicDay") {
+  //       await supabase
+  //         .from("registroDiaAtipico")
+  //         .delete()
+  //         .eq("id", recordEdit.id);
+  //       await getRecordsAtipicDay();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-        if (error) throw error;
-        console.log("Agua: ", data);
-        setWaterRecords(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleDate1 = (e) => {
+    const date = e.target.value;
+    var parts = date.split("-");
+    var day = parts[2];
+    var month = parts[1];
+    var year = parts[0];
+    const formatDate = new Date(year, month - 1, day);
+    setDate1(formatDate);
+    console.log(date);
+  };
+
+  const handleDate2 = (e) => {
+    const date = e.target.value;
+    var parts = date.split("-");
+    var day = parts[2];
+    var month = parts[1];
+    var year = parts[0];
+    const formatDate = new Date(year, month - 1, day);
+    setDate2(formatDate);
+  };
+
+  useEffect(() => {
     getRecordsAtipicDay();
     getRecords();
     getRecordsInsuline();
     getRecordsWater();
-  }, []);
+    getAtipicDay();
+  }, [user]);
 
   return (
-    <div>
+    <div className="overflow-y-hidden">
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <div>
+          <h2 className="mb-3">Editar datos de registro</h2>
+          <form className="flex flex-col">
+            {recordEdit.editType === "glucose" ||
+            recordEdit.editType === "insuline" ||
+            recordEdit.editType === "water" ? (
+              <input
+                type="text"
+                className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                onChange={(e) => {
+                  setRecordEdit({
+                    ...recordEdit,
+                    medition: parseInt(e.target.value),
+                  });
+                  console.log(recordEdit);
+                }}
+                value={recordEdit.medition}
+              />
+            ) : (
+              <select
+                className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                name="atipicDay"
+                id="atipicDay"
+                onChange={(e) =>
+                  setRecordEdit({ ...recordEdit, medition: e.target.value })
+                }
+              >
+                {atipicDays.map((day) => (
+                  <option key={day.idDiaatipico} value={day.idDiaatipico}>
+                    {day.typeDay}
+                  </option>
+                ))}
+              </select>
+            )}
+            <div>
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  handleEdit();
+                }}
+                className="bg-blue-500 text-white rounded-lg px-3 py-1.5 mr-3"
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
       <SideBar />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <h2 className="text-2xl mb-5 font-semibold">Tus registros</h2>
         <span>Seleccione un periodo:</span>
-        <div className="mt-5">
+        <div className={`mt-5 ${update && "mb-4"} `}>
           <span>Fecha inicio:</span>
           <input
             type="date"
@@ -246,146 +426,718 @@ export default function AllGlucoseRegister() {
             className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
             disabled={loading}
           >
-            Buscar
+            {update ? "Actualizar" : "Filtrar"}
           </button>
         </div>
 
-        <div className="flex flex-row justify-center items-center w-full h-full flex-wrap">
+        <div className="flex flex-row justify-center items-center w-full h-full flex-wrap overflow-auto">
+          {update && (
+            <div
+              className="p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 w-full"
+              role="alert"
+            >
+              <span className="font-medium">Atención!</span> Los registros han
+              sido actualizados, para poder visualizar los cambios de click en
+              el boton de "Actualizar".
+            </div>
+          )}
           {Object.keys(totalRecords).map((key) => {
             return (
-              <table className="mt-10">
-                <thead className="border-2">
-                  <tr>
-                    <th className="border-2 px-10">Fecha</th>
-                    <th className="border-2 px-10">Desayuno</th>
-                    <th className="border-2 px-10">Colacion</th>
-                    <th className="border-2 px-10">Comida</th>
-                    <th className="border-2 px-10">Ejercicio</th>
-                    <th className="border-2 px-10">Cena</th>
-                    <th className="border-2 px-10">Madrugada</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border-2">
-                      <div className="flex justify-center border-b-2">
-                        <span>{key}</span>
-                      </div>
-                      <div className="flex justify-center">
-                        <span>Glucosa</span>
-                      </div>
-                    </td>
-                    <td className="border-2">
-                      <div className="flex">
-                        <div className="flex flex-col items-center border-r-2 px-8">
-                          <span>Pre</span>
+              <div className="w-full">
+                <table className="mt-10">
+                  <thead className="border-2">
+                    <tr>
+                      <th className="border-2 px-7">Fecha</th>
+                      <th className="border-2 px-7">Desayuno</th>
+                      <th className="border-2 px-7">Colacion Matutina</th>
+                      <th className="border-2 px-7">Comida</th>
+                      <th className="border-2 px-7">Colacion Vespertina</th>
+                      <th className="border-2 px-7">Ejercicio</th>
+                      <th className="border-2 px-7">Cena</th>
+                      <th className="border-2 px-7">Madrugada</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="border-2">
+                        <div className="flex justify-center border-b-2">
+                          <span>{key}</span>
+                        </div>
+                        <div className="flex justify-center">
+                          <span>Glucosa</span>
+                        </div>
+                      </td>
+                      <td className="border-2">
+                        <div className="flex w-full">
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Prepandrial - Desayuno" && (
+                                    <div
+                                      className="flex flex-col items-center border-r-2 hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Postpandrial - Desayuno" && (
+                                    <div
+                                      className="flex flex-col items-center  hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pos</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="border-2">
+                        <div className="flex w-full">
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Prepandrial - Colacion Matutina" && (
+                                    <div
+                                      className="flex flex-col items-center border-r-2  hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Postpandrial - Colación Matutina" && (
+                                    <div
+                                      className="flex flex-col items-center  hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pos</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="border-2">
+                        <div className="flex">
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Prepandrial - Comida" && (
+                                    <div
+                                      className="flex flex-col items-center border-r-2 hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Postpandrial - Comida" && (
+                                    <div
+                                      className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pos</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="border-2">
+                        <div className="flex">
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Prepandrial - Colación Vespertina" && (
+                                    <div
+                                      className="flex flex-col items-center border-r-2 hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Postpandrial - Colación Vespertina" && (
+                                    <div
+                                      className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pos</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="border-2 text-center">
+                        <div className="flex">
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Antes - Ejercicio" && (
+                                    <div
+                                      className="flex flex-col items-center border-r-2 hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Después - Ejercicio" && (
+                                    <div
+                                      className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pos</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="border-2">
+                        <div className="flex">
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Prepandrial - Cena" && (
+                                    <div
+                                      className="flex flex-col items-center border-r-2 hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {recordsAux[key] && (
+                            <div className="w-1/2">
+                              {recordsAux[key].map((record, index) => (
+                                <div className="" key={index}>
+                                  {record.measurement ===
+                                    "Postpandrial - Cena" && (
+                                    <div
+                                      className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                      onClick={() => {
+                                        setOpen(!open);
+                                        setRecordEdit({
+                                          id: record.id,
+                                          measurement: record.measurement,
+                                          medition: record.glucose,
+                                          editType: "glucose",
+                                        });
+                                        console.log(recordEdit);
+                                      }}
+                                    >
+                                      <span>Pre</span>
+                                      <span>{record.glucose}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="border-2 text-center">
+                        {recordsAux[key] && (
+                          <div className="h-full">
+                            {recordsAux[key].map((record, index) => (
+                              <div className="h-full" key={index}>
+                                {record.measurement ===
+                                  "Postpandrial - Colación Vespertina" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer h-full hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.measurement,
+                                        medition: record.glucose,
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>{record.glucose}</span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border-2 ">
+                        <div className="flex justify-center">
+                          <span>Dosis insulina</span>
+                        </div>
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Desayuno" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Colacion Matutina" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Comida" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Colacion Vespertina" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Ejercicio" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Cena" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="border-2 text-center">
+                        {insulineRecordsAux[key] && (
+                          <div className="">
+                            {insulineRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                {record.medition === "Nocturna" && (
+                                  <div
+                                    className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                    onClick={() => {
+                                      setOpen(!open);
+                                      setRecordEdit({
+                                        id: record.id,
+                                        measurement: record.medition,
+                                        medition: record.dose,
+                                        editType: "insuline",
+                                      });
+                                      console.log(recordEdit);
+                                    }}
+                                  >
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.doseType === "Rápida" ? "R" : "L"}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border-2">
+                        <div className="flex justify-center">
+                          <span>Agua</span>
+                        </div>
+                      </td>
 
-                          {totalRecords[key].map((record, index) => (
-                            <span key={index}>
-                              {record.measurement ===
-                                "Prepandrial - Desayuno" && record.glucose}
-                            </span>
-                          ))}
+                      <td className="border-2 text-center">
+                        {waterRecordsAux[key] && (
+                          <div className="">
+                            {waterRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                <div
+                                  className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                  onClick={() => {
+                                    setOpen(!open);
+                                    setRecordEdit({
+                                      id: record.id,
+                                      measurement: "",
+                                      medition: record.agua,
+                                      editType: "water",
+                                    });
+                                  }}
+                                >
+                                  <span>{record.agua}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="border-2">
+                        <div className="flex justify-center">
+                          <span>Dia atipico</span>
                         </div>
-                        <div className="flex flex-col px-8">
-                          <span>Pos</span>
-                          {totalRecords[key].map((record, index) => (
-                            <span key={index}>
-                              {record.measurement ===
-                                "Postpandrial - Desayuno" && record.glucose}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="border-2">
-                      <div className="flex">
-                        <div className="flex flex-col border-r-2 px-8">
-                          <span>Pre</span>
-                          {totalRecords[key].map((record, index) => (
-                            <span key={index}>
-                              {record.measurement ===
-                                "Postpandrial - Desayuno" && record.glucose}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="flex flex-col px-8">
-                          <span>Pos</span>
-                          <span>120</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="border-2">
-                      <div className="flex">
-                        <div className="flex flex-col border-r-2 px-8">
-                          <span>Pre</span>
-                          <span>120</span>
-                        </div>
-                        <div className="flex flex-col px-8">
-                          <span>Pos</span>
-                          <span>120</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="border-2 text-center">
-                      <div className="flex">
-                        <div className="flex flex-col border-r-2 px-8">
-                          <span>Pre</span>
-                          <span>120</span>
-                        </div>
-                        <div className="flex flex-col px-8">
-                          <span>Pos</span>
-                          <span>120</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="border-2">
-                      <div className="flex">
-                        <div className="flex flex-col border-r-2 px-8">
-                          <span>Pre</span>
-                          <span>120</span>
-                        </div>
-                        <div className="flex flex-col px-8">
-                          <span>Pos</span>
-                          <span>120</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="border-2 text-center">
-                      <span>120</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border-2 ">
-                      <div className="flex justify-center">
-                        <span>Dosis insulina</span>
-                      </div>
-                    </td>
-                    <td className="border-2 text-center">10</td>
-                    <td className="border-2 text-center">10</td>
-                    <td className="border-2 text-center">10</td>
-                    <td className="border-2 text-center">10</td>
-                    <td className="border-2 text-center">10</td>
-                    <td className="border-2 text-center">10</td>
-                  </tr>
-                  <tr>
-                    <td className="border-2">
-                      <div className="flex justify-center">
-                        <span>Agua</span>
-                      </div>
-                    </td>
-                    <td className="border-2 text-center">10</td>
-                  </tr>
-                  <tr>
-                    <td className="border-2">
-                      <div className="flex justify-center">
-                        <span>Dia atipico</span>
-                      </div>
-                    </td>
-                    <td className="border-2 text-center">Ninguno</td>
-                  </tr>
-                </tbody>
-              </table>
+                      </td>
+                      <td className="border-2 text-center">
+                        {atipicDayRecordsAux[key] && (
+                          <div className="">
+                            {atipicDayRecordsAux[key].map((record, index) => (
+                              <div className="" key={index}>
+                                <div
+                                  className="flex flex-col items-center hover:cursor-pointer hover:bg-gray-200 hover:transition-colors ease-in-out duration-300"
+                                  onClick={() => {
+                                    setOpen(!open);
+                                    setRecordEdit({
+                                      id: record.id,
+                                      measurement: "",
+                                      medition: record.atipicDay,
+                                      editType: "atipicDay",
+                                    });
+                                  }}
+                                >
+                                  <span>{record.atipicDay}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             );
           })}
 
