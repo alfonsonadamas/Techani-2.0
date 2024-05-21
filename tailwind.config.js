@@ -6,6 +6,8 @@ module.exports = {
     "./public/index.html",
     "./src/pages/Login.jsx",
     "./src/pages/ViewEstados.jsx",
+    "./src/pages/ViewActivity.jsx",
+    "./src/components/Modal.jsx",
     "./src/components/Sidebar.jsx",
     "./src/pages/Alimentos.jsx",
     "./src/pages/GlucoseRegister.jsx",

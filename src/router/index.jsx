@@ -15,6 +15,8 @@ import AlimentosRegister from "../pages/AlimentosRegister";
 import AllAlimentosRegister from "../pages/AllAlimentosRegister";
 
 import Exercise from "../pages/Exercise";
+import NewActivity from "../pages/NewActivity";
+import ViewActivity from "../pages/ViewActivity";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
 import Activities from "../pages/Activities";
@@ -123,6 +125,26 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/newActivity",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <NewActivity />,
+          },
+        ],
+      },
+      {
+        path: "/viewActivity",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <ViewActivity />,
           },
         ],
       },
