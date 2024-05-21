@@ -1,173 +1,130 @@
 import { useState, useEffect } from "react";
+// npm install axios
 import { useNavigate } from "react-router-dom";
-import * as Yup from "yup";
+
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 import NavRegsitro from "../components/NavRegistro";
-import { Formik } from "formik";
+import fondo from "../assets/img/fondo-login.jpg";
 
 export default function Login() {
-  const [loading, setloading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { user } = useUserContext();
 
-  const userLogin = async (
-    { email, password, validate },
-    { setSubmitting, setErrors, resetForm }
-  ) => {
-    setSubmitting(true);
+  const userLogin = async (e) => {
+    e.preventDefault();
     try {
       const user = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (user.error.message === "Invalid login credentials") {
-        return setErrors({ validate: "Correo o contraseña incorrectos" });
-      }
-      if (user.error.message === "Email not confirmed") {
-        return setErrors({ validate: "Correo Electronico no confirmado" });
-      }
-
+      console.log(user);
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
-    } finally {
-      setSubmitting(false);
     }
+
+    //console.log(idpatient);
   };
 
   const handleLoginGoogle = async (e) => {
     e.preventDefault();
-    setloading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-      });
-      console.log(data, error);
-    } catch (error) {
-      console.log(error);
-    }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    navigate("/dashboard");
+    console.log(data, error);
   };
 
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
-    setloading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "facebook",
-      });
-      console.log(data, error);
-    } catch (error) {
-      console.log(error);
-    }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+    });
+    navigate("/dashboard");
+    console.log(data, error);
   };
-
-  const validationSchema = Yup.object({
-    email: Yup.string()
-      .email("Correo electrónico inválido")
-      .required("El correo electrónico es requerido"),
-    password: Yup.string().required("La contraseña es requerida"),
-  });
 
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
     }
-  }, [user, navigate]);
-  return (
-    <div className="h-screen" data-aos="fade-right">
-      <NavRegsitro data={"login"} />
-      <Formik
-        initialValues={{
-          email: "",
-          password: "",
-          validate: "",
-        }}
-        onSubmit={userLogin}
-        validationSchema={validationSchema}
-      >
-        {({
-          handleSubmit,
-          handleChange,
-          values,
-          errors,
-          isSubmitting,
-          touched,
-        }) => (
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col justify-center items-center h-4/5"
-          >
-            <div className="flex flex-col items-center justify-center h-full w-full">
-              <h3 className="text-2xl font-semibold font-fuenteTechani mb-10">
-                Inicia Sesión en Techani
-              </h3>
-              <div className="flex w-full">
-                <div className="w-1/2 flex flex-col justify-center items-end pr-20">
-                  <div>
-                    <div className="flex flex-col mb-3">
-                      <label className="text-sm">Correo Electrónico</label>
-                      <input
-                        type="text"
-                        name="email"
-                        placeholder="nombre@ejemplo.com"
-                        onChange={handleChange}
-                        className="focus:ring-0  border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black focus:border-t-0 transition duration-300 mb-1  border-gray-300 py-2  w-72"
-                        autoComplete="off"
-                      />
-                      <p className="text-red-400">
-                        {errors.email && touched.email && errors.email}
-                      </p>
-                    </div>
+  }, [navigate, user]);
 
-                    <div className="flex flex-col mb-3">
-                      <label className="text-sm">Contraseña</label>
-                      <input
-                        type="password"
-                        name="password"
-                        placeholder="Contraseña"
-                        onChange={handleChange}
-                        className="focus:ring-0 border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 mb-1 w-72"
-                        autoComplete="off"
-                      />
-                      <p className="text-red-400">
-                        {errors.password && touched.password && errors.password}
-                      </p>
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="text-red-400 mb-2"> {errors.validate}</p>
-                      <button
-                        className="bg-azul rounded-sm text-white w-full py-2 transition-all ease-in disabled:opacity-50 disabled:shadow-none hover:shadow-xl"
-                        type="submit"
-                        disabled={
-                          !values.email || !values.password || isSubmitting
-                        }
-                      >
-                        Iniciar Sesion
-                      </button>
-                    </div>
+  return (
+    <div className="h-screen bg-cover bg-center" data-aos="fade-right">
+      <NavRegsitro />
+      <div className="mt-10 md:mt-20 flex justify-center">
+        <form className="flex flex-col justify-center items-center h-4/5  bg-opacity-30 bg-white backdrop-filter backdrop-blur-md p-6 w-[70%] rounded-lg">
+          <div className="flex flex-col items-center justify-center h-full w-full">
+            <h3 className="sm:text-[4vw] text-[5vw] md:text-[30px] text-center font-semibold font-fuenteTechani mb-7 lg:mb-10">
+              Inicia Sesión en Techani
+            </h3>
+            <div className="flex w-full flex-col lg:flex lg:flex-row lg:p-0">
+              <div className="w-full lg:w-1/2 flex flex-col justify-center items-center ">
+                <div>
+                  <div className="flex flex-col items-center sm:items-start">
+                    <label className="text-[4vw] md:text-[18px] mb-2 text-gray-700 font-semibold">
+                      Correo Electrónico
+                    </label>
+                    <input
+                      type="text"
+                      name="email"
+                      placeholder="nombre@ejemplo.com"
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="border-b-2 focus:outline-none focus:border-b-black transition duration-300 py-2 mb-5 w-[200px] md:w-72 border border-gray-400 rounded shadow "
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div className="flex flex-col items-center sm:items-start">
+                    <label className="text-[4vw] md:text-[18px] mb-2 text-gray-700 font-semibold">
+                      Contraseña
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Contraseña"
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="border-b-2 focus:outline-none focus:border-b-black transition duration-300 py-2 mb-5 w-[200px] md:w-72 border border-gray-400 rounded shadow "
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div className="flex ">
+                    <button
+                      className="bg-azul rounded-sm text-white w-full py-2 transition-all ease-in disabled:opacity-50 disabled:shadow-none hover:shadow-xl"
+                      onClick={(e) => userLogin(e, email, password)}
+                      disabled={!email || !password}
+                    >
+                      Iniciar Sesion
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                <div className="w-1/2 ">
-                  <div className="flex flex-col pl-20 py-20 justify-center border-l-2 border-l-gray-400 w-7/12">
+              <div className="mt-[10px] lg:mt-0 w-full lg:w-1/2 flex flex-col items-center  ">
+                <div className="flex flex-col items-center justify-center lg:border-l-2 lg:border-l-gray-400 w-full">
+                  <div className="flex flex-col justify-center w-[200px] md:w-72">
+                    <label className="sm:text-[4vw] text-[4vw] md:text-[18px] mb-2 text-gray-700 font-semibold">
+                      También puedes Iniciar Sesión con:
+                    </label>
                     <button
                       onClick={handleLoginGoogle}
-                      className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center justify-center mb-5 disabled:opacity-20 disabled:cursor-default"
-                      disabled={loading}
+                      class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5"
                     >
                       <img
                         src="https://img.icons8.com/color/16/000000/google-logo.png"
                         alt="Google Logo"
-                        className="mr-2"
+                        class="mr-2"
                       />
                       <span>Continuar con Google</span>
                     </button>
 
                     <button
                       onClick={handleLoginFacebook}
-                      className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center justify-center disabled:opacity-20 disabled:cursor-default"
-                      disabled={loading}
+                      class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -186,8 +143,8 @@ export default function Login() {
                           y2="40.615"
                           gradientUnits="userSpaceOnUse"
                         >
-                          <stop offset="0" stopColor="#2aa4f4"></stop>
-                          <stop offset="1" stopColor="#007ad9"></stop>
+                          <stop offset="0" stop-color="#2aa4f4"></stop>
+                          <stop offset="1" stop-color="#007ad9"></stop>
                         </linearGradient>
                         <path
                           fill="url(#Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1)"
@@ -204,9 +161,9 @@ export default function Login() {
                 </div>
               </div>
             </div>
-          </form>
-        )}
-      </Formik>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

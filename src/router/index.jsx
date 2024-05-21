@@ -12,6 +12,8 @@ import Profile from "../pages/Profile";
 import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
 import Ejercicio from "../pages/Ejercicio";
+import NewActivity from "../pages/NewActivity";
+import ViewActivity from "../pages/ViewActivity";
 import Citas from "../pages/Citas";
 import Estados from "../pages/Estados";
 
@@ -111,6 +113,26 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Ejercicio />,
+          },
+        ],
+      },
+      {
+        path: "/newActivity",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <NewActivity />,
+          },
+        ],
+      },
+      {
+        path: "/viewActivity",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <ViewActivity />,
           },
         ],
       },
