@@ -5,18 +5,25 @@ import { supabase } from "../config/supabase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { FaPencilAlt, FaCaretDown, FaCaretUp, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import "react-toastify/dist/ReactToastify.css";
+import {
+  FaPencilAlt,
+  FaCaretDown,
+  FaCaretUp,
+  FaEdit,
+  FaTrash,
+  FaPlus,
+} from "react-icons/fa";
 
 export default function Profile() {
-
   const { user } = useUserContext();
   const [profile, setProfile] = useState({
-    picture: "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+    picture:
+      "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
     name: "",
     email: "",
     birthday: "",
-    phone: ""
+    phone: "",
   });
   const [showAdditionalData, setShowAdditionalData] = useState(false);
   const [showSupportingFamily, setShowSupportingFamily] = useState(false);
@@ -26,13 +33,15 @@ export default function Profile() {
 
   useEffect(() => {
     if (user) {
-      const avatarUrl = user.user_metadata.avatar_url || "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png";
+      const avatarUrl =
+        user.user_metadata.avatar_url ||
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png";
       setProfile({
         name: user.user_metadata.full_name || "",
         email: user.email || "",
         birthday: user.user_metadata.birthday || "",
         phone: user.user_metadata.phone || "",
-        picture: avatarUrl
+        picture: avatarUrl,
       });
     }
   }, [user]);
@@ -44,7 +53,7 @@ export default function Profile() {
           full_name: values.fullName,
           birthday: values.birthday,
           phone: values.phone,
-        }
+        },
       });
 
       if (error) {
@@ -55,7 +64,7 @@ export default function Profile() {
           ...prev,
           name: values.fullName,
           birthday: values.birthday,
-          phone: values.phone
+          phone: values.phone,
         }));
       }
     } catch (error) {
@@ -77,7 +86,8 @@ export default function Profile() {
   const handleImageError = () => {
     setProfile((prevState) => ({
       ...prevState,
-      picture: "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png"
+      picture:
+        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
     }));
   };
 
@@ -86,18 +96,22 @@ export default function Profile() {
     if (!file) return;
 
     const filePath = `${user.id}/${file.name}`;
-    const { data, error } = await supabase.storage.from('avatars').upload(filePath, file);
+    const { data, error } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file);
 
     if (error) {
       toast.error("Error al subir la imagen");
     } else {
-      const { publicURL } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const { publicURL } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
       await supabase.auth.updateUser({
-        data: { avatar_url: publicURL }
+        data: { avatar_url: publicURL },
       });
       setProfile((prevState) => ({
         ...prevState,
-        picture: publicURL
+        picture: publicURL,
       }));
       toast.success("Imagen de perfil actualizada");
     }
@@ -105,17 +119,24 @@ export default function Profile() {
 
   const validationSchema = Yup.object({
     fullName: Yup.string().required("El nombre es obligatorio"),
-    email: Yup.string().email("Correo electrónico no válido").required("El correo electrónico es obligatorio"),
+    email: Yup.string()
+      .email("Correo electrónico no válido")
+      .required("El correo electrónico es obligatorio"),
     birthday: Yup.date().required("La fecha de nacimiento es obligatoria"),
     phone: Yup.string().required("El teléfono es obligatorio"),
-    password: Yup.string().min(6, "La contraseña debe tener al menos 6 caracteres")
+    password: Yup.string().min(
+      6,
+      "La contraseña debe tener al menos 6 caracteres"
+    ),
   });
 
   const familyValidationSchema = Yup.object({
     familyName: Yup.string().required("El nombre es obligatorio"),
     familyPhone: Yup.string().required("El teléfono es obligatorio"),
-    familyEmail: Yup.string().email("Correo electrónico no válido").required("El correo electrónico es obligatorio"),
-    familyRelation: Yup.string().required("El parentesco es obligatorio")
+    familyEmail: Yup.string()
+      .email("Correo electrónico no válido")
+      .required("El correo electrónico es obligatorio"),
+    familyRelation: Yup.string().required("El parentesco es obligatorio"),
   });
 
   const handleAddFamily = (values) => {
@@ -123,7 +144,7 @@ export default function Profile() {
       familyName: values.familyName,
       familyPhone: values.familyPhone,
       familyEmail: values.familyEmail,
-      familyRelation: values.familyRelation
+      familyRelation: values.familyRelation,
     };
     setFamilyMembers([...familyMembers, newMember]);
     setShowAddFamilyForm(false);
@@ -151,7 +172,7 @@ export default function Profile() {
             email: profile.email,
             birthday: profile.birthday,
             phone: profile.phone,
-            password: ''
+            password: "",
           }}
           enableReinitialize={true}
           validationSchema={validationSchema}
@@ -168,7 +189,10 @@ export default function Profile() {
                     width={200}
                     onError={handleImageError}
                   />
-                  <label htmlFor="fileUpload" className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg">
+                  <label
+                    htmlFor="fileUpload"
+                    className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
+                  >
                     <FaPencilAlt />
                   </label>
                   <input
@@ -181,7 +205,9 @@ export default function Profile() {
               </div>
               <div className="flex flex-wrap w-full">
                 <div className="flex flex-col w-1/2 pr-2 mb-4">
-                  <label htmlFor="fullName" className="font-bold mb-2">Nombre</label>
+                  <label htmlFor="fullName" className="font-bold mb-2">
+                    Nombre
+                  </label>
                   <input
                     id="fullName"
                     type="text"
@@ -190,10 +216,16 @@ export default function Profile() {
                     onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500focus:border-blue-500 block w-full p-2.5"
                   />
-                  {errors.fullName && touched.fullName && <div className="text-red-500 text-sm">{errors.fullName}</div>}
+                  {errors.fullName && touched.fullName && (
+                    <div className="text-red-500 text-sm">
+                      {errors.fullName}
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col w-1/2 pl-2 mb-4">
-                  <label htmlFor="email" className="font-bold mb-2">Email</label>
+                  <label htmlFor="email" className="font-bold mb-2">
+                    Email
+                  </label>
                   <input
                     id="email"
                     type="email"
@@ -202,10 +234,14 @@ export default function Profile() {
                     onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   />
-                  {errors.email && touched.email && <div className="text-red-500 text-sm">{errors.email}</div>}
+                  {errors.email && touched.email && (
+                    <div className="text-red-500 text-sm">{errors.email}</div>
+                  )}
                 </div>
                 <div className="flex flex-col w-1/2 pr-2 mb-4">
-                  <label htmlFor="birthday" className="font-bold mb-2">Fecha de Nacimiento</label>
+                  <label htmlFor="birthday" className="font-bold mb-2">
+                    Fecha de Nacimiento
+                  </label>
                   <input
                     id="birthday"
                     type="date"
@@ -214,10 +250,16 @@ export default function Profile() {
                     onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   />
-                  {errors.birthday && touched.birthday && <div className="text-red-500 text-sm">{errors.birthday}</div>}
+                  {errors.birthday && touched.birthday && (
+                    <div className="text-red-500 text-sm">
+                      {errors.birthday}
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col w-1/2 pl-2 mb-4">
-                  <label htmlFor="phone" className="font-bold mb-2">Teléfono</label>
+                  <label htmlFor="phone" className="font-bold mb-2">
+                    Teléfono
+                  </label>
                   <input
                     id="phone"
                     type="text"
@@ -226,10 +268,14 @@ export default function Profile() {
                     onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   />
-                  {errors.phone && touched.phone && <div className="text-red-500 text-sm">{errors.phone}</div>}
+                  {errors.phone && touched.phone && (
+                    <div className="text-red-500 text-sm">{errors.phone}</div>
+                  )}
                 </div>
                 <div className="flex flex-col w-full mb-4">
-                  <label htmlFor="password" className="font-bold mb-2">Contraseña</label>
+                  <label htmlFor="password" className="font-bold mb-2">
+                    Contraseña
+                  </label>
                   <input
                     id="password"
                     type="password"
@@ -238,7 +284,11 @@ export default function Profile() {
                     onChange={handleChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   />
-                  {errors.password && touched.password && <div className="text-red-500 text-sm">{errors.password}</div>}
+                  {errors.password && touched.password && (
+                    <div className="text-red-500 text-sm">
+                      {errors.password}
+                    </div>
+                  )}
                   <button
                     type="button"
                     className="text-blue-500 underline hover:text-blue-600 mt-2"
@@ -269,12 +319,15 @@ export default function Profile() {
                   onClick={() => setShowAdditionalData(!showAdditionalData)}
                   className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
                 >
-                  DATOS ADICIONALES {showAdditionalData ? <FaCaretUp /> : <FaCaretDown />}
+                  DATOS ADICIONALES{" "}
+                  {showAdditionalData ? <FaCaretUp /> : <FaCaretDown />}
                 </button>
                 {showAdditionalData && (
                   <div className="mt-4 bg-white p-4 rounded shadow-md">
                     <div className="flex flex-col w-full mb-4">
-                      <label htmlFor="insulinBrand" className="font-bold mb-2">Marca de Insulina</label>
+                      <label htmlFor="insulinBrand" className="font-bold mb-2">
+                        Marca de Insulina
+                      </label>
                       <select
                         id="insulinBrand"
                         name="insulinBrand"
@@ -287,10 +340,17 @@ export default function Profile() {
                       </select>
                     </div>
                     <div className="flex flex-col w-full mb-4">
-                      <label htmlFor="glucoseRange" className="font-bold mb-2">Glucosa en Rango</label>
+                      <label htmlFor="glucoseRange" className="font-bold mb-2">
+                        Glucosa en Rango
+                      </label>
                       <div className="flex space-x-4">
                         <div className="flex flex-col w-1/2">
-                          <label htmlFor="lowGlucose" className="font-bold mb-2">Bajo</label>
+                          <label
+                            htmlFor="lowGlucose"
+                            className="font-bold mb-2"
+                          >
+                            Bajo
+                          </label>
                           <input
                             id="lowGlucose"
                             type="number"
@@ -299,7 +359,12 @@ export default function Profile() {
                           />
                         </div>
                         <div className="flex flex-col w-1/2">
-                          <label htmlFor="highGlucose" className="font-bold mb-2">Alto</label>
+                          <label
+                            htmlFor="highGlucose"
+                            className="font-bold mb-2"
+                          >
+                            Alto
+                          </label>
                           <input
                             id="highGlucose"
                             type="number"
@@ -327,7 +392,8 @@ export default function Profile() {
                   onClick={() => setShowSupportingFamily(!showSupportingFamily)}
                   className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
                 >
-                  FAMILIARES DE APOYO {showSupportingFamily ? <FaCaretUp /> : <FaCaretDown />}
+                  FAMILIARES DE APOYO{" "}
+                  {showSupportingFamily ? <FaCaretUp /> : <FaCaretDown />}
                 </button>
                 {showSupportingFamily && (
                   <div className="mt-4 bg-white p-4 rounded shadow-md">
@@ -344,21 +410,32 @@ export default function Profile() {
                     {showAddFamilyForm && (
                       <Formik
                         initialValues={{
-                          familyName: '',
-                          familyPhone: '',
-                          familyEmail: '',
-                          familyRelation: ''
+                          familyName: "",
+                          familyPhone: "",
+                          familyEmail: "",
+                          familyRelation: "",
                         }}
                         validationSchema={familyValidationSchema}
                         onSubmit={(values) => {
                           handleAddFamily(values);
                         }}
                       >
-                        {({ handleSubmit, handleChange, values, errors, touched }) => (
+                        {({
+                          handleSubmit,
+                          handleChange,
+                          values,
+                          errors,
+                          touched,
+                        }) => (
                           <form onSubmit={handleSubmit}>
                             <div className="flex flex-wrap">
                               <div className="flex flex-col w-1/2 pr-2 mb-4">
-                                <label htmlFor="familyName" className="font-bold mb-2">Nombre</label>
+                                <label
+                                  htmlFor="familyName"
+                                  className="font-bold mb-2"
+                                >
+                                  Nombre
+                                </label>
                                 <input
                                   id="familyName"
                                   type="text"
@@ -367,10 +444,19 @@ export default function Profile() {
                                   onChange={handleChange}
                                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 />
-                                {errors.familyName && touched.familyName && <div className="text-red-500 text-sm">{errors.familyName}</div>}
+                                {errors.familyName && touched.familyName && (
+                                  <div className="text-red-500 text-sm">
+                                    {errors.familyName}
+                                  </div>
+                                )}
                               </div>
                               <div className="flex flex-col w-1/2 pl-2 mb-4">
-                                <label htmlFor="familyPhone" className="font-bold mb-2">Teléfono</label>
+                                <label
+                                  htmlFor="familyPhone"
+                                  className="font-bold mb-2"
+                                >
+                                  Teléfono
+                                </label>
                                 <input
                                   id="familyPhone"
                                   type="text"
@@ -379,22 +465,41 @@ export default function Profile() {
                                   onChange={handleChange}
                                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 />
-                                {errors.familyPhone && touched.familyPhone && <div className="text-red-500 text-sm">{errors.familyPhone}</div>}
+                                {errors.familyPhone && touched.familyPhone && (
+                                  <div className="text-red-500 text-sm">
+                                    {errors.familyPhone}
+                                  </div>
+                                )}
                               </div>
                               <div className="flex flex-col w-1/2 pr-2 mb-4">
-                                <label htmlFor="familyEmail" className="font-bold mb-2">Correo Electrónico</label>
+                                <label
+                                  htmlFor="familyEmail"
+                                  className="font-bold mb-2"
+                                >
+                                  Correo Electrónico
+                                </label>
                                 <input
                                   id="familyEmail"
                                   type="email"
                                   name="familyEmail"
+                                  autoComplete="off"
                                   value={values.familyEmail}
                                   onChange={handleChange}
                                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 />
-                                {errors.familyEmail && touched.familyEmail && <div className="text-red-500 text-sm">{errors.familyEmail}</div>}
+                                {errors.familyEmail && touched.familyEmail && (
+                                  <div className="text-red-500 text-sm">
+                                    {errors.familyEmail}
+                                  </div>
+                                )}
                               </div>
                               <div className="flex flex-col w-1/2 pl-2 mb-4">
-                                <label htmlFor="familyRelation" className="font-bold mb-2">Parentesco</label>
+                                <label
+                                  htmlFor="familyRelation"
+                                  className="font-bold mb-2"
+                                >
+                                  Parentesco
+                                </label>
                                 <input
                                   id="familyRelation"
                                   type="text"
@@ -403,7 +508,12 @@ export default function Profile() {
                                   onChange={handleChange}
                                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 />
-                                {errors.familyRelation && touched.familyRelation && <div className="text-red-500 text-sm">{errors.familyRelation}</div>}
+                                {errors.familyRelation &&
+                                  touched.familyRelation && (
+                                    <div className="text-red-500 text-sm">
+                                      {errors.familyRelation}
+                                    </div>
+                                  )}
                               </div>
                               <div className="flex justify-end w-full">
                                 <button
@@ -420,7 +530,10 @@ export default function Profile() {
                     )}
                     <div className="mt-4">
                       {familyMembers.map((member, index) => (
-                        <div key={index} className="flex justify-between border-b border-gray-300 pb-2 mb-2">
+                        <div
+                          key={index}
+                          className="flex justify-between border-b border-gray-300 pb-2 mb-2"
+                        >
                           <div>
                             <div>{member.familyName}</div>
                             <div>{member.familyPhone}</div>
@@ -428,8 +541,14 @@ export default function Profile() {
                             <div>{member.familyRelation}</div>
                           </div>
                           <div>
-                            <FaEdit onClick={() => handleEditFamily(index)} className="cursor-pointer mr-2 text-blue-500 hover:text-blue-600" />
-                            <FaTrash onClick={() => handleDeleteFamily(index)} className="cursor-pointer text-red-500 hover:text-red-600" />
+                            <FaEdit
+                              onClick={() => handleEditFamily(index)}
+                              className="cursor-pointer mr-2 text-blue-500 hover:text-blue-600"
+                            />
+                            <FaTrash
+                              onClick={() => handleDeleteFamily(index)}
+                              className="cursor-pointer text-red-500 hover:text-red-600"
+                            />
                           </div>
                         </div>
                       ))}
