@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
-import Modal from "../components/Modal";
+import Modal from "../components/ModalGlucosa";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 // import PdfGlucose from "../components/PdfGlucose";
 

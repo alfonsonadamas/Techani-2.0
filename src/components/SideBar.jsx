@@ -11,6 +11,7 @@ export default function SideBar() {
   const [isHidden4, setIsHidden4] = useState(true);
   const [isHidden5, setIsHidden5] = useState(true);
   const [isHidden6, setIsHidden6] = useState(true);
+  const [isHidden7, setIsHidden7] = useState(true);
   const [name, setName] = useState("");
   const [picture, setPicture] = useState("");
 
@@ -45,6 +46,10 @@ export default function SideBar() {
 
   const dropDown6 = () => {
     setIsHidden6(!isHidden6);
+  };
+
+  const dropDown7 = () => {
+    setIsHidden7(!isHidden7);
   };
 
   useEffect(() => {
@@ -622,6 +627,68 @@ export default function SideBar() {
             </Link>
           </div>
         </div>
+
+        <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
+          <img
+            className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            alt="grapic"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABPUlEQVR4nO2XUQ6DMAxDcwpS7YrbcafBTuNpEh8TAtqCwem2SP2x+PBr07iYxS5UrNCFbwFZKjeze+sgycz60XzfKoh/nMRgZpcWQXwGwloD8QWIpkB8BaIZEM9ANAHiBRBykG5cpSM2rXwrA3mbeowr7YQIk8jPSct4YTtJa7rT011v4iTmTObAwk2ntXbpJq02bJhOpwCWtEvu8stBano+N44PA2HmQGmBDaLKATBBmDlQawwsEHYOSEASIQfkIE7KASlIIuTA0YaRA2HlgBTEia9QGYiTn9ISED/gH/l0ED/oH/lUEA+UyNiq194JueEl/RYskbFHv1a8UkMYrrmz0YzhD2Kxdhg/cyJQG2DpUBtg6VAbYOlQG2DpUBtg6VAbYOlQG2DpUBtg6VAbYOlQG2DpUBtg6VAbYOgvvSBxjV0qsYoAAAAASUVORK5CYII="
+          />
+
+          <div
+            className="flex justify-between w-full items-center"
+            onClick={dropDown7}
+          >
+            <span className="text-[15px] ml-2 font-semibold">Gráficas</span>
+            <span
+              className={
+                isHidden7
+                  ? "text-sm duration-300"
+                  : "text-sm rotate-180 duration-300 "
+              }
+            >
+              <svg
+                class="w-3 h-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div
+          className={
+            isHidden7
+              ? "hidden text-left text-sm  mt-2 w-4/5 mx-auto"
+              : " text-left text-sm  mt-2 w-4/5 mx-auto"
+          }
+        >
+          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+            <Link
+              to={"/graphics"}
+              className="flex items-center cursor-pointer p-2 "
+            >
+              <img
+                className="h-5 w-5"
+                alt="graphic"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABqklEQVR4nO2YwUoDMRCG//bSix4VfQBP4jPo0dYH8D161Hfw5kN4EN/FLfRuPVsvghRkJDALg+52s5tkkpb5IXRpk5n5mskkG8C0W6KEbQngdB9ASBOGuKWyqwZDiUEq8XmcwM8/h6nsHgF41ZgZSgwCLRhSAFGBISWQ5DCkCOKUDEYbJBlMDpAkMLlAosNo7Oy+rYrhMLaGns2KA1GPgwwkrshmhGWpFVlkqZUhtW4AvANYAZjmnJFtgfjIjav9vQXE0ag+BrYF0qURgHUJIO7iYCP6fwGY9PBz/wfiemAcrfIx4CAW3M/B/PDzE4Cxh48Zj3FtFhBH8HtDJY7aJwDOAXzwd48d9s9ESt0FxBH1Tc5B1LoE8M2/zVvGH4g/4YXXiSpIXZ3qNbFouVy7FSnjnqVc0M9i/OGAOHqpyYCsTpuOG8I593Ozc9WwuNecXkPiiAriU2YfuO8ngAvPxa0CMmWYpjLZpDFXMBIVjXhWQuLIckSZ8N5CIqVGu3rWWgXs/FQSSN+ULBYkaxxkIHFFNiMsS63IIkstlqVWqalFhbTB2hsQE5T1CwsPr7cDvXGAAAAAAElFTkSuQmCC"
+              />
+
+              <span className="ml-3">Ver Gráficas</span>
+            </Link>
+          </div>
+        </div>
+
         {/* Aqui acaba */}
       </div>
     </div>
