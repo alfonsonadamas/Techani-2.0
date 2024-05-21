@@ -33,6 +33,7 @@ module.exports = {
     "./src/pages/Index.jsx",
     "./src/components/NavRegistro.jsx",
     "./src/components/Modal.jsx",
+    "./src/components/ModalGlucosa.jsx",
     "./src/pages/Profile.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],

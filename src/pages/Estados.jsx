@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import SideBar from "../components/SideBar";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
-import { useUserContext } from "../context/UserContext";
 
 export default function Estados() {
   const [estados, setEstados] = useState({ idEmocion: null, value: null });
   const [error, setError] = useState("");
   const [SaveSuccessfully, setSaveSuccessfully] = useState(false);
-  const { user } = useUserContext();
   const { user } = useUserContext();
 
   const handleMoodChange = (idEmocion, value) => {

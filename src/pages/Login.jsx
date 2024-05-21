@@ -6,10 +6,12 @@ import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 import NavRegsitro from "../components/NavRegistro";
 import fondo from "../assets/img/fondo-login.jpg";
+import * as Yup from "yup";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setloading] = useState(false);
   const navigate = useNavigate();
   const { user } = useUserContext();
 
