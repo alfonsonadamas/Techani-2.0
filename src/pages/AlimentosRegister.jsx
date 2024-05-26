@@ -20,6 +20,9 @@ export default function Comidas() {
   //const [carbohydratesAmount, setcarbohydratesAmount] = useState('');
   //const [portionAmount, setportionAmount]=useState('');
   const [sendForm, setSendForm] = useState(false);
+  const [alimentExisting,setAlimentExisting] = useState(false);
+  const [SMAE,setSMAE] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Obtiene la fecha actual
   const fecha = new Date();
@@ -92,6 +95,23 @@ export default function Comidas() {
     }
   };
 
+  const fetchSMAE = async () => {
+    try{
+      setLoading(true);
+      const { data:foodSMAE,error} = await supabase
+        .from("SMAE")
+        .select("idSMAE,food,tipoAlimento(idTipoalimento,food), unidadesMedida(idUnidadMedida,name),carbohydrates, portionamount");
+      if (error){
+        throw error;
+      }
+      setSMAE(foodSMAE);
+    } catch (error){
+      console.error("Error al cargar los alimentos:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const fetchMedidas = async () => {
     try {
       const { data: unidadesMedida, error } = await supabase
@@ -110,6 +130,8 @@ export default function Comidas() {
   useEffect(() => {
     fetchTipoAlimento();
     fetchMedidas();
+    console.log("SMAE",SMAE);
+    fetchSMAE();
   }, []);
 
   return (
@@ -121,8 +143,22 @@ export default function Comidas() {
           <label className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
             Registro Alimento
           </label>
-          
-          <Formik 
+          <div className="flex mb-2">
+            <button
+              onClick={() => setAlimentExisting(false)}
+              className={`mr-3 ${!alimentExisting ? 'flex items-center justify-between transition duration-300 ease-out hover:ease-out px-7 py-1 rounded-t-lg text-white bg-azul' : 'bg-white text-black'}`}
+            >
+              Registrar nuevo
+            </button>
+            <button
+              onClick={() => setAlimentExisting(true)}
+              className={`${alimentExisting ? 'bg-azul flex items-center justify-between transition duration-300 ease-out hover:ease-out px-7 py-1 rounded-t-lg text-white' : 'bg-white text-black'}`}
+            >
+              Registrar existente
+            </button>
+          </div>
+          {!alimentExisting && (
+            <Formik 
             initialValues={{
               foodName: "",
               foodType: "",
@@ -263,6 +299,83 @@ export default function Comidas() {
                 </form>
               )}
             </Formik>
+          )}
+
+          {alimentExisting && (
+            <div>
+              {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Tipo alimento
+              </label>
+
+              <select
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                name="foodType"
+                id="foodType"
+                defaultValue={foodType}
+                // value={values.foodType}
+                //onChange={handleChange}
+                //onBlur={handleBlur}
+              >
+                <option value="">Seleccione un tipo de alimento</option>
+                {foodTypes.map((type) => (
+                  <option
+                    key={type.idTipoAlimento}
+                    value={type.idTipoAlimento} // Usamos el índice como valor
+                  >
+                    {type.food}
+                  </option>
+                ))}
+              </select> */}
+              {/* <div className="w-full h-full">
+                {loading ? (
+                  <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md ">
+                    <p className="text-lg font-medium text-center text-gray-400">
+                      Cargando alimentos...
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {SMAE && SMAE.length === 0 && (
+                      <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md ">
+                        <p className="text-lg font-medium text-center text-gray-400">
+                          Sin registros
+                        </p>
+                      </div>
+                    )}
+
+                    {SMAE && SMAE.length > 0 && (
+                      <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md">
+                        <table className="w-full h-full text-center">
+                          <thead>
+                            <tr>
+                              <th className="border-slate-300 border">Comida</th>
+                              <th className="border-slate-300 border">Tipo de alimento</th>
+                              <th className="border-slate-300 border">Cantidad por porción</th>
+                              <th className="border-slate-300 border">Carbohidratos</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {SMAE.map((foods) => (
+                              <tr key={foods.idSMAE}>
+                                <td className="border-slate-300 border">{foods.food}</td>
+                                <td className="border-slate-300 border">
+                                  {foods.tipoAlimento.food}
+                                </td>
+                                <td className="border-slate-300 border">
+                                  {foods.portionamount} {foods.unidadesMedida.name}
+                                </td>
+                                <td className="border-slate-300 border">{foods.carbohydrates}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div> */}
+            </div>
+          )}
           </>
         ) : (
           <div
