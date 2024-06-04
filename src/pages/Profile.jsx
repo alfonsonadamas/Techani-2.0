@@ -43,41 +43,46 @@ export default function Profile() {
   };
 
   const updateProfile = async () => {
-    try {
-      const updates = {
-        id: user.id,
-        data: {
-          avatar_url: url,
-          picture: url,
-        },
-      };
-      const { data, error } = await supabase.auth.updateUser(updates);
-      console.log(data, error);
-      if (error) throw error;
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   const updates = {
+    //     id: user.id,
+    //     data: {
+    //       avatar_url: url,
+    //       picture: url,
+    //     },
+    //   };
+    //   const { data, error } = await supabase.auth.updateUser(updates);
+    //   console.log(data, error);
+    //   if (error) throw error;
+    // } catch (error) {
+    //   console.log(error);
+    // }
+  };
+
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.log(error);
   };
 
   const onSubmit = async (
     { fullName, email, birthday, phone },
     { setSubmitting, setErrors, resetForm }
   ) => {
-    try {
-      await supabase.storage
-        .from("analisis_archivos")
-        .upload(
-          `${user.id}/profile_img${
-            file.type === "image/png" ? ".png" : ".jpeg"
-          }`,
-          file
-        );
-      findUrl();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setSubmitting(false);
-    }
+    // try {
+    //   await supabase.storage
+    //     .from("analisis_archivos")
+    //     .upload(
+    //       `${user.id}/profile_img${
+    //         file.type === "image/png" ? ".png" : ".jpeg"
+    //       }`,
+    //       file
+    //     );
+    //   findUrl();
+    // } catch (error) {
+    //   console.log(error);
+    // } finally {
+    //   setSubmitting(false);
+    // }
   };
 
   useEffect(() => {
@@ -102,8 +107,8 @@ export default function Profile() {
 
   return (
     <div>
-      <SideBar></SideBar>
-      <div className="p-16 pt-16 sm:ml-64">
+      <SideBar />
+      <div className="p-16 pt-16 sm:ml-64 flex flex-col">
         <Formik
           initialValues={{
             fullName: name,
@@ -169,6 +174,17 @@ export default function Profile() {
             </form>
           )}
         </Formik>
+        <div className="mt-10 w-1/6">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              logout();
+            }}
+            className="bg-blue-500 px-5 py-3 w-full text-white rounded-lg"
+          >
+            Cerrar Sesion
+          </button>
+        </div>
       </div>
     </div>
   );

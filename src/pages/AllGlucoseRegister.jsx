@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
-import Modal from "../components/Modal";
+import Modal from "../components/ModalGlucosa";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 // import PdfGlucose from "../components/PdfGlucose";
+
+let totalRecords = [];
 
 export default function AllGlucoseRegister() {
   const { user } = useUserContext();
@@ -15,44 +17,44 @@ export default function AllGlucoseRegister() {
   const [atipicDayRecordsAux, setAtipicDayRecordsAux] = useState([]);
   const [waterRecords, setWaterRecords] = useState([]);
   const [waterRecordsAux, setWaterRecordsAux] = useState([]);
-  const [totalRecords, setTotalRecords] = useState([]);
   const [recordsAux, setRecordsAux] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
   const [open, setOpen] = useState(false);
   const [recordEdit, setRecordEdit] = useState([{}]);
+  const [update, setUpdate] = useState(false);
+  const [atipicDays, setAtipicDays] = useState([]);
 
-  const handleEdit = async () => {
+  const getAtipicDay = async () => {
+    const { data, error } = await supabase.from("diaAtipico").select("*");
+    if (error) throw error;
+    console.log(data);
+    setAtipicDays(data);
+  };
+
+  const getRecords = async () => {
     try {
       setLoading(true);
-      if (recordEdit.editType === "glucose") {
-        await supabase
-          .from("registroGlucosa")
-          .update({ glucosa: recordEdit.medition })
-          .eq("id", recordEdit.id);
+      const { data, error } = await supabase
+        .from("registroGlucosa")
+        .select("id, created_at, glucosa, medicion(measurement)")
+        .eq("uid", user.id);
 
-        const { data, error } = await supabase
-          .from("registroGlucosa")
-          .select("id, created_at, glucosa, medicion(measurement)")
-          .eq("uid", user.id);
+      if (error) throw error;
 
-        if (error) throw error;
+      const newData = data.map((record) => {
+        const object = {
+          id: record.id,
+          created_at: record.created_at,
+          measurement: record.medicion.measurement,
+          glucose: record.glucosa,
+        };
+        return object;
+      });
 
-        const newData = data.map((record) => {
-          const object = {
-            id: record.id,
-            created_at: record.created_at,
-            measurement: record.medicion.measurement,
-            glucose: record.glucosa,
-          };
-          return object;
-        });
-
-        setRecords(newData);
-        getRecords();
-        filterRecords();
-      }
+      setRecords(newData);
+      console.log("no editado", records);
     } catch (error) {
       console.log(error);
     } finally {
@@ -60,29 +62,85 @@ export default function AllGlucoseRegister() {
     }
   };
 
-  const handleDate1 = (e) => {
-    const date = e.target.value;
-    var parts = date.split("-");
-    var day = parts[2];
-    var month = parts[1];
-    var year = parts[0];
-    const formatDate = new Date(year, month - 1, day);
-    setDate1(formatDate);
-    console.log(date);
+  const getRecordsInsuline = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroInsulina")
+        .select(
+          "id, created_at, dosis, tipoInsulina(insulin), tipoDosis(tipoDosis), medicion"
+        )
+        .eq("uid", user.id);
+
+      if (error) throw error;
+
+      const newData = data.map((record) => {
+        const object = {
+          id: record.id,
+          dose: record.dosis,
+          created_at: record.created_at,
+          insulineType: record.tipoInsulina.insulin,
+          doseType: record.tipoDosis.tipoDosis,
+          medition: record.medicion,
+        };
+        return object;
+      });
+
+      setInsulineRecords(newData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDate2 = (e) => {
-    const date = e.target.value;
-    var parts = date.split("-");
-    var day = parts[2];
-    var month = parts[1];
-    var year = parts[0];
-    const formatDate = new Date(year, month - 1, day);
-    setDate2(formatDate);
+  const getRecordsAtipicDay = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroDiaAtipico")
+        .select("id, created_at, diaAtipico(typeDay)")
+        .eq("uid", user.id);
+
+      if (error) throw error;
+
+      const newData = data.map((record) => {
+        const object = {
+          id: record.id,
+          created_at: record.created_at,
+          atipicDay: record.diaAtipico.typeDay,
+        };
+        return object;
+      });
+
+      setAtipicDayRecords(newData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRecordsWater = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("registroAgua")
+        .select("id, created_at, agua")
+        .eq("uid", user.id);
+
+      if (error) throw error;
+      setWaterRecords(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filterRecords = () => {
     setLoading(true);
+    setUpdate(false);
     const recordsFiltered = records.filter((record) => {
       const date = new Date(record.created_at);
       const newDate1 = new Date(date1);
@@ -154,8 +212,6 @@ export default function AllGlucoseRegister() {
     setAtipicDayRecordsAux(registerAtipicDay);
     setWaterRecordsAux(registerWater);
 
-    console.log(recordsAux);
-
     const recordsTotal = Object.assign(
       {},
       registerGlucose,
@@ -164,32 +220,58 @@ export default function AllGlucoseRegister() {
       registerWater
     );
 
-    setTotalRecords(recordsTotal);
+    totalRecords = recordsTotal;
 
     setLoading(false);
   };
 
-  const getRecords = async () => {
+  const handleEdit = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("registroGlucosa")
-        .select("id, created_at, glucosa, medicion(measurement)")
-        .eq("uid", user.id);
+      if (recordEdit.editType === "glucose") {
+        await supabase
+          .from("registroGlucosa")
+          .update({ glucosa: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-      if (error) throw error;
+        await getRecords();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
+      }
+      if (recordEdit.editType === "insuline") {
+        await supabase
+          .from("registroInsulina")
+          .update({ dosis: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-      const newData = data.map((record) => {
-        const object = {
-          id: record.id,
-          created_at: record.created_at,
-          measurement: record.medicion.measurement,
-          glucose: record.glucosa,
-        };
-        return object;
-      });
+        await getRecordsInsuline();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
+      }
+      if (recordEdit.editType === "water") {
+        await supabase
+          .from("registroInsulina")
+          .update({ dosis: recordEdit.medition })
+          .eq("id", recordEdit.id);
 
-      setRecords(newData);
+        await getRecordsInsuline();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
+      }
+      if (recordEdit.editType === "atipicDay") {
+        await supabase
+          .from("registroDiaAtipico")
+          .update({ diaAtipico: recordEdit.medition })
+          .eq("id", recordEdit.id);
+
+        await getRecordsAtipicDay();
+        filterRecords();
+        setOpen(false);
+        setUpdate(true);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -197,118 +279,136 @@ export default function AllGlucoseRegister() {
     }
   };
 
+  // const handleDelete = async () => {
+  //   try {
+  //     if (recordEdit.editType === "glucose") {
+  //       await supabase.from("registroGlucosa").delete().eq("id", recordEdit.id);
+  //       await getRecords();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //     if (recordEdit.editType === "insuline") {
+  //       await supabase
+  //         .from("registroInsulina")
+  //         .delete()
+  //         .eq("id", recordEdit.id);
+  //       await getRecordsInsuline();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //     if (recordEdit.editType === "water") {
+  //       const { error } = await supabase
+  //         .from("registroAgua")
+  //         .delete()
+  //         .eq("id", recordEdit.id);
+  //       console.log(error);
+  //       await getRecordsWater();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //     if (recordEdit.editType === "atipicDay") {
+  //       await supabase
+  //         .from("registroDiaAtipico")
+  //         .delete()
+  //         .eq("id", recordEdit.id);
+  //       await getRecordsAtipicDay();
+  //       filterRecords();
+  //       setOpen(false);
+  //       setUpdate(true);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const handleDate1 = (e) => {
+    const date = e.target.value;
+    var parts = date.split("-");
+    var day = parts[2];
+    var month = parts[1];
+    var year = parts[0];
+    const formatDate = new Date(year, month - 1, day);
+    setDate1(formatDate);
+    console.log(date);
+  };
+
+  const handleDate2 = (e) => {
+    const date = e.target.value;
+    var parts = date.split("-");
+    var day = parts[2];
+    var month = parts[1];
+    var year = parts[0];
+    const formatDate = new Date(year, month - 1, day);
+    setDate2(formatDate);
+  };
+
   useEffect(() => {
-    const getRecordsInsuline = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("registroInsulina")
-          .select(
-            "id, created_at, dosis, tipoInsulina(insulin), tipoDosis(tipoDosis), medicion"
-          )
-          .eq("uid", user.id);
-
-        if (error) throw error;
-
-        const newData = data.map((record) => {
-          const object = {
-            id: record.id,
-            dose: record.dosis,
-            created_at: record.created_at,
-            insulineType: record.tipoInsulina.insulin,
-            doseType: record.tipoDosis.tipoDosis,
-            medition: record.medicion,
-          };
-          return object;
-        });
-
-        setInsulineRecords(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const getRecordsAtipicDay = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("registroDiaAtipico")
-          .select("id, created_at, diaAtipico(typeDay)")
-          .eq("uid", user.id);
-
-        if (error) throw error;
-
-        const newData = data.map((record) => {
-          const object = {
-            id: record.id,
-            created_at: record.created_at,
-            atipicDay: record.diaAtipico.typeDay,
-          };
-          return object;
-        });
-
-        setAtipicDayRecords(newData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const getRecordsWater = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("registroAgua")
-          .select("created_at, agua")
-          .eq("uid", user.id);
-
-        if (error) throw error;
-        setWaterRecords(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
     getRecordsAtipicDay();
     getRecords();
     getRecordsInsuline();
     getRecordsWater();
+    getAtipicDay();
   }, [user]);
 
   return (
     <div className="overflow-y-hidden">
       <Modal open={open} onClose={() => setOpen(false)}>
         <div>
-          <h2>Editar datos de registro</h2>
-          <input
-            type="text"
-            className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
-            onChange={(e) => {
-              setRecordEdit({
-                ...recordEdit,
-                medition: parseInt(e.target.value),
-              });
-              console.log(recordEdit);
-            }}
-            value={recordEdit.medition}
-          />
-          <button
-            onClick={handleEdit}
-            className="bg-blue-500 text-white rounded-lg px-3 py-1.5"
-          >
-            Guardar
-          </button>
+          <h2 className="mb-3">Editar datos de registro</h2>
+          <form className="flex flex-col">
+            {recordEdit.editType === "glucose" ||
+            recordEdit.editType === "insuline" ||
+            recordEdit.editType === "water" ? (
+              <input
+                type="text"
+                className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                onChange={(e) => {
+                  setRecordEdit({
+                    ...recordEdit,
+                    medition: parseInt(e.target.value),
+                  });
+                  console.log(recordEdit);
+                }}
+                value={recordEdit.medition}
+              />
+            ) : (
+              <select
+                className="bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                name="atipicDay"
+                id="atipicDay"
+                onChange={(e) =>
+                  setRecordEdit({ ...recordEdit, medition: e.target.value })
+                }
+              >
+                {atipicDays.map((day) => (
+                  <option key={day.idDiaatipico} value={day.idDiaatipico}>
+                    {day.typeDay}
+                  </option>
+                ))}
+              </select>
+            )}
+            <div>
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  handleEdit();
+                }}
+                className="bg-blue-500 text-white rounded-lg px-3 py-1.5 mr-3"
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
         </div>
       </Modal>
       <SideBar />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <h2 className="text-2xl mb-5 font-semibold">Tus registros</h2>
         <span>Seleccione un periodo:</span>
-        <div className="mt-5">
+        <div className={`mt-5 ${update && "mb-4"} `}>
           <span>Fecha inicio:</span>
           <input
             type="date"
@@ -326,11 +426,21 @@ export default function AllGlucoseRegister() {
             className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
             disabled={loading}
           >
-            Buscar
+            {update ? "Actualizar" : "Filtrar"}
           </button>
         </div>
 
         <div className="flex flex-row justify-center items-center w-full h-full flex-wrap overflow-auto">
+          {update && (
+            <div
+              className="p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 w-full"
+              role="alert"
+            >
+              <span className="font-medium">Atención!</span> Los registros han
+              sido actualizados, para poder visualizar los cambios de click en
+              el boton de "Actualizar".
+            </div>
+          )}
           {Object.keys(totalRecords).map((key) => {
             return (
               <div className="w-full">
@@ -758,7 +868,12 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -785,7 +900,12 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -812,7 +932,12 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -839,7 +964,12 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -866,7 +996,12 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -893,7 +1028,12 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.insulineType === "Rápida"
+                                        ? "R"
+                                        : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -920,7 +1060,10 @@ export default function AllGlucoseRegister() {
                                       console.log(recordEdit);
                                     }}
                                   >
-                                    <span>{record.dose}</span>
+                                    <span>
+                                      {record.dose}{" "}
+                                      {record.doseType === "Rápida" ? "R" : "L"}
+                                    </span>
                                   </div>
                                 )}
                               </div>

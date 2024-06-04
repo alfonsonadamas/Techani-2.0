@@ -26,6 +26,7 @@ import AtipicDay from "../pages/AtipicDayRegister";
 import Files from "../pages/Files";
 import AllFiles from "../pages/AllFiles";
 import MyDates from "../pages/MyDates";
+import Grapics from "../pages/Graphics";
 
 export const router = createBrowserRouter([
   {
@@ -246,6 +247,15 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Exercise />,
+          },
+        ],
+      },
+      {
+        path: "/graphics",
+        children: [
+          {
+            index: true,
+            element: <Grapics />,
           },
         ],
       },
