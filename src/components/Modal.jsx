@@ -1,13 +1,13 @@
 import React from "react";
 
-const Modal = ({ isOpen, onClose, children, title }) => {
+const Modal = ({ isOpen, onClose, children, title, width }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
       <div className=" absolute w-full h-full bg-gray-900 opacity-50"></div>
       {/* <div className="bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto"> */}
-      <div className="relative p-4 w-full max-w-md max-h-full">
+      <div className={`relative p-4 w-full ${width} max-h-full`}>
         {/* <div className="py-4 text-left px-6"> */}
         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           {/* Encabezado */}
