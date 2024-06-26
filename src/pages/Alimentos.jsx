@@ -316,7 +316,7 @@ export default function Alimentos() {
                 )}
               </div>
 
-              <Modal isOpen={modalIsOpen} onClose={closeModal} title="Seleccione un alimento">
+              <Modal isOpen={modalIsOpen} onClose={closeModal} title="Seleccione un alimento" width="max-w-md">
                 <div className="mb-4">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Tipo de alimento

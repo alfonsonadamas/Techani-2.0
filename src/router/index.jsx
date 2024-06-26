@@ -13,6 +13,7 @@ import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
 import AlimentosRegister from "../pages/AlimentosRegister";
 import AllAlimentosRegister from "../pages/AllAlimentosRegister";
+import AllFoodsRegister from "../pages/AllFoodsRegister";
 
 import Exercise from "../pages/Exercise";
 import NewActivity from "../pages/NewActivity";
@@ -155,6 +156,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <AllAlimentosRegister />,
+          },
+        ],
+      },
+      {
+        path: "/myFoods",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AllFoodsRegister/>,
           },
         ],
       },
