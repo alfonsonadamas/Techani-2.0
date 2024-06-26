@@ -9,38 +9,54 @@ export default function SignUp() {
   const [loading, setloading] = useState(false);
   const [form, setForm] = useState(false);
   const [sendEmail, setSendEmail] = useState(false);
+  const [mayus, setMayus] = useState(false);
+  const [length, setLength] = useState(false);
+  const [num, setNum] = useState(false);
+  const [caracEsp, setCaracEsp] = useState(false);
 
   const showForm = () => {
     setForm(true);
   };
 
+  const confirmPassword = (password, passwordConfirm) => {
+    setMayus(/.*[A-Z].*/.test(password));
+    setLength(/.{6,}/.test(password));
+    setNum(/.*[0-9].*/.test(password));
+    setCaracEsp(/.*[!@#$%^&*(),.?":{}|<>].*/.test(password));
+  };
+
   const createNewUser = async (
-    { email, password, name, lastname },
+    { email, password, name, lastname, passwordConfirm },
     { setSubmitting, setErrors, resetForm }
   ) => {
-    setSubmitting(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: name + " " + lastname,
+      if (password === passwordConfirm) {
+        setSubmitting(true);
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: name + " " + lastname,
+            },
           },
-        },
-      });
-      console.log(data, error);
-      setSendEmail(true);
+        });
+        console.log(data, error);
+        setSendEmail(true);
+      } else {
+        console.log("Contraseñas no coinciden");
+        setErrors([{ password: "Las contraseñas no coinciden" }]);
+        setSubmitting(false);
+      }
     } catch (error) {
       console.log(error);
     } finally {
       setSubmitting(false);
-      resetForm();
     }
   };
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Email Invalido").required("Email Requerido"),
+    email: Yup.string().email("Email no valido").required("Email Requerido"),
     password: Yup.string()
       .required("Contraseña Requerida")
       .min(6, "Contraseña no valida mínimo 6 caracteres")
@@ -106,6 +122,7 @@ export default function SignUp() {
                 password: "",
                 name: "",
                 lastname: "",
+                passwordConfirm: "",
               }}
               onSubmit={createNewUser}
               validationSchema={validationSchema}
@@ -126,7 +143,7 @@ export default function SignUp() {
                     Crea una cuenta
                   </h2>
                   <div className="flex flex-col mb-5">
-                    <label className="text-sm">Nombre</label>
+                    <label className="text-sm">Nombre(s)</label>
                     <input
                       type="text"
                       name="name"
@@ -185,8 +202,9 @@ export default function SignUp() {
                     <input
                       type="password"
                       name="password"
-                      placeholder="Contraseña"
+                      placeholder="Minimo 6 caracteres"
                       onChange={handleChange}
+                      onInput={confirmPassword(values.password)}
                       className={
                         errors.password && touched.password && errors.password
                           ? "text-red-400 border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black transition duration-300  border-red-400 py-2 w-72 focus:ring-0 "
@@ -194,9 +212,60 @@ export default function SignUp() {
                       }
                       autoComplete="off"
                     />
-                    <p className="text-red-400 mt-2">
+                    <p className="text-red-400 mt-2 mb-2">
                       {errors.password && touched.password && errors.password}
                     </p>
+                    <ul className="list-disc pl-10 text-gray-500 text-xs">
+                      <li className={length && "text-green-500"}>
+                        Minimo 6 caracteres
+                      </li>
+                      <li className={mayus && "text-green-500"}>
+                        Al menos una letra mayúscula
+                      </li>
+                      <li className={num && "text-green-500"}>
+                        Al menos un número
+                      </li>
+                      <li className={caracEsp && "text-green-500"}>
+                        Al menos un caracter especial
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="flex flex-col mb-5">
+                    <label className="text-sm">Confirmar contraseña</label>
+                    <input
+                      type="password"
+                      name="passwordConfirm"
+                      placeholder="Confirmar contraseña"
+                      onChange={handleChange}
+                      onKeyDown={() =>
+                        confirmPassword(values.password, values.passwordConfirm)
+                      }
+                      className={
+                        errors.passwordConfirm &&
+                        touched.passwordConfirm &&
+                        errors.passwordConfirm
+                          ? "text-red-400 border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black transition duration-300  border-red-400 py-2 w-72 focus:ring-0 "
+                          : "border-b-2 border-l-0 border-t-0 border-r-0 focus:border-transparent focus:outline-none focus:border-b-black transition duration-300  border-gray-300 py-2 w-72 focus:ring-0 "
+                      }
+                      autoComplete="off"
+                    />
+
+                    <p className="text-red-400 mt-2">
+                      {errors.passwordConfirm &&
+                        touched.passwordConfirm &&
+                        errors.passwordConfirm}
+                    </p>
+                    <ul className="list-disc pl-10 text-gray-500 text-xs">
+                      <li
+                        className={
+                          values.password === values.passwordConfirm &&
+                          "text-green-500"
+                        }
+                      >
+                        Las contraseñas coinciden
+                      </li>
+                    </ul>
                   </div>
 
                   <p className="text-[12px] mb-8 text-gray-400 w-80 text-center ">
@@ -205,14 +274,8 @@ export default function SignUp() {
                   </p>
                   <button
                     type="submit"
-                    className="bg-azul w-28 rounded-sm text-white py-2 transition-all ease-in disabled:opacity-50 disabled:shadow-none hover:shadow-xl"
-                    disabled={
-                      isSubmitting ||
-                      values.email === "" ||
-                      values.password === "" ||
-                      values.name === "" ||
-                      values.lastname === ""
-                    }
+                    className="bg-azul w-28 mb-10 rounded-sm text-white py-2 transition-all ease-in disabled:opacity-50 disabled:shadow-none hover:shadow-xl"
+                    disabled={isSubmitting}
                   >
                     Continuar
                   </button>
@@ -230,7 +293,9 @@ export default function SignUp() {
                   leído y comprendido la Política de Privacidad
                 </p>
                 <button
-                  onClick={handleLoginGoogle}
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
                   className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-16 border border-gray-400 rounded shadow flex items-center mb-5 disabled:opacity-20 disabled:cursor-default"
                   disabled={loading}
                 >
@@ -242,7 +307,9 @@ export default function SignUp() {
                   <span>Continuar con Google</span>
                 </button>
                 <button
-                  onClick={handleLoginFacebook}
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
                   className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-14 border mb-5 border-gray-400 rounded shadow flex items-center justify-center disabled:opacity-20 disabled:cursor-default"
                   disabled={loading}
                 >

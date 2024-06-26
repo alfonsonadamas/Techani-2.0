@@ -91,7 +91,7 @@ export default function GlucoseRegister() {
   const validationSchema = Yup.object().shape({
     glucose: Yup.number()
       .min(0, "La glucosa no puede ser menor a 0")
-      .max(500, "La glucosa no puede ser mayor a 500")
+      .max(200, "La glucosa no puede ser mayor a 200")
       .required("La glucosa es requerida"),
 
     meditionType: Yup.string().required("El tipo de medición es requerido"),
@@ -107,15 +107,19 @@ export default function GlucoseRegister() {
       }
       today = today.join("-");
 
-      const { data, error } = await supabase
-        .from("registroGlucosa")
-        .select("*")
-        .eq("uid", user.id)
-        .eq("created_at", today);
-      if (error) throw error;
-      console.log(data);
-      console.log(today);
-      setRecords(data);
+      try {
+        const { data, error } = await supabase
+          .from("registroGlucosa")
+          .select("*")
+          .eq("uid", user.id)
+          .eq("created_at", today);
+        if (error) throw error;
+        console.log(data);
+        console.log(today);
+        setRecords(data);
+      } catch (error) {
+        console.log(error);
+      }
     };
     getRecords();
   }, [user]);

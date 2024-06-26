@@ -63,7 +63,9 @@ const Index = () => {
 
             <ul className="flex flex-col items-center">
               <li className="my-2">
-                <a href="registroCorreo.php">Registrarse</a>
+                <Link to="/signup" className="text-azulSecundario font-bold">
+                  Registrarse
+                </Link>
               </li>
               <li className="my-2">
                 <Link to="/login" className="text-azulSecundario font-bold">
@@ -82,7 +84,7 @@ const Index = () => {
         <div className="mr-10 hidden md:flex">
           <ul className="flex items-center">
             <li className="mx-14">
-              <a href="registroCorreo.php">Registrarse</a>
+              <Link to="/signup">Registrarse</Link>
             </li>
             <li>
               <Link to="/login" className="mr-5 text-azulSecundario font-bold">
@@ -110,12 +112,12 @@ const Index = () => {
             <p className="text-[5vw] sm:text-[2vw] text-white text-justify ">
               En Techani, entendemos a los usuarios y la importancia de brindar
               una experiencia integral en el control y monitoreo de la diabetes
-              tipo 1 y 2.
+              tipo 1.
             </p>
 
             <div className="flex flex-col justify-around sm:flex sm:flex-row mt-10">
               <Link
-                to={"/"}
+                to={"/signup"}
                 className="bg-azulFondo mb-[7px] sm:mb-0 lg:mr-[7px] text-center transition duration-300 ease-out hover:ease-out hover:bg-azulSecundario hover:shadow-2xl  px-7 py-1 rounded-lg text-white"
               >
                 Registrarse

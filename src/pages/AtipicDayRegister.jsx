@@ -39,6 +39,7 @@ export default function AtipicDay() {
       ]);
 
       if (error) throw error;
+      setSubmited(true);
     } catch (error) {
       console.log(error);
     } finally {
