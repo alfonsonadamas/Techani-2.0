@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
-import Modal from "../components/Modal"; // Asegúrate de tener el componente Modal creado
+import Modal from "../components/ModalCitas"; // Asegúrate de tener el componente Modal creado
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 
 function MyDates() {
   //const [citas, setCitas] = useState([{ idCita: null }]);
@@ -36,9 +37,9 @@ function MyDates() {
   const handleEliminarCita = async (idCita) => {
     try {
       console.log("ID de la cita a eliminar:", idCita);
-      await supabase.from("citasMedicas").delete().match({ idCita });
+      await supabase.from("citasMedicas").delete().eq("idCita", idCita);
       if (error) throw error;
-      obtenerCitas();
+      window.location.reload();
     } catch (error) {
       console.error("Error al eliminar la cita:", error.message);
     }
@@ -78,7 +79,7 @@ function MyDates() {
     <div>
       <SideBar />
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-        <label className="block text-gray-900 dark:text-white text-2xl mb-5 font-semibold">
+        <label className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
           Mis citas
         </label>
         <ul className="mt-4">
@@ -156,7 +157,7 @@ function MyDates() {
               handleSubmit,
               isSubmitting,
             }) => (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className="flex flex-col">
                 <label htmlFor="date">Fecha</label>
                 <input
                   id="date"
@@ -182,7 +183,7 @@ function MyDates() {
                 <label htmlFor="typecites">Tipo de cita</label>
                 <input
                   id="typecites"
-                  type="typecites"
+                  type="text"
                   name="typecites"
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -216,13 +217,18 @@ function MyDates() {
                   <div>{errors.doctorName}</div>
                 )}
 
-                <button type="submit" disabled={isSubmitting}>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white py-1 px-4 rounded mt-5 "
+                  disabled={isSubmitting}
+                >
                   Guardar cambios
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   onClick={() => setModalIsOpen(!modalIsOpen)}
+                  className="bg-red-500 text-white py-1 px-4 rounded mt-5"
                 >
                   Cancelar
                 </button>

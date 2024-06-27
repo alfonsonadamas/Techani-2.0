@@ -12,6 +12,7 @@ function Citas() {
   const [sendForm, setSendForm] = useState(false);
   // Aquí inicializamos citas como un array vacío
   const { user } = useUserContext();
+  const navigation = useNavigate();
 
   const handleFormSubmit = async (
     { date, time, appointmentType, location, doctorName },
@@ -36,7 +37,7 @@ function Citas() {
       console.log(data);
       setSendForm(true); // Actualiza el estado para mostrar el mensaje de éxito
       setSubmitting(false);
-
+      navigate("/myDates"); // Redirige a la página de citas
       // Restablecer el formulario para dejar los campos en blanco
       resetForm();
     } catch (error) {
