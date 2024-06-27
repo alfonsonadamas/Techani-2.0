@@ -28,37 +28,34 @@ export default function ViewEstados() {
   };
 
   const updateEemoc = async (
-    { idRegistro, idEm, Inten, timeReg },
+    { idRegistro, idEmocion, Intencidad, timeRegistroEm },
     { setSubmitting }
   ) => {
     try {
       // Verifica que todos los parámetros necesarios estén presentes
+      console.log("idRegistro", editRecord.idRegistroEmocion);
+      console.log(Intencidad, timeRegistroEm, idEmocion);
       setSubmitting(true);
-      console.log(idRegistro);
-      await supabase
+
+      const { data, error } = await supabase
         .from("emociones")
         .update({
-          idEmocion: idEm,
-          Intencidad: Inten,
-          timeRegistroEm: timeReg,
+          idEmocion: idEmocion,
+          Intencidad: Intencidad,
+          timeRegistroEm: timeRegistroEm,
         })
         .eq("uid", user.id)
-        .eq("idRegistroEmocion", idRegistro);
+        .eq("idRegistroEmocion", editRecord.idRegistroEmocion);
 
       closeModal();
       emotions(); // Actualiza
+      console.log(data, error);
     } catch (error) {
       console.log("Error en updateEstados:", error.message);
     } finally {
       setSubmitting(false);
     }
   };
-
-  const validationSchema = Yup.object({
-    excersiceName: Yup.string()
-      .matches(/^[^\d]+$/, "El campo debe ser texto")
-      .required("Este campo es requerido"),
-  });
 
   const emotions = async () => {
     try {
@@ -389,7 +386,6 @@ export default function ViewEstados() {
                       Intencidad: editRecord.Intencidad,
                       timeRegistroEm: editRecord.timeRegistroEm,
                     }}
-                    validationSchema={validationSchema}
                     onSubmit={updateEemoc}
                   >
                     {({
