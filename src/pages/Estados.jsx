@@ -96,9 +96,8 @@ export default function Estados() {
             <div className="flex w-full items-center justify-center">
               <div
                 style={{
-                  width: "400px",
-                  height: "400px",
-                  borderRadius: "50%",
+                  width: "auto",
+                  height: "auto",
                   position: "relative",
                   overflow: "hidden",
                 }}
@@ -108,19 +107,14 @@ export default function Estados() {
                   style={{
                     width: "100%",
                     height: "100%",
-                    backgroundImage:
-                      "conic-gradient(#1a56db 0%, #F9F9CE 0%, #F9F9CE 16.67%, #DEF9CE 16.67%, #DEF9CE 33.33%, #CEF9EF 33.33%, #CEF9EF 50%, #CEEDF9 50%, #CEEDF9 66.67%, #CED5F9 66.67%, #CED5F9 83.33%, #E0CEF9 83.33%, #E0CEF9 100%)",
                     display: "grid",
-                    gridTemplateColumns: `repeat(2, 3fr)`,
-                    gap: "0",
-
+                    gridTemplateColumns: `repeat(8, 1fr)`,
+                    gap: "30px",
                     placeItems: "center",
+                    padding: "20px",
                   }}
                 >
-                  <div
-                    className="flex flex-col items-center"
-                    style={{ marginLeft: "40px", marginTop: "15px" }}
-                  >
+                  <div className="flex flex-col items-center">
                     <button
                       type="button"
                       style={{
@@ -134,18 +128,15 @@ export default function Estados() {
                             : "rgba(0, 0, 0, 0)",
                         transition: "background-color 0.3s ease",
                       }}
-                      className=" hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
                       onClick={() => handleMoodChange(1, "😊")}
                     >
                       😊
                     </button>
-                    <p>Felicidad</p>
+                    <p>Alegría</p>
                   </div>
 
-                  <div
-                    className="flex flex-col items-center"
-                    style={{ marginRight: "40px", marginTop: "15px" }}
-                  >
+                  <div className="flex flex-col items-center">
                     <button
                       type="button"
                       style={{
@@ -159,18 +150,15 @@ export default function Estados() {
                             : "rgba(0, 0, 0, 0)",
                         transition: "background-color 0.3s ease",
                       }}
-                      className=" hover:bg-blue-700 rounded-full flex items-center justify-center"
-                      onClick={() => handleMoodChange(2, "😐")}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(2, "😎")}
                     >
-                      😐
+                      😎
                     </button>
-                    <p>Sorpresa</p>
+                    <p>Orgullo</p>
                   </div>
 
-                  <div
-                    className="flex flex-col items-center"
-                    style={{ marginBottom: "15px", marginRight: "30px" }}
-                  >
+                  <div className="flex flex-col items-center">
                     <button
                       type="button"
                       style={{
@@ -184,17 +172,15 @@ export default function Estados() {
                             : "rgba(0, 0, 0, 0)",
                         transition: "background-color 0.3s ease",
                       }}
-                      className=" hover:bg-blue-700 rounded-full flex items-center justify-center"
-                      onClick={() => handleMoodChange(3, "😔")}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(3, "🥹")}
                     >
-                      😔
+                      🥹
                     </button>
-                    <p>Tristeza</p>
+                    <p>Depresión</p>
                   </div>
-                  <div
-                    className="flex flex-col items-center"
-                    style={{ marginBottom: "15px", marginLeft: "30px" }}
-                  >
+
+                  <div className="flex flex-col items-center">
                     <button
                       type="button"
                       style={{
@@ -208,17 +194,15 @@ export default function Estados() {
                             : "rgba(0, 0, 0, 0)",
                         transition: "background-color 0.3s ease",
                       }}
-                      className=" hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
                       onClick={() => handleMoodChange(4, "😰")}
                     >
                       😰
                     </button>
                     <p>Miedo</p>
                   </div>
-                  <div
-                    className="flex flex-col items-center"
-                    style={{ marginBottom: "20px", marginLeft: "40px" }}
-                  >
+
+                  <div className="flex flex-col items-center">
                     <button
                       type="button"
                       style={{
@@ -232,17 +216,15 @@ export default function Estados() {
                             : "rgba(0, 0, 0, 0)",
                         transition: "background-color 0.3s ease",
                       }}
-                      className=" hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
                       onClick={() => handleMoodChange(5, "😡")}
                     >
                       😡
                     </button>
                     <p>Ira</p>
                   </div>
-                  <div
-                    className="flex flex-col items-center"
-                    style={{ marginBottom: "20px", marginRight: "40px" }}
-                  >
+
+                  <div className="flex flex-col items-center">
                     <button
                       type="button"
                       style={{
@@ -256,12 +238,370 @@ export default function Estados() {
                             : "rgba(0, 0, 0, 0)",
                         transition: "background-color 0.3s ease",
                       }}
-                      className=" hover:bg-blue-700 rounded-full flex items-center justify-center"
-                      onClick={() => handleMoodChange(6, "😪")}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(6, "🤗")}
                     >
-                      😪
+                      🤗
                     </button>
-                    <p>Disgusto</p>
+                    <p>Gratidud</p>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 7
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(7, "🙏🏻")}
+                    >
+                      🙏🏻
+                    </button>
+                    <p>Esperanza</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 8
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(8, "😌")}
+                    >
+                      😌
+                    </button>
+                    <p>Satisfacción</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 9
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(9, "💪🏻")}
+                    >
+                      💪🏻
+                    </button>
+                    <p>Valentía</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 10
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(10, "😉")}
+                    >
+                      😉
+                    </button>
+                    <p>Optimismo</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 11
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(11, "😁")}
+                    >
+                      😁
+                    </button>
+                    <p>Entusiasmo</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 12
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(12, "🤯")}
+                    >
+                      🤯
+                    </button>
+                    <p>Frustración</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 13
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(13, "🤦🏻‍♂")}
+                    >
+                      🤦🏻‍♂
+                    </button>
+                    <p>Desesperación</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 14
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(14, "😥")}
+                    >
+                      😥
+                    </button>
+                    <p>Ansiedad</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 15
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(15, "🥺")}
+                    >
+                      🥺
+                    </button>
+                    <p>Culpa</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 16
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(16, "😳")}
+                    >
+                      😳
+                    </button>
+                    <p>Vergüenza</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 17
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(17, "😐")}
+                    >
+                      😐
+                    </button>
+                    <p>Apatía</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 18
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(18, "😔")}
+                    >
+                      😔
+                    </button>
+                    <p>Aislamiento</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 19
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(19, "😢")}
+                    >
+                      😢
+                    </button>
+                    <p>Vulnerabilidad</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 20
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(20, "😒")}
+                    >
+                      😒
+                    </button>
+                    <p>Desconfianza</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 21
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(21, "🤨")}
+                    >
+                      🤨
+                    </button>
+                    <p>Escepticismo</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 22
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(22, "😠")}
+                    >
+                      😠
+                    </button>
+                    <p>Resentimiento</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: "2.5rem",
+                        lineHeight: "1",
+                        width: "4rem",
+                        height: "4rem",
+                        backgroundColor:
+                          estados.idEmocion === 23
+                            ? "#1a56db"
+                            : "rgba(0, 0, 0, 0)",
+                        transition: "background-color 0.3s ease",
+                      }}
+                      className="hover:bg-blue-700 rounded-full flex items-center justify-center"
+                      onClick={() => handleMoodChange(23, "😖")}
+                    >
+                      😖
+                    </button>
+                    <p>Estrés</p>
                   </div>
                 </div>
               </div>

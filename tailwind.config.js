@@ -6,6 +6,7 @@ module.exports = {
     "./public/index.html",
     "./src/pages/Login.js",
     "./src/pages/ViewEstados.jsx",
+    "./src/pages/MyExercise.jsx",
     "./src/pages/ViewActivity.jsx",
     "./src/components/Modal.jsx",
     "./src/components/Sidebar.js",

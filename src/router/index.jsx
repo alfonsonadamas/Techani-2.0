@@ -12,6 +12,7 @@ import Profile from "../pages/Profile";
 import Food from "../pages/Food";
 import Alimentos from "../pages/Alimentos";
 import Ejercicio from "../pages/Ejercicio";
+import MyExercise from "../pages/MyExercise";
 import NewActivity from "../pages/NewActivity";
 import ViewActivity from "../pages/ViewActivity";
 import Citas from "../pages/Citas";
@@ -113,6 +114,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Ejercicio />,
+          },
+        ],
+      },
+      {
+        path: "/myExercise",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyExercise />,
           },
         ],
       },

@@ -4,6 +4,9 @@ import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import edit from "../assets/img/edit.png";
 import delate from "../assets/img/delate.png";
+import * as Yup from "yup";
+import { Formik } from "formik";
+import Modal from "../components/Modal";
 
 export default function ViewEstados() {
   const { user } = useUserContext();
@@ -11,6 +14,51 @@ export default function ViewEstados() {
   const [loading, setLoading] = useState(false);
   const [fechaini, setFechaini] = useState(null);
   const [fechafin, setFechafin] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [editRecord, setEditRecord] = useState(null);
+
+  const openModal = (record) => {
+    setEditRecord(record);
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setEditRecord(null);
+  };
+
+  const updateEemoc = async (
+    { idRegistro, idEm, Inten, timeReg },
+    { setSubmitting }
+  ) => {
+    try {
+      // Verifica que todos los parámetros necesarios estén presentes
+      setSubmitting(true);
+      console.log(idRegistro);
+      await supabase
+        .from("emociones")
+        .update({
+          idEmocion: idEm,
+          Intencidad: Inten,
+          timeRegistroEm: timeReg,
+        })
+        .eq("uid", user.id)
+        .eq("idRegistroEmocion", idRegistro);
+
+      closeModal();
+      emotions(); // Actualiza
+    } catch (error) {
+      console.log("Error en updateEstados:", error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const validationSchema = Yup.object({
+    excersiceName: Yup.string()
+      .matches(/^[^\d]+$/, "El campo debe ser texto")
+      .required("Este campo es requerido"),
+  });
 
   const emotions = async () => {
     try {
@@ -20,7 +68,7 @@ export default function ViewEstados() {
         .select()
         .eq("uid", user.id)
         .order("created_at", { ascending: false }); // Ordenar por created_at de forma descendente
-      console.log(data);
+
       if (error) console.log("error", error);
 
       setRecords(data);
@@ -30,6 +78,30 @@ export default function ViewEstados() {
       setLoading(false);
     }
   };
+
+  const getEmotions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("emocion")
+        .select("idEmocion, emotion");
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
+  const [em, setEmotions] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const emotionData = await getEmotions();
+      setEmotions(emotionData);
+    };
+
+    fetchData();
+  }, []);
 
   const deleteEmotion = async (id) => {
     try {
@@ -55,24 +127,63 @@ export default function ViewEstados() {
         (!fechafin || recordDate <= fechafin)
       );
     });
+
+    // Ordenar los registros por fecha de creación de más reciente a más antiguo
+    filteredRecords.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+
     return filteredRecords;
   };
 
   const mapEmotionToEmoji = (idEmocion) => {
     switch (idEmocion) {
       case 1:
-        return "😊";
+        return "😊"; // Alegría
       case 2:
-        return "😐";
+        return "😎"; // Orgullo
       case 3:
-        return "😔";
-      // Agrega más casos según tus necesidades
+        return "🥹"; // Depresión
       case 4:
-        return "😰";
+        return "😰"; // Miedo
       case 5:
-        return "😡";
+        return "😡"; // Ira
       case 6:
-        return "😪";
+        return "🤗"; // Gratitud
+      case 7:
+        return "🙏"; // Esperanza
+      case 8:
+        return "😌"; // Satisfacción
+      case 9:
+        return "💪"; // Valentía
+      case 10:
+        return "😉"; // Optimismo
+      case 11:
+        return "😁"; // Entusiasmo
+      case 12:
+        return "😟"; // Frustración
+      case 13:
+        return "😩"; // Desesperación
+      case 14:
+        return "😟"; // Ansiedad
+      case 15:
+        return "😔"; // Culpa
+      case 16:
+        return "😳"; // Vergüenza
+      case 17:
+        return "😐"; // Apatía
+      case 18:
+        return "😔"; // Aislamiento
+      case 19:
+        return "😢"; // Vulnerabilidad
+      case 20:
+        return "😒"; // Desconfianza
+      case 21:
+        return "🤨"; // Escepticismo
+      case 22:
+        return "😠"; // Resentimiento
+      case 23:
+        return "😖"; // Estrés
       default:
         return "❓"; // Emoji por defecto o mensaje de error
     }
@@ -81,18 +192,53 @@ export default function ViewEstados() {
   const mapNameEmotion = (idEmocion) => {
     switch (idEmocion) {
       case 1:
-        return "Felicidad";
+        return "Alegría";
       case 2:
-        return "Sorpresa";
+        return "Orgullo";
       case 3:
-        return "Tristesa";
+        return "Depresión";
       // Agrega más casos según tus necesidades
       case 4:
         return "Miedo";
       case 5:
         return "Ira";
       case 6:
-        return "Disgusto";
+        return "Gratitud";
+      case 7:
+        return "Esperanza";
+      case 8:
+        return "Satisfacción";
+      case 9:
+        return "Valentía";
+      case 10:
+        return "Optimismo";
+      case 11:
+        return "Entusiasmo";
+      case 12:
+        return "Frustración";
+      case 13:
+        return "Desesperación";
+      case 14:
+        return "Ansiedad";
+      case 15:
+        return "Culpa";
+      case 16:
+        return "Vergüenza";
+      case 17:
+        return "Apatía";
+      case 18:
+        return "Aislamiento";
+      case 19:
+        return "Vulnerabilidad";
+      case 20:
+        return "Desconfianza";
+      case 21:
+        return "Escepticismo";
+      case 22:
+        return "Resentimiento";
+      case 23:
+        return "Estrés";
+
       default:
         return "❓"; // Emoji por defecto o mensaje de error
     }
@@ -212,7 +358,7 @@ export default function ViewEstados() {
                     <div className=" flex flex-row justify-end items-center mr-5">
                       <button
                         type="button"
-                        onClick={{}}
+                        onClick={() => openModal(record)}
                         className="bg-azulHover p-1 rounded hover:bg-azul mb-5 mr-3"
                       >
                         <img src={edit} alt="editar" className="h-5" />
@@ -229,6 +375,113 @@ export default function ViewEstados() {
                 </div>
               ))
             )}
+            <Modal
+              isOpen={modalIsOpen}
+              onClose={closeModal}
+              title="Editar Emociones"
+            >
+              {editRecord && (
+                <div>
+                  <Formik
+                    initialValues={{
+                      idRegistroEmocion: editRecord.idRegistroEmocion,
+                      idEmocion: editRecord.idEmocion,
+                      Intencidad: editRecord.Intencidad,
+                      timeRegistroEm: editRecord.timeRegistroEm,
+                    }}
+                    validationSchema={validationSchema}
+                    onSubmit={updateEemoc}
+                  >
+                    {({
+                      values,
+                      errors,
+                      touched,
+                      handleBlur,
+                      handleChange,
+                      handleSubmit,
+                      isSubmitting,
+                    }) => (
+                      <form onSubmit={handleSubmit}>
+                        <select
+                          className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          id="idEmocion"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          defaultValue={values.idEmocion}
+                          name="idEmocion"
+                        >
+                          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Nombre del ejercicio:
+                          </label>
+                          <option disabled>Selecciona una emoción</option>
+                          {em.map((type) => (
+                            <option key={type.idEmocion} value={type.idEmocion}>
+                              {type.emotion}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="w-full mt-10">
+                          <label
+                            htmlFor="rango"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            ¿Con cuanta intensidad sientes tu emoción?
+                          </label>
+                          <input
+                            type="range"
+                            id="Intencidad"
+                            name="Intencidad"
+                            min="0"
+                            max="5"
+                            step="1"
+                            className="form-range w-full mt-2"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            defaultValue={values.Intencidad}
+                          />
+                          <p className="text-center text-gray-700 mt-2">
+                            {values.Intencidad}
+                          </p>
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="timeRegistroEm"
+                            className=" mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            En que tiempo del día haces el registro:
+                          </label>
+                          <select
+                            className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            name="timeRegistroEm"
+                            id="timeRegistroEm"
+                            defaultValue={values.timeRegistroEm}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          >
+                            <option disabled value="">
+                              -- Selecciona una opcion --
+                            </option>
+                            <option required value="Desayuno">
+                              Desayuno
+                            </option>
+                            <option value="Comida">Comida</option>
+                            <option value="Cena">Cena</option>
+                          </select>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+                        >
+                          Guardar
+                        </button>
+                      </form>
+                    )}
+                  </Formik>
+                </div>
+              )}
+            </Modal>
           </div>
         )}
       </div>
