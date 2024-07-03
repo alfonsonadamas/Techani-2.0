@@ -363,18 +363,7 @@ export default function SideBar() {
             </Link>
           </div>
           <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/newActivitie"} className="flex cursor-pointer p-2 ">
-              <img
-                alt="exercise"
-                className="w-5 h-5"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADIklEQVR4nO2ZXYhMYRjHf8taZFfJR3Jhdyk3tMlHaeXGZ3EhpJQLJNkLCWG5lNYiF0L7cUOE5EKZUYpyo8TaRAl31q4pVmLWxxrt7uit/6m348yM3T0z+x7Nv97OnPM+857nP8/7fL0DRRQco4gwSoDtwAsgDXQAu4kYZgMPRMCMPuvzTiKAUuAQ8FNKfwS2AmXALj17jeOYD7Rbv/xlYLI1PxroB3pxFOOAE8BvEXgLrAnwl3rNP8dBLAPeSMF+4CxQ7pOpBu5ZvrIehzARaAYGpOBLYIlPxmylfcB3yXwCNuAQ1gLvpJzZTieBsT6ZecBjy19uAlNxBNOAK5Zyj4C5Ppkx8oVfkkkM1QrrgDYgZb0w7PEN2BuQrWuBV5a/XAAqhkoiX8p7ysWBSt97jbLnNZ8WmaUMA0+1UL0S0Ej4y/EAfxk0erSgP/zlA8Zxr1rWMtu5JqzF27To0TxbxJQc3XrXD+CAQm2oZg7DFx5mecc1S+4+MCs89f8m8ySEqJUJXgLcobLDWaSzECnRnCHjPNI5LJJr3sYcYA8QAz4rOTYWKqIOxyKTgE1AqyrgTNvWVMpOESlVNj+mcqXPp3C3gsM2YIZkvbLFCSJm3AK++hRPqb09AiwIKGFWSO6DC0S8qOUN04ucU3k0wSc/Xg3WGeCSVcIcLgCPnM58Crih/rsygGgNcFCNVK+13oAsWEeBMJioZDAF2CwH7wwoMtvVr6wMowYLk4gJncul3LOArfYeuAhsEckRQzYiG3VwYCtuaq27wP6AJgvXiBhfuGPNmc+ntV3MCYqTSPuI1FmHB1905GnCapX8okt9iLm26LmTRLzi8zowXc9WW72Pf/QAq3CQiP++2iJxG1ik/GGuMT1PBoRm54i0WiSCENO8OfNymkiX7hdm+P5izZs+3mkiqRznAhWaN+daThPp/EeLdOA4kRbdG18IQlzzTThOpMqKWnFZoFzXuBW1ZuI4EZQnkhnySFIZnygQQXmiWdEppWuTC5YYLBHnkS4ScQz/jUUSUrxW/3F4XV/k0BgQUhuIIMpEJiFLNBTwT6MiiiBk/AElsZmxUBZWTAAAAABJRU5ErkJggg=="
-              ></img>
-
-              <span className="ml-3">Nueva Actividad</span>
-            </Link>
-          </div>
-          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/"} className="flex cursor-pointer p-2 ">
+            <Link to={"/myExercise"} className="flex cursor-pointer p-2 ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -390,7 +379,7 @@ export default function SideBar() {
                 />
               </svg>
 
-              <span className="ml-3">Mis Registros</span>
+              <span className="ml-3">Mis Ejercicios</span>
             </Link>
           </div>
 

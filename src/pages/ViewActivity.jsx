@@ -7,7 +7,6 @@ import edit from "../assets/img/edit.png";
 import delate from "../assets/img/delate.png";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { type } from "@testing-library/user-event/dist/type";
 
 export default function ViewActivity() {
   const { user } = useUserContext();
@@ -15,11 +14,6 @@ export default function ViewActivity() {
   const [loading, setLoading] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-
-  const [foodType, setFoodType] = useState("");
-  const [foodTypes, setFoodTypes] = useState([]);
-  const [measuringunits, setMeasuringunits] = useState([]);
-  const [measuringunit, setMeasuringunit] = useState("");
 
   const openModal = (record) => {
     setEditRecord(record);
@@ -31,25 +25,16 @@ export default function ViewActivity() {
     setEditRecord(null);
   };
 
-  const fecha = new Date();
-  const año = fecha.getFullYear();
-  const mes = fecha.getMonth() + 1;
-  const dia = fecha.getDate();
-  const fechaActual = `${año}-${mes < 10 ? "0" : ""}${mes}-${dia}`;
-
   const getRecords = async () => {
     try {
       setLoading(true);
-      // unidadesMedida ( idUnidadMedida, name )
-      // idUnidadMedida, food,portionamount, carbohydrates,    BancoAlimentos
       const { data, error } = await supabase
         .from("actividadesUsuario")
-        .select("")
+        .select("*")
         .eq("uid", user.id)
-        .order("idActUs", { ascending: true });
+        .order("idActividades", { ascending: true });
 
       if (error) console.log("error", error);
-      //console.log(data);
       setRecords(data);
     } catch (error) {
       console.log(error);
@@ -65,7 +50,7 @@ export default function ViewActivity() {
         .from("actividadesUsuario")
         .delete()
         .eq("uid", user.id)
-        .eq("idActUs", id);
+        .eq("idActividades", id);
     } catch (error) {
       console.log(error);
     } finally {
@@ -74,86 +59,38 @@ export default function ViewActivity() {
     }
   };
 
-  const fetchTipoAlimento = async () => {
-    try {
-      const { data: tipoAlimentos, error } = await supabase
-        .from("tipoAlimento")
-        .select("*");
-      if (error) {
-        throw error;
-      }
-      setFoodTypes(tipoAlimentos);
-    } catch (error) {
-      console.error("Error al obtener los tipos de alimentos:", error.message);
-    }
-  };
-
-  const fetchMedidas = async () => {
-    try {
-      const { data: unidadesMedida, error } = await supabase
-        .from("unidadesMedida")
-        .select("*");
-      if (error) {
-        throw error;
-      }
-      setMeasuringunits(unidadesMedida);
-    } catch (error) {
-      console.error("Error al obtener las medidas:", error.message);
-    }
-  };
-
-  const updatefood = async (
-    {
-      id,
-      foodName,
-      foodType,
-      portionAmount,
-      measuringunit,
-      carbohydratesAmount,
-    },
+  const updateExcersice = async (
+    { idActividad, excersiceName },
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
-      // setLoading(true);
       setSubmitting(true);
-      const Indexfoodtypes = foodTypes.find((type) => type.food === foodType);
-      setFoodType(Indexfoodtypes.idTipoalimento);
 
       await supabase
-        .from("BancoAlimentos")
+        .from("actividadesUsuario")
         .update({
-          food: foodName,
-          idTipoAlimento: Indexfoodtypes.idTipoalimento,
-          idUnidadMedida: measuringunit,
-          portionamount: portionAmount,
-          carbohydrates: carbohydratesAmount,
-          created_at: fechaActual,
+          nameActivity: excersiceName,
         })
         .eq("uid", user.id)
-        .eq("idBancoAlimentos", id);
+        .eq("idActividades", idActividad);
 
       closeModal();
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
       getRecords(); //actualiza
     }
   };
 
   const validationSchema = Yup.object({
-    foodName: Yup.string()
+    excersiceName: Yup.string()
       .matches(/^[^\d]+$/, "El campo debe ser texto")
       .required("Este campo es requerido"),
-    foodType: Yup.string().required("Este campo es requerido"),
-    portionAmount: Yup.string().required("Este campo es requerido"),
-    carbohydratesAmount: Yup.string().required("Este campo es requerido"),
   });
 
   useEffect(() => {
     getRecords();
-    fetchTipoAlimento();
-    fetchMedidas();
   }, []);
 
   return (
@@ -167,11 +104,11 @@ export default function ViewActivity() {
               {loading && (
                 <div
                   role="status"
-                  class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
+                  className="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
                 >
                   <svg
                     aria-hidden="true"
-                    class="w-8 h-8 text-gray-200 animate-spin  fill-blue-600"
+                    className="w-8 h-8 text-gray-200 animate-spin  fill-blue-600"
                     viewBox="0 0 100 101"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
@@ -185,7 +122,7 @@ export default function ViewActivity() {
                       fill="currentFill"
                     />
                   </svg>
-                  <span class="sr-only">Loading...</span>
+                  <span className="sr-only">Loading...</span>
                 </div>
               )}
               <p
@@ -203,58 +140,58 @@ export default function ViewActivity() {
           {records && records.length > 0 && (
             <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md">
               <table className="w-full h-full text-center">
-                <tr>
-                  <th className="border-slate-300 border">
-                    Nombre de la Actividad
-                  </th>
-                  <th className="border-slate-300 border">Editar</th>
-                  <th className="border-slate-300 border">Eliminar</th>
-                </tr>
-                {records.map((record) => (
+                <thead>
                   <tr>
-                    <td className="border-slate-300 border">
-                      {record.nameActivity}
-                    </td>
-                    <td className="border-slate-300 border">
-                      <button
-                        type="button"
-                        onClick={() => openModal(record)}
-                        className="bg-azulHover p-1 rounded hover:bg-azul"
-                      >
-                        <img src={edit} alt="editar" className="h-5" />
-                      </button>
-                    </td>
-                    <td className="border-slate-300 border">
-                      <button
-                        type="button"
-                        onClick={() => deleteExcercise(record.idActUs)}
-                        className="bg-red-600 p-1 rounded hover:bg-red-800"
-                      >
-                        <img src={delate} alt="borrar" className="h-5" />
-                      </button>
-                    </td>
+                    <th className="border-slate-300 border">
+                      Nombre de la Actividad
+                    </th>
+                    <th className="border-slate-300 border">Editar</th>
+                    <th className="border-slate-300 border">Eliminar</th>
                   </tr>
-                ))}
+                </thead>
+                <tbody>
+                  {records.map((record) => (
+                    <tr key={record.idActividades}>
+                      <td className="border-slate-300 border">
+                        {record.nameActivity}
+                      </td>
+                      <td className="border-slate-300 border">
+                        <button
+                          type="button"
+                          onClick={() => openModal(record)}
+                          className="bg-azulHover p-1 rounded hover:bg-azul"
+                        >
+                          <img src={edit} alt="editar" className="h-5" />
+                        </button>
+                      </td>
+                      <td className="border-slate-300 border">
+                        <button
+                          type="button"
+                          onClick={() => deleteExcercise(record.idActividades)}
+                          className="bg-red-600 p-1 rounded hover:bg-red-800"
+                        >
+                          <img src={delate} alt="borrar" className="h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
 
               <Modal
                 isOpen={modalIsOpen}
                 onClose={closeModal}
-                title="Editar alimento"
+                title="Editar Ejercicio"
               >
                 {editRecord && (
                   <div>
                     <Formik
                       initialValues={{
-                        foodName: editRecord.food,
-                        foodType: "",
-                        portionAmount: editRecord.portionamount,
-                        measuringunit: 1,
-                        carbohydratesAmount: editRecord.carbohydrates,
-                        id: editRecord.idBancoAlimentos,
+                        idActividad: editRecord.idActividades,
+                        excersiceName: editRecord.nameActivity,
                       }}
                       validationSchema={validationSchema}
-                      onSubmit={updatefood}
+                      onSubmit={updateExcersice}
                     >
                       {({
                         values,
@@ -267,117 +204,23 @@ export default function ViewActivity() {
                       }) => (
                         <form onSubmit={handleSubmit}>
                           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Nombre del alimento:
+                            Nombre del ejercicio:
                           </label>
                           <input
-                            name="foodName"
-                            id="foodName"
+                            name="excersiceName"
+                            id="excersiceName"
                             type="text"
                             onChange={handleChange}
                             onBlur={handleBlur}
                             autoComplete="off"
                             className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            value={values.foodName}
+                            value={values.excersiceName}
                           />
                           <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                            {errors.foodName &&
-                              touched.foodName &&
-                              errors.foodName}
+                            {errors.excersiceName &&
+                              touched.excersiceName &&
+                              errors.excersiceName}
                           </p>
-
-                          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Tipo de alimento:
-                          </label>
-                          <select
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            name="foodType"
-                            id="foodType"
-                            defaultValue={values.foodType}
-                            // value={values.foodType}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                          >
-                            <option value="">
-                              Seleccione un tipo de alimento
-                            </option>
-                            {foodTypes.map((type) => (
-                              <option
-                                key={type.idTipoAlimento}
-                                value={type.idTipoAlimento} // Usamos el índice como valor
-                              >
-                                {type.food}
-                              </option>
-                            ))}
-                          </select>
-                          <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                            {errors.foodType &&
-                              touched.foodType &&
-                              errors.foodType}
-                          </p>
-
-                          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Cantidad por porción:
-                          </label>
-                          <div className="flex">
-                            <input
-                              name="portionAmount"
-                              id="portionAmount"
-                              type="number"
-                              step="0.1"
-                              min={1}
-                              max={999}
-                              defaultValue={values.portionAmount}
-                              autoComplete="off"
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            />
-                            <select
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                              name="measuringunit"
-                              id="measuringunit"
-                              defaultValue={measuringunit}
-                              // value={values.foodType}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                            >
-                              {measuringunits.map((type) => (
-                                <option
-                                  key={type.idUnidadMedida}
-                                  value={type.idUnidadMedida} // Usamos el índice como valor
-                                >
-                                  {type.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                            {errors.portionAmount &&
-                              touched.portionAmount &&
-                              errors.portionAmount}
-                          </p>
-
-                          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Carbohidratos por porción:
-                          </label>
-                          <input
-                            name="carbohydratesAmount"
-                            id="carbohydratesAmount"
-                            type="number"
-                            min={1}
-                            max={999}
-                            defaultValue={values.carbohydratesAmount}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            autoComplete="off"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          />
-                          <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                            {errors.carbohydratesAmount &&
-                              touched.carbohydratesAmount &&
-                              errors.carbohydratesAmount}
-                          </p>
-                          {/* <p className="text-gray-700">ID Unidad Medida: {editRecord.unidadesMedida.idUnidadMedida}</p> */}
                           <button
                             type="submit"
                             className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"

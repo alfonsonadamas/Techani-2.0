@@ -130,6 +130,26 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "/myExercise",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyExercise />,
+          },
+        ],
+      },
+      {
+        path: "/myExercise",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <MyExercise />,
+          },
+        ],
+      },
+      {
         path: "/newActivity",
         element: <LayoutPrivate />,
         children: [
@@ -165,7 +185,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllFoodsRegister/>,
+            element: <AllFoodsRegister />,
           },
         ],
       },
