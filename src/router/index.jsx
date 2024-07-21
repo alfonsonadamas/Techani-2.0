@@ -29,6 +29,7 @@ import Files from "../pages/Files";
 import AllFiles from "../pages/AllFiles";
 import MyDates from "../pages/MyDates";
 import Grapics from "../pages/Graphics";
+import MyExercise from "../pages/MyExercise";
 
 export const router = createBrowserRouter([
   {
@@ -129,16 +130,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "/myExercise",
-        element: <LayoutPrivate />,
-        children: [
-          {
-            index: true,
-            element: <MyExercise />,
-          },
-        ],
-      },
+
       {
         path: "/myExercise",
         element: <LayoutPrivate />,
