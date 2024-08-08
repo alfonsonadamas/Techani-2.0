@@ -8,6 +8,7 @@ import delate from "../assets/img/delate.png";
 import * as Yup from "yup";
 import { Formik } from "formik";
 
+
 export default function MyExercise() {
   const { user } = useUserContext();
   const [records, setRecords] = useState([]);
