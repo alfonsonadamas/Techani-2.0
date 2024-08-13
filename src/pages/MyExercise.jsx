@@ -164,7 +164,7 @@ export default function MyExercise() {
 
   const filterRecords = () => {
     const filteredRecords = records.filter((record) => {
-      const recordDate = new Date(record.created_at);
+      const recordDate = new Date(record.date);
       return (
         (!fechaini || recordDate >= fechaini) &&
         (!fechafin || recordDate <= fechafin)
@@ -173,7 +173,7 @@ export default function MyExercise() {
 
     // Ordenar los registros por fecha de creación de más reciente a más antiguo
     filteredRecords.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      (a, b) => new Date(b.date) - new Date(a.date)
     );
 
     return filteredRecords;
@@ -280,7 +280,7 @@ export default function MyExercise() {
                         />
 
                         <h3 className="text-center mt-2">
-                          Fecha: {formatDate(record.created_at)}
+                          Fecha: {record.date}
                         </h3>
                         <h3 className="text-center mt-2 mb-2">
                           Tiempo: {record.time} minutos
@@ -319,7 +319,7 @@ export default function MyExercise() {
                     initialValues={{
                       idEjercicio: editRecord.idEjercicio,
                       idActividad: editRecord.idActividades,
-                      time: editRecord.actividadUsuario,
+                      time: editRecord.time,
                       weigth: editRecord.weight,
                       actividadUsuario: edit.actividadUsuario,
                     }}
@@ -348,16 +348,17 @@ export default function MyExercise() {
                             >
                               Search
                             </label>
+                            <p>{JSON.stringify(values)}</p>
                             <div className="relative">
+                              
                               <input
                                 type="search"
                                 id="default-search"
                                 name="idActividad"
                                 autoComplete="off"
-                                defaultValue={values.idEjercicio}
                                 onChange={handleSearch}
                                 className="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Buscar actividad..."
+                                placeholder="Buscar   actividad..."
                               />
                             </div>
                           </div>
