@@ -14,7 +14,7 @@ export default function NavRegsitro({ data }) {
           to={data === "login" ? "/signup" : "/login"}
           className="relative inline-block transition-all duration-300 hover:text-azulSecundario"
         >
-          {data === "login" ? "Crear Cuenta" : "Iniciar Sesión"}
+          Crear Cuenta
         </Link>
       </div>
     </div>

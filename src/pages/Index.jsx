@@ -92,9 +92,9 @@ const Index = () => {
               </Link>
             </li>
             <li>
-              <Link to={"/login"}>
+              <a href="login.php">
                 <img src={perfil} alt="" width="60" height="" />
-              </Link>
+              </a>
             </li>
           </ul>
         </div>
