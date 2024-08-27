@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 // npm install axios
+// npm install axios
 import { useNavigate } from "react-router-dom";
 
 import { supabase } from "../config/supabase";
@@ -23,10 +24,13 @@ export default function Login() {
         password,
       });
       console.log(user);
+      console.log(user);
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
     }
+
+    //console.log(idpatient);
 
     //console.log(idpatient);
   };
@@ -42,15 +46,11 @@ export default function Login() {
 
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
-    setloading(true);
-    // try {
-    //   const { data, error } = await supabase.auth.signInWithOAuth({
-    //     provider: "facebook",
-    //   });
-    //   console.log(data, error);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    navigate("/dashboard");
+    console.log(data, error);
   };
 
   const validationSchema = Yup.object({
@@ -64,8 +64,7 @@ export default function Login() {
     if (user) {
       navigate("/dashboard");
     }
-  }, [navigate, user]);
-
+  }, [user, navigate]);
   return (
     <div className="h-screen bg-cover bg-center" data-aos="fade-right">
       <NavRegsitro />
@@ -126,6 +125,7 @@ export default function Login() {
                     <button
                       onClick={handleLoginGoogle}
                       class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5"
+                      class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5"
                     >
                       <img
                         src="https://img.icons8.com/color/16/000000/google-logo.png"
@@ -137,6 +137,7 @@ export default function Login() {
 
                     <button
                       onClick={handleLoginFacebook}
+                      class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center"
                       class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center"
                     >
                       <svg
@@ -156,6 +157,8 @@ export default function Login() {
                           y2="40.615"
                           gradientUnits="userSpaceOnUse"
                         >
+                          <stop offset="0" stop-color="#2aa4f4"></stop>
+                          <stop offset="1" stop-color="#007ad9"></stop>
                           <stop offset="0" stop-color="#2aa4f4"></stop>
                           <stop offset="1" stop-color="#007ad9"></stop>
                         </linearGradient>
