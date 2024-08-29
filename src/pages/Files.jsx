@@ -3,56 +3,46 @@ import SideBar from "../components/SideBar";
 import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Files() {
   const [caracteres, setCaracteres] = useState(200);
   const [file, setFile] = useState(null);
   const { user } = useUserContext();
-  const [url, setUrl] = useState("");
-
-  const getUrl = async (filename) => {
-    try {
-      const { data, error } = supabase.storage
-        .from("analisis_archivos")
-        .getPublicUrl(
-          `${user.id}/${filename}${file.type === "image/png" ? ".png" : ".pdf"}`
-        );
-      console.log("link:");
-      console.log(data.publicUrl, error);
-      setUrl(data.publicUrl);
-    } catch (error) {}
-  };
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (
     { filename, date, observation },
-    { setSubmitting, setErrors }
+    { setErrors, resetForm }
   ) => {
     try {
-      setSubmitting(true);
-      const { data, error } = await supabase.storage
+      setLoading(true);
+      const { error } = await supabase.storage
         .from("analisis_archivos")
-        .upload(
-          `${user.id}/${filename}${
-            file.type === "image/png" ? ".png" : ".pdf"
-          }`,
-          file
-        );
-      getUrl(filename);
-      const { dataUpload, errorUpload } = await supabase
-        .from("analisisArchivos")
-        .insert({
+        .upload(`${user.id}/${file.name}`, file);
+
+      if (error && error.error === "Duplicate") {
+        toast.error("El archivo ya existe");
+      } else {
+        const { data, error } = supabase.storage
+          .from("analisis_archivos")
+          .getPublicUrl(`${user.id}/${file.name}`);
+        console.log("link:");
+        console.log(data.publicUrl, error);
+
+        await supabase.from("analisisArchivos").insert({
           title: filename,
           date: date,
           observations: observation,
           uid: user.id,
-          file: url,
+          file: data.publicUrl,
         });
-      console.log("Archivo subido: ", dataUpload, errorUpload);
-      if (error) throw error;
+        toast.success("Archivo subido correctamente");
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Error", error);
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -71,7 +61,7 @@ export default function Files() {
   return (
     <div>
       <SideBar></SideBar>
-      <div className="p-16 pt-24 ml-64">
+      <div className="p-16 pt-24 ml-64" data-aos="fade-up">
         <Formik
           initialValues={{ filename: "", date: "", observation: "" }}
           onSubmit={onSubmit}
@@ -84,8 +74,10 @@ export default function Files() {
             touched,
             handleBlur,
             isSubmitting,
+            resetForm,
           }) => (
             <form onSubmit={handleSubmit}>
+              <ToastContainer />
               <div className="flex">
                 <div className="flex-1 mr-2">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -132,8 +124,8 @@ export default function Files() {
                 </label>
                 <input
                   type="file"
-                  name="filename"
-                  accept="image/jpeg, application/pdf, image/png"
+                  name="file"
+                  accept="image/jpeg,image/png"
                   autoComplete="off"
                   onChange={(e) => {
                     setFile(e.target.files[0]);
@@ -168,7 +160,8 @@ export default function Files() {
               </div>
               <button
                 type="submit"
-                className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
+                className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white disabled:opacity-50"
+                disabled={loading}
               >
                 Guardar
               </button>
