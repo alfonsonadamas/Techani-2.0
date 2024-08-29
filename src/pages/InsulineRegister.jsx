@@ -106,7 +106,7 @@ export default function InsulineRegister() {
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
         <div className="w-full h-60 flex justify-center items-center">
-          <div className=" w-full">
+          <div className=" w-full mt-20">
             {!submited ? (
               <Formik
                 initialValues={{

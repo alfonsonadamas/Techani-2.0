@@ -129,7 +129,7 @@ export default function GlucoseRegister() {
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
         <div className="w-full h-60 flex justify-center items-center">
-          <div className=" w-full">
+          <div className=" w-full mt-20">
             {!submited ? (
               <Formik
                 initialValues={{
@@ -148,9 +148,9 @@ export default function GlucoseRegister() {
                   handleBlur,
                   isSubmitting,
                 }) => (
-                  <form onSubmit={handleSubmit} className="mx-auto w-full ">
+                  <form onSubmit={handleSubmit} className="mx-auto w-full">
                     <div className="mt-24">
-                      <p className="mb-4 text-sm text-gray-900 dark:text-white w-full">
+                      <p className="mb-4 text-sm text-gray-900 dark:text-white w-full ">
                         ¡Hola! <br /> Para mantener un control detallado de tu
                         salud, es crucial registrar con precisión tus niveles de
                         glucosa. Para esto es necesario que hagas una medicion
@@ -225,6 +225,7 @@ export default function GlucoseRegister() {
                       </button>
                     </div>
                   </form>
+
                 )}
               </Formik>
             ) : (
