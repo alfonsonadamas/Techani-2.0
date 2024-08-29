@@ -25,9 +25,9 @@ import InsulineRegister from "../pages/InsulineRegister";
 import WaterRegister from "../pages/WaterRegister";
 import AtipicDay from "../pages/AtipicDayRegister";
 import Files from "../pages/Files";
-import AllFiles from "../pages/AllFiles";
 import MyDates from "../pages/MyDates";
 import Grapics from "../pages/Graphics";
+import MyFiles from "../pages/MyFiles";
 
 export const router = createBrowserRouter([
   {
@@ -248,7 +248,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllFiles />,
+            element: <MyFiles />,
           },
         ],
       },

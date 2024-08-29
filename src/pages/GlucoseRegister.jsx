@@ -31,10 +31,6 @@ export default function GlucoseRegister() {
     }
 
     if (records.length > 0) {
-      // if (records.idMedicion === parseInt(meditionType)) {
-      //   console.log("Ya existe un registro con este tipo de medición");
-      //   return;
-      // }
       records.forEach((record) => {
         if (record.idMedicion === parseInt(meditionType)) {
           setErrors({
@@ -42,9 +38,7 @@ export default function GlucoseRegister() {
           });
           return;
         }
-        return;
       });
-      return;
     }
 
     const date = new Date().toLocaleDateString();
@@ -221,7 +215,6 @@ export default function GlucoseRegister() {
                       </button>
                     </div>
                   </form>
-
                 )}
               </Formik>
             ) : (

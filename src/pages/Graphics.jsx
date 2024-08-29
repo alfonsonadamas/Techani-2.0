@@ -43,7 +43,7 @@ export default function Grapics() {
       colors: ["#fff"],
     },
     title: {
-      text: "100% Stacked Bar",
+      text: "Tiempo en rango",
     },
     xaxis: {
       categories: [2024],
@@ -129,7 +129,7 @@ export default function Grapics() {
         colors: ["#fff"],
       },
       title: {
-        text: "100% Stacked Bar",
+        text: "Tiempo en rango",
       },
       xaxis: {
         categories: [2024],

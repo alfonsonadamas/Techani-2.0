@@ -62,6 +62,7 @@ export default function Files() {
     <div>
       <SideBar></SideBar>
       <div className="p-16 pt-24 ml-64" data-aos="fade-up">
+        <h2 className="text-2xl mb-5 font-semibold">Subir nuevo archivo</h2>
         <Formik
           initialValues={{ filename: "", date: "", observation: "" }}
           onSubmit={onSubmit}
