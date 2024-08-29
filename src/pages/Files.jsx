@@ -58,26 +58,25 @@ export default function Files() {
       setCaracteres(maxLength - currentLength);
     }
   };
-  //función que verifica el archivo que se está subiendo
+  //función que verifica el archivo que se está subiendo tiene el peso y el formato adecuado
   const validationFile = (e) => {
     const selectedFile = e.target.files[0];
-    const typeOfFile = selectedFile.name.split(".").slice(-1)[0];
+    const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
     const extensions = ["jpg","png","jpeg"];  
-
-    if(selectedFile.size <= 300000){
-      if(extensions.includes(typeOfFile)){
+    console.log(typeOfFile);
+    if(extensions.includes(typeOfFile)){
+      if(selectedFile.size <= 300000){
         setFile(selectedFile);
         setError(null);
       } else{
-        setFile(null);
+        setError("El tamaño de la imágen es demasiado grande, elige otra.");
+      setFile(null);
+      e.target.value = null; 
+      }
+    } else{
+      setFile(null);
         setError("El tipo de archivo no es valido.");
         e.target.value = null;
-      }
-      
-    } else{
-      setError("El tamaño de la imágen es demasiado grande, elige otra.");
-      setFile(null);
-      e.target.value = null;
     }
    
   }
