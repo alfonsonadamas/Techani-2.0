@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
 import SideBar from '../components/SideBar';
+import Modal from "../components/Modal";
 
 export default function AllFoodsRegister() {
     const { user } = useUserContext();
@@ -11,6 +12,19 @@ export default function AllFoodsRegister() {
     const [foods, setFoods] = useState([]);
     const [originalFoods, setOriginalFoods] = useState([]);
     const [daySelect, setDaySelect] = useState("");
+    const [editMeal, setEditMeal] = useState(null);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+
+    const openModal = (record) => {
+        setEditMeal(record);
+        console.log(record)
+        setModalIsOpen(true);
+      };
+    
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setEditMeal(null);
+    };
 
     const getFoods = async () => {
         try {
@@ -63,6 +77,9 @@ export default function AllFoodsRegister() {
             setOriginalMeals(Mealstype);
         };
         mealType();
+    };
+    const modalmeal = async (comida) => {
+        console.log("Comida:",comida);
     };
 
     const handleDay = (e) => {
@@ -133,13 +150,35 @@ export default function AllFoodsRegister() {
                                     <ul>
                                         {comida.meal.map(alimento => (
                                             <li key={alimento.idAlimentos}>
-                                                {alimento.portion} {alimento.BancoAlimentos.food}
+                                                <a className="cursor-pointer hover:underline" onClick={() => openModal(alimento)}> {alimento.portion} {alimento.BancoAlimentos.food} </a>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             ))}
                         </div>
+                        <Modal
+                            isOpen={modalIsOpen}
+                            onClose={closeModal}
+                            title={"Alimento"}
+                        >
+                            {editMeal && (
+                                <div>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Nombre del alimento:
+                                    </label>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Tipo de alimento:
+                                    </label>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Cantidad por porción:
+                                    </label>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Fecha:
+                                    </label>
+                                </div>
+                            )}
+                        </Modal>
                     </div>
                 </div>
             </div>
