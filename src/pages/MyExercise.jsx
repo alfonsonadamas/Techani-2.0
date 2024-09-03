@@ -133,7 +133,8 @@ export default function MyExercise() {
         .from("ejercicio")
         .select()
         .eq("uid", user.id)
-        .order("created_at", { ascending: false }); // Ordenar por created_at de forma descendente
+        .order("created_at", { ascending: false }) // Ordenar por created_at de forma descendente
+        .limit(4); // Limitar a los últimos 5 registros
 
       if (error) console.log("error", error);
 
@@ -247,7 +248,7 @@ export default function MyExercise() {
           </button>
         </div>
         {loading ? (
-          <p className="bg-blue-500">Cargando registros...</p>
+          <p className="">Cargando registros...</p>
         ) : (
           <div>
             <div
@@ -258,8 +259,8 @@ export default function MyExercise() {
                 gap: "15px",
               }}
             >
-              {records.length === 0 ? (
-                <p className="bg-yellow-500">No hay registros disponibles.</p>
+              {records && records.length === 0 ? (
+                <p className="">No hay registros disponibles.</p>
               ) : (
                 filterRecords().map((record) => (
                   <div key={record.idEmocion} className="p-5">
