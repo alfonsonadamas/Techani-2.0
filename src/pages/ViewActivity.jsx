@@ -30,7 +30,7 @@ export default function ViewActivity() {
       setLoading(true);
       const { data, error } = await supabase
         .from("actividadesUsuario")
-        .select("*")
+        .select()
         .eq("uid", user.id)
         .order("idActividades", { ascending: true });
 
@@ -97,7 +97,7 @@ export default function ViewActivity() {
     <div>
       <SideBar />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
-        <h2 className="text-2xl font-semibold mb-4">Tus Ejercios</h2>
+        <h2 className="text-2xl font-semibold mb-4">Tus Ejercicios</h2>
         <div className="w-full h-full">
           {records && records.length === 0 && (
             <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md ">
