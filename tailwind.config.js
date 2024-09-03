@@ -2,7 +2,7 @@
 
 module.exports = {
   content: [
-    "./src/**/*.{html,js}",
+    "./src/**/*.{html,jsx,js,ts,tsx}",
     "./public/index.html",
     "./src/pages/Login.jsx",
     "./src/pages/ViewEstados.jsx",
@@ -52,6 +52,7 @@ module.exports = {
         fondoGris: "#F6F6F6",
         azulFondo: "#18578B",
         azulHover: "#2B8EDE",
+        fondo: "#ECECEC",
       },
     },
   },
