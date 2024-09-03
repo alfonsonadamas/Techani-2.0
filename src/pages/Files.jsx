@@ -10,6 +10,7 @@ export default function Files() {
   const [file, setFile] = useState(null);
   const { user } = useUserContext();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null)
 
   const onSubmit = async (
     { filename, date, observation },
@@ -57,6 +58,28 @@ export default function Files() {
       setCaracteres(maxLength - currentLength);
     }
   };
+  //función que verifica el archivo que se está subiendo tiene el peso y el formato adecuado
+  const validationFile = (e) => {
+    const selectedFile = e.target.files[0];
+    const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
+    const extensions = ["jpg","png","jpeg"];  
+    console.log(typeOfFile);
+    if(extensions.includes(typeOfFile)){
+      if(selectedFile.size <= 300000){
+        setFile(selectedFile);
+        setError(null);
+      } else{
+        setError("El tamaño de la imágen es demasiado grande, elige otra.");
+      setFile(null);
+      e.target.value = null; 
+      }
+    } else{
+      setFile(null);
+        setError("El tipo de archivo no es valido.");
+        e.target.value = null;
+    }
+   
+  }
 
   return (
     <div>
@@ -103,6 +126,7 @@ export default function Files() {
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Fecha de los Análisis
                   </label>
+                  
                   <input
                     type="date"
                     name="date"
@@ -128,19 +152,21 @@ export default function Files() {
                   name="file"
                   accept="image/jpeg,image/png"
                   autoComplete="off"
-                  onChange={(e) => {
-                    setFile(e.target.files[0]);
-                  }}
+                  onChange={
+                    validationFile
+                  }
                   onBlur={handleBlur}
                   aria-describedby="helper-text-explanation"
                   className={
-                    errors.glucose
+                    error
                       ? "bg-gray-50 mb-2 border border-red-500  text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full "
                       : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full "
                   }
                   placeholder="Ingresa el nombre del Análisis"
                 />
+                <p className="text-red-500 text-xs rounded-lg">{error}</p>
               </div>
+              
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white ">
                   Observaciones

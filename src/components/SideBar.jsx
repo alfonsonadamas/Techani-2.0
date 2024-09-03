@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../assets/img/Techani (1).png";
 import { useUserContext } from "../context/UserContext";
+import act1 from "../assets/img/yoga.png";
+import act2 from "../assets/img/ejercicio.png";
 
 export default function SideBar() {
   const { user } = useUserContext();
@@ -280,6 +282,9 @@ export default function SideBar() {
               <div
                 className="flex justify-between w-full items-center"
                 onClick={dropDown2}
+              <div
+                className="flex justify-between w-full items-center"
+                onClick={dropDown2}
               >
                 <span className="text-[15px] ml-2 font-semibold">
                   Alimentos
@@ -342,25 +347,25 @@ export default function SideBar() {
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEg0lEQVR4nO2Ze4gVVRzHP66BuauBbVjtiuabCKk0V4LqDx9l5FsoCemPQCG1MjQrIyIzS8peJD2IkNV1jQQrKdI0LRUMzVK5RZkm9iRNa9V01+rGD76zHId5XO/OzF7hfuHAcM6Zc853zu89UEYZZaSFbsAUYAhQw3mIQcAK4DRwBlgNNAP1wLWcB+gJrAL+A/Jq20TqH6fvE2AsUEGJoQMwCzipg9pNvAFc48y5AlgC/OUQ+g6YAVRRAqgC3nMO9yHQP2L+DcARZ761P4CngVraCZcCO3SYP4HJMfOnSGfyIc30aDkwmAzRB9ivA+yJuQUPP2v+q8B1us1OwPXA2z5Sm4BxaetRNfCtNtwKdC3wvZ/0zmvAUL13EVAHvK6xY7pdV49mpqFHnYDPiiBhuCNGtMxITNCas4EDzthR4Jkk9egVLfw9cHGRPuYlIAc0qeXUd5Vvbkfp3VaHUIvMuTnZojFKPuJEwKZpo04+6oxD6lPd4DnpkcnoIS1wH+3rdJ/16dE++bEuhSzwmF76vEQ8clfgfsdyunrUIyr4a9JkE680YQZhHfCbc8Bf1Xd7wHzTo0nAFp8eNcjEn4U5mrA5ZRJzIyya1+ZGvG8mvdGnR2ZhJ3pStK+ADZJss6ULHnqqry1r2o1lSsLa5QFfuzaBdWl9SBmbtM+DAWMPaWxjEetmTuQ2+Snz8POUVdaIRLPGRqdFxDZaBOxVPnJSz4tCRCQO8yNEwwiRBpGxPsfkbxYAjili45uADcBxNXu+sYh1KoDpcUSGyF7nZeNHKCqu1vN6jTW3U55e4UsN3g0jslZ9yyLS33rNeZ/sca/2bpLDJIyIJ1K9Y5IvT8SyRk57W3JGIUTssKVI5G/t3dntbKtoWXEia3yjvW+JIzJYipyXYlsweYmaPX/sKLtbFmoLzJC8CBxUPPUD8HxIgjfHiYhvjiKCTOuxGPNrTi4J1Org+YB2IKAk21FGxpvTEOcQLwMWArsdh/iV+mwsCAOV2n7tvJPT1x4Q8s5KnWGHotxKZY071W9lJD8uAB5II0Qx2/4k8G/ELVppdUFA8uYZl76+/n4FGJTEiXiFC5Pvpfqilc7XXerkEi+HEOnn6++fNZFRWsPEaHjEvOGO6bQIwUOD+nYCw0R+mCNa9VkRWXsOgd/DAWa7xlfnyjttf0yAmiiRw1qjkB8+XhL1u6/fqiRPyXq1iNhzqimQFZFTWqOQkk2l5lrkmwTySRLZqzVanVMERmrurjbsV6Vc/x6tdSgpIo86h7MvHgYb+8JXMamWf7GqvTnYu+QfFqqy/47+gu1WofxUWFKWBJEuTjXGiny3KryeBjwiWX/LIeGF4FE+Jx/RzPL9qLrxdMV+rTFVpe9gvZRgWWB2p3KAx+UDzFx+JPN4UPJezIE8H2EfYTvwgUztC6p+zlBRz8z21aoyht74ZseK/KLiQDEHalEFMafC2RrgTWCxKid3A+P1e+5KoLtipsQw0ElUvHZCCvSlIt1Gee4nVJOdKvGpU15iP3RKBj1k4y9s74OUUUYZJI7/ASQbTKZ3KJIpAAAAAElFTkSuQmCC"
                   />
 
-                  <span className="ml-3">Registrar Alimento</span>
-                </Link>
-              </div>
-              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-                <Link to={"/myaliments"} className="flex cursor-pointer p-2 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-                    />
-                  </svg>
+              <span className="ml-3">Registrar Alimento</span>
+            </Link>
+          </div>
+          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+            <Link to={"/myaliments"} className="flex cursor-pointer p-2 ">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-5 h-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
+                />
+              </svg>
 
                   <span className="ml-3">Ver Registros de Comidas</span>
                 </Link>
@@ -427,19 +432,9 @@ export default function SideBar() {
                   <span className="ml-3">Nuevo Registro</span>
                 </Link>
               </div>
-              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-                <Link to={"/newActivitie"} className="flex cursor-pointer p-2 ">
-                  <img
-                    alt="exercise"
-                    className="w-5 h-5"
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADIklEQVR4nO2ZXYhMYRjHf8taZFfJR3Jhdyk3tMlHaeXGZ3EhpJQLJNkLCWG5lNYiF0L7cUOE5EKZUYpyo8TaRAl31q4pVmLWxxrt7uit/6m348yM3T0z+x7Nv97OnPM+857nP8/7fL0DRRQco4gwSoDtwAsgDXQAu4kYZgMPRMCMPuvzTiKAUuAQ8FNKfwS2AmXALj17jeOYD7Rbv/xlYLI1PxroB3pxFOOAE8BvEXgLrAnwl3rNP8dBLAPeSMF+4CxQ7pOpBu5ZvrIehzARaAYGpOBLYIlPxmylfcB3yXwCNuAQ1gLvpJzZTieBsT6ZecBjy19uAlNxBNOAK5Zyj4C5Ppkx8oVfkkkM1QrrgDYgZb0w7PEN2BuQrWuBV5a/XAAqhkoiX8p7ysWBSt97jbLnNZ8WmaUMA0+1UL0S0Ej4y/EAfxk0erSgP/zlA8Zxr1rWMtu5JqzF27To0TxbxJQc3XrXD+CAQm2oZg7DFx5mecc1S+4+MCs89f8m8ySEqJUJXgLcobLDWaSzECnRnCHjPNI5LJJr3sYcYA8QAz4rOTYWKqIOxyKTgE1AqyrgTNvWVMpOESlVNj+mcqXPp3C3gsM2YIZkvbLFCSJm3AK++hRPqb09AiwIKGFWSO6DC0S8qOUN04ucU3k0wSc/Xg3WGeCSVcIcLgCPnM58Crih/rsygGgNcFCNVK+13oAsWEeBMJioZDAF2CwH7wwoMtvVr6wMowYLk4gJncul3LOArfYeuAhsEckRQzYiG3VwYCtuaq27wP6AJgvXiBhfuGPNmc+ntV3MCYqTSPuI1FmHB1905GnCapX8okt9iLm26LmTRLzi8zowXc9WW72Pf/QAq3CQiP++2iJxG1ik/GGuMT1PBoRm54i0WiSCENO8OfNymkiX7hdm+P5izZs+3mkiqRznAhWaN+daThPp/EeLdOA4kRbdG18IQlzzTThOpMqKWnFZoFzXuBW1ZuI4EZQnkhnySFIZnygQQXmiWdEppWuTC5YYLBHnkS4ScQz/jUUSUrxW/3F4XV/k0BgQUhuIIMpEJiFLNBTwT6MiiiBk/AElsZmxUBZWTAAAAABJRU5ErkJggg=="
-                  ></img>
 
-                  <span className="ml-3">Nueva Actividad</span>
-                </Link>
-              </div>
               <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-                <Link to={"/"} className="flex cursor-pointer p-2 ">
+                <Link to={"/MyExercise"} className="flex cursor-pointer p-2 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -455,26 +450,13 @@ export default function SideBar() {
                     />
                   </svg>
 
-                  <span className="ml-3">Mis Registros</span>
-                </Link>
-              </div>
+              <span className="ml-3">Mis Registros</span>
+            </Link>
+          </div>
 
               <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
                 <Link to={"/newActivity"} className="flex cursor-pointer p-2 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-                    />
-                  </svg>
+                  <img alt="diabetes" className="h-5 w-5" src={act1} />
 
                   <span className="ml-3">Nuevo Ejercicio</span>
                 </Link>
@@ -482,20 +464,7 @@ export default function SideBar() {
 
               <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
                 <Link to={"/viewActivity"} className="flex cursor-pointer p-2 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-                    />
-                  </svg>
+                  <img alt="diabetes" className="h-5 w-5" src={act2} />
 
                   <span className="ml-3">Mis Ejercicios</span>
                 </Link>
