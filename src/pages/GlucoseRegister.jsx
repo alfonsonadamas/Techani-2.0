@@ -30,58 +30,58 @@ export default function GlucoseRegister() {
       return;
     }
 
-    if (records.length > 0) {
-      records.forEach((record) => {
-        if (record.idMedicion === parseInt(meditionType)) {
-          setErrors({
-            meditionType: "Ya existe un registro con este tipo de medición",
-          });
-          return;
-        }
-        return;
-      });
-      return;
-    }
+    // if (records.length > 0) {
+    //   records.forEach((record) => {
+    //     if (record.idMedicion === parseInt(meditionType)) {
+    //       setErrors({
+    //         meditionType: "Ya existe un registro con este tipo de medición",
+    //       });
+    //       return;
+    //     }
+    //     return;
+    //   });
+    //   return;
+    // }
 
     const date = new Date().toLocaleDateString();
     console.log(date);
-    // var parts = date.split("/");
-    // var year = parts[2];
-    // var month = parts[1];
-    // var day = parts[0];
-    // var formatDate = `${year}-${month}-${day}`;
+    var parts = date.split("/");
+    var year = parts[2];
+    var month = parts[1];
+    var day = parts[0];
+    var formatDate = `${year}-${month}-${day}`;
 
-    // try {
-    //   setSubmitting(true);
-    //   await supabase.from("registroGlucosa").insert([
-    //     {
-    //       uid: user.id,
-    //       created_at: formatDate,
-    //       glucosa: glucose,
-    //       idMedicion: meditionType,
-    //     },
-    //   ]);
+    try {
+      setSubmitting(true);
+      await supabase.from("registroGlucosa").insert([
+        {
+          uid: user.id,
+          created_at: formatDate,
+          glucosa: glucose,
+          idMedicion: meditionType,
+        },
+      ]);
 
-    //   // await emailjs.send(
-    //   //   "service_gb8sr3f",
-    //   //   "template_jt5p6ui",
-    //   //   {
-    //   //     to_email: user.email,
-    //   //     from_name: "Techani",
-    //   //     to_name: user.user_metadata.full_name,
-    //   //     message: `
-    //   //   Glucosa: ${glucose}
-    //   //   Tipo de medición: ${meditionType}`,
-    //   //   },
-    //   //   "RBjxGi8gd0qdpEToN"
-    //   // );
-    //   setSubmited(true);
-    // } catch (error) {
-    //   console.log(error);
-    // } finally {
-    //   setSubmitting(false);
-    //   resetForm();
-    // }
+      //   // await emailjs.send(
+      //   //   "service_gb8sr3f",
+      //   //   "template_jt5p6ui",
+      //   //   {
+      //   //     to_email: user.email,
+      //   //     from_name: "Techani",
+      //   //     to_name: user.user_metadata.full_name,
+      //   //     message: `
+      //   //   Glucosa: ${glucose}
+      //   //   Tipo de medición: ${meditionType}`,
+      //   //   },
+      //   //   "RBjxGi8gd0qdpEToN"
+      //   // );
+      //   setSubmited(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSubmitting(false);
+      resetForm();
+    }
   };
 
   const validationSchema = Yup.object().shape({

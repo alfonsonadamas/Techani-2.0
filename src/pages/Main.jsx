@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import "../dist/output.css";
 import SideBar from "../components/SideBar";
 import axios from "axios";
 import calendar from "../assets/img/calendar.png";
 import clouds from "../assets/img/clouds.png";
 import water from "../assets/img/water.png";
+import loc from "../assets/img/location.png";
 import ReactApexChart from "react-apexcharts";
 import { useUserContext } from "../context/UserContext";
+import { supabase } from "../config/supabase";
 
 export default function Main() {
   const date = new Date();
@@ -17,12 +18,17 @@ export default function Main() {
     month: "long",
     day: "numeric",
   };
+  const [lastGlucose, setLastGlucose] = useState(0);
+  const [lastInsuline, setLastInsuline] = useState(0);
 
-  const [data, setData] = useState({
+  const [temperature, setTemperature] = useState(0);
+  const [location, setLocation] = useState(null);
+
+  const [dataGraf, setDataGraf] = useState({
     series: [
       {
-        name: "Desktops",
-        data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
+        name: "Glucosa",
+        data: [],
       },
     ],
     options: {
@@ -50,17 +56,7 @@ export default function Main() {
         },
       },
       xaxis: {
-        categories: [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-        ],
+        categories: [],
       },
     },
   });
@@ -68,19 +64,90 @@ export default function Main() {
   const formatDate = new Intl.DateTimeFormat("es-ES", options).format(date);
 
   const getApi = async () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      console.log(position.coords.latitude, position.coords.longitude);
+    });
     try {
       const res = await axios.get(
-        "https://api.openweathermap.org/data/2.5/weather?q=lima,Peru&appid=687d1c96cd63e7daf8e83eca065e07b2"
+        "https://api.openweathermap.org/data/2.5/weather?lat=19.7212636&lon=-101.1842388&appid=687d1c96cd63e7daf8e83eca065e07b2"
       );
-      console.log(res.data);
+      console.log(Math.floor(res.data.main.temp - 273.15));
+      setTemperature(Math.floor(res.data.main.temp - 273.15));
+      setLocation(res.data.name);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getGlucose = async () => {
+    try {
+      const { data } = await supabase
+        .from("registroGlucosa")
+        .select("*")
+        .eq("uid", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      console.log(data);
+      setLastGlucose(data[0].glucosa);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getDataGlucose = async () => {
+    try {
+      const { data } = await supabase
+        .from("registroGlucosa")
+        .select("*")
+        .eq("uid", user.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      console.log("Datos ", data);
+      const newData = data.map((item) => item.glucosa);
+
+      setDataGraf({
+        ...dataGraf,
+        series: [
+          {
+            name: "Glucosa",
+            data: newData,
+          },
+        ],
+        options: {
+          ...dataGraf.options,
+          xaxis: {
+            categories: data.map((item) => {
+              const date = new Date(item.created_at);
+              return date.toLocaleDateString();
+            }),
+          },
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getInsuline = async () => {
+    try {
+      const { data } = await supabase
+        .from("registroInsulina")
+        .select("*")
+        .eq("uid", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      console.log(data);
+      setLastInsuline(data[0].dosis);
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    //getApi();
-    console.log(user.id);
+    getApi();
+    getGlucose();
+    getInsuline();
+    getDataGlucose();
   }, [user]);
 
   return (
@@ -123,7 +190,8 @@ export default function Main() {
             <p className="text-xl font-semibold mb-2 mt-3">Ultima glucosa</p>
             <p className="mb-2">Nocturna</p>
             <p className="text-4xl font-medium">
-              90 <span className="text-lg font-normal">mg/dl</span>
+              {lastGlucose}
+              <span className="text-lg font-normal">mg/dl</span>
             </p>
           </div>
           <div
@@ -133,7 +201,8 @@ export default function Main() {
             <p className="text-xl font-semibold mb-2 mt-3">Ultima insulina</p>
             <p className="mb-2">Correccion</p>
             <p className="text-4xl font-medium">
-              10 <span className="text-lg font-normal">u</span>
+              {lastInsuline}
+              <span className="text-lg font-normal">u</span>
             </p>
           </div>
           <div
@@ -145,30 +214,32 @@ export default function Main() {
             <p className="text-4xl font-medium">😎</p>
           </div>
           <div
-            className="bg-white w-full border-2 rounded-lg shadow-lg flex flex-col items-center"
+            className="bg-white w-full border-2 rounded-lg shadow-lg flex flex-col items-center justify-center"
             style={{ width: "18%", backgroundColor: "#57A3E2" }}
           >
-            <div className="flex items-center">
-              <img src={clouds} alt="clouds" className="w-14 mr-5 mt-2" />
-              <p className="text-white text-3xl">21°</p>
+            <div className="flex items-center justify-center h-1/2">
+              <img src={clouds} alt="clouds" className="w-14 mr-5" />
+              <p className="text-white text-4xl">{temperature}°</p>
             </div>
-            <p className="text-white text-lg mt-2 mb-2">Nublado</p>
-            <p className="text-white">Morelia</p>
+            <div className="flex h-1/2 mt-2 items-center justify-center">
+              <img src={loc} alt="location" className="w-5 mr-2" />
+              <p className="text-white text-2xl">{location}</p>
+            </div>
           </div>
         </div>
         <div
           className="w-full flex justify-between mt-5"
-          style={{ height: 370 }}
+          style={{ height: 350 }}
         >
           <div
             className="border-2 rounded-lg shadow-lg"
             style={{ width: "78.5%" }}
           >
             <ReactApexChart
-              series={data.series}
-              options={data.options}
+              series={dataGraf.series}
+              options={dataGraf.options}
               type="line"
-              height={370}
+              height={350}
             />
           </div>
 
