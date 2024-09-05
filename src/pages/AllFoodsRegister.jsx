@@ -4,6 +4,9 @@ import { supabase } from "../config/supabase";
 import SideBar from '../components/SideBar';
 import Modal from "../components/Modal";
 
+import edit from "../assets/img/edit.png";
+import delate from "../assets/img/delate.png";
+
 export default function AllFoodsRegister() {
     const { user } = useUserContext();
     const [loading, setLoading] = useState(false);
@@ -14,6 +17,7 @@ export default function AllFoodsRegister() {
     const [daySelect, setDaySelect] = useState("");
     const [editMeal, setEditMeal] = useState(null);
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [IDmeal,setIDmeal] = useState(null);
 
     const openModal = (record) => {
         setEditMeal(record);
@@ -78,13 +82,17 @@ export default function AllFoodsRegister() {
         };
         mealType();
     };
-    const modalmeal = async (comida) => {
-        console.log("Comida:",comida);
+    const deletemeal = async (id) => {
+        console.log("Comida:",id);
     };
 
     const handleDay = (e) => {
         setDaySelect(e.target.value);
     };
+
+    const handleBoton = (id) => {
+        setIDmeal(preID => preID === id ? null : id);
+    }
 
     useEffect(() => {
         getFoods();
@@ -149,8 +157,29 @@ export default function AllFoodsRegister() {
                                     <h3 className="text-xl font-semibold">{comida.tipoComida.meal} - {comida.hour}</h3>
                                     <ul>
                                         {comida.meal.map(alimento => (
-                                            <li key={alimento.idAlimentos}>
-                                                <a className="cursor-pointer hover:underline" onClick={() => openModal(alimento)}> {alimento.portion} {alimento.BancoAlimentos.food} </a>
+                                            <li key={alimento.idAlimentos} className="flex items-center pb-2">
+                                                <a className="cursor-pointer hover:underline" onClick={ () => handleBoton(alimento.idAlimentos)}> {alimento.portion} {alimento.BancoAlimentos.food} </a>
+                                                {IDmeal === alimento.idAlimentos && (
+                                                    <div className="flex" data-aos="fade-left" data-aos-duration="250">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openModal(alimento)}
+                                                            className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
+                                                        >
+                                                            <img src={edit} alt="editar" className="h-5" />
+                                                            <p className="px-2">Editar</p>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => deletemeal(alimento.idAlimentos)}
+                                                            className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
+                                                        >
+                                                            <img src={delate} alt="borrar" className="h-5" />
+                                                            <p className="px-2">Borrar</p>
+                                                        </button>
+                                                    </div>
+                                                )}
+                                                
                                             </li>
                                         ))}
                                     </ul>
