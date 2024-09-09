@@ -10,7 +10,7 @@ export default function Files() {
   const [file, setFile] = useState(null);
   const { user } = useUserContext();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null);
 
   const onSubmit = async (
     { filename, date, observation },
@@ -62,24 +62,23 @@ export default function Files() {
   const validationFile = (e) => {
     const selectedFile = e.target.files[0];
     const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
-    const extensions = ["jpg","png","jpeg"];  
+    const extensions = ["jpg", "png", "jpeg"];
     console.log(typeOfFile);
-    if(extensions.includes(typeOfFile)){
-      if(selectedFile.size <= 300000){
+    if (extensions.includes(typeOfFile)) {
+      if (selectedFile.size <= 300000) {
         setFile(selectedFile);
         setError(null);
-      } else{
+      } else {
         setError("El tamaño de la imágen es demasiado grande, elige otra.");
-      setFile(null);
-      e.target.value = null; 
-      }
-    } else{
-      setFile(null);
-        setError("El tipo de archivo no es valido.");
+        setFile(null);
         e.target.value = null;
+      }
+    } else {
+      setFile(null);
+      setError("El tipo de archivo no es valido.");
+      e.target.value = null;
     }
-   
-  }
+  };
 
   return (
     <div>
@@ -126,11 +125,12 @@ export default function Files() {
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Fecha de los Análisis
                   </label>
-                  
+
                   <input
                     type="date"
                     name="date"
                     autoComplete="off"
+                    min={new Date().toISOString().split("T")[0]}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     aria-describedby="helper-text-explanation"
@@ -152,9 +152,7 @@ export default function Files() {
                   name="file"
                   accept="image/jpeg,image/png"
                   autoComplete="off"
-                  onChange={
-                    validationFile
-                  }
+                  onChange={validationFile}
                   onBlur={handleBlur}
                   aria-describedby="helper-text-explanation"
                   className={
@@ -166,7 +164,7 @@ export default function Files() {
                 />
                 <p className="text-red-500 text-xs rounded-lg">{error}</p>
               </div>
-              
+
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white ">
                   Observaciones
