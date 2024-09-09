@@ -4,6 +4,7 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 import { toast, ToastContainer } from "react-toastify";
+import * as Yup from "yup";
 
 export default function Files() {
   const [caracteres, setCaracteres] = useState(200);
@@ -81,6 +82,14 @@ export default function Files() {
    
   }
 
+  const validationSchema = Yup.object().shape({
+    filename: Yup.string()
+      .required("Ingresa el Tipo de Analisis"),
+
+    date: Yup.string()
+    .required("La Fecha es requerida"),
+  });
+
   return (
     <div>
       <SideBar></SideBar>
@@ -89,6 +98,7 @@ export default function Files() {
         <Formik
           initialValues={{ filename: "", date: "", observation: "" }}
           onSubmit={onSubmit}
+          validationSchema={validationSchema}
         >
           {({
             values,
@@ -110,6 +120,7 @@ export default function Files() {
                   <input
                     type="text"
                     name="filename"
+                    maxLength={40}
                     autoComplete="off"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -121,6 +132,11 @@ export default function Files() {
                     }
                     placeholder="Ingresa el nombre del Análisis"
                   />
+                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.filename &&
+                          touched.filename &&
+                          errors.filename}
+                      </p>
                 </div>
                 <div className="flex-1 ml-2">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -141,6 +157,11 @@ export default function Files() {
                     }
                     placeholder="Fecha del Análisis"
                   />
+                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.date &&
+                          touched.date &&
+                          errors.date}
+                      </p>
                 </div>
               </div>
               <div>
