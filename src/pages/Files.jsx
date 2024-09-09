@@ -4,13 +4,14 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 import { toast, ToastContainer } from "react-toastify";
+import * as Yup from "yup";
 
 export default function Files() {
   const [caracteres, setCaracteres] = useState(200);
   const [file, setFile] = useState(null);
   const { user } = useUserContext();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null);
 
   const onSubmit = async (
     { filename, date, observation },
@@ -62,32 +63,41 @@ export default function Files() {
   const validationFile = (e) => {
     const selectedFile = e.target.files[0];
     const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
-    const extensions = ["jpg","png","jpeg"];  
+    const extensions = ["jpg", "png", "jpeg"];
     console.log(typeOfFile);
-    if(extensions.includes(typeOfFile)){
-      if(selectedFile.size <= 300000){
+    if (extensions.includes(typeOfFile)) {
+      if (selectedFile.size <= 300000) {
         setFile(selectedFile);
         setError(null);
-      } else{
+      } else {
         setError("El tamaño de la imágen es demasiado grande, elige otra.");
-      setFile(null);
-      e.target.value = null; 
-      }
-    } else{
-      setFile(null);
-        setError("El tipo de archivo no es valido.");
+        setFile(null);
         e.target.value = null;
+      }
+    } else {
+      setFile(null);
+      setError("El tipo de archivo no es valido.");
+      e.target.value = null;
     }
-   
-  }
+  };
+
+  const validationSchema = Yup.object().shape({
+    filename: Yup.string()
+      .required("Ingresa el Tipo de Analisis"),
+
+    date: Yup.string()
+    .required("La Fecha es requerida"),
+  });
 
   return (
     <div>
       <SideBar></SideBar>
       <div className="p-16 pt-24 ml-64" data-aos="fade-up">
+        <h2 className="text-2xl mb-5 font-semibold">Subir nuevo archivo</h2>
         <Formik
           initialValues={{ filename: "", date: "", observation: "" }}
           onSubmit={onSubmit}
+          validationSchema={validationSchema}
         >
           {({
             values,
@@ -109,6 +119,7 @@ export default function Files() {
                   <input
                     type="text"
                     name="filename"
+                    maxLength={40}
                     autoComplete="off"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -120,16 +131,22 @@ export default function Files() {
                     }
                     placeholder="Ingresa el nombre del Análisis"
                   />
+                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.filename &&
+                          touched.filename &&
+                          errors.filename}
+                      </p>
                 </div>
                 <div className="flex-1 ml-2">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Fecha de los Análisis
                   </label>
-                  
+
                   <input
                     type="date"
                     name="date"
                     autoComplete="off"
+                    min={new Date().toISOString().split("T")[0]}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     aria-describedby="helper-text-explanation"
@@ -140,6 +157,11 @@ export default function Files() {
                     }
                     placeholder="Fecha del Análisis"
                   />
+                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.date &&
+                          touched.date &&
+                          errors.date}
+                      </p>
                 </div>
               </div>
               <div>
@@ -151,9 +173,7 @@ export default function Files() {
                   name="file"
                   accept="image/jpeg,image/png"
                   autoComplete="off"
-                  onChange={
-                    validationFile
-                  }
+                  onChange={validationFile}
                   onBlur={handleBlur}
                   aria-describedby="helper-text-explanation"
                   className={
@@ -165,7 +185,7 @@ export default function Files() {
                 />
                 <p className="text-red-500 text-xs rounded-lg">{error}</p>
               </div>
-              
+
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white ">
                   Observaciones

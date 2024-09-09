@@ -177,7 +177,7 @@ export default function SideBar() {
           <div
             className={`${
               responsive ? "hidden" : "block"
-            } fixed top-14 bottom-0 p-2 w-[275px] overflow-y-auto text-center`}
+            } fixed top-14 bottom-0 p-2 w-[230px] overflow-y-auto text-center`}
           >
             {/* Aqui empieza el menu desplegable */}
 
