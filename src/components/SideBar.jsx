@@ -86,7 +86,7 @@ export default function SideBar() {
   };
 
   return (
-    <div className="bg-white py-3 fixed top-0 left-0 right-0 shadow-md">
+    <div className="bg-white z-10 py-3 top-0 left-0 right-0 shadow-md fixed">
       <div className=" flex items-center justify-between">
         <div className="  flex items-center justify-start rtl:justify-end">
           <button className="ml-5" onClick={toogleResponsive}>
