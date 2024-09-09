@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import SideBar from "../components/SideBar";
 import axios from "axios";
 import calendar from "../assets/img/calendar.png";
-import clouds from "../assets/img/clouds.png";
+import temperatureL from "../assets/img/fria.png";
+import temperatureM from "../assets/img/neutra.png";
+import temperatureH from "../assets/img/caliente.png";
+import waterL from "../assets/img/Vacio.png";
+import waterM from "../assets/img/medio.png";
+import waterH from "../assets/img/lleno.png";
 import water from "../assets/img/water.png";
 import loc from "../assets/img/location.png";
 import idea from "../assets/img/idea.png";
@@ -68,6 +73,18 @@ export default function Main() {
 
   const formatDate = new Intl.DateTimeFormat("es-ES", options).format(date);
 
+  const formDate = () => {
+    const date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+
+    const newDate = `${year}-${month < 10 ? `0${month}` : month}-${
+      day < 10 ? `0${day}` : day
+    }`;
+    return newDate;
+  };
+
   const getApi = async () => {
     navigator.geolocation.getCurrentPosition((position) => {
       console.log(position.coords.latitude, position.coords.longitude);
@@ -91,7 +108,8 @@ export default function Main() {
         .select("created_at, glucosa, medicion(measurement)")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
-        .limit(1);
+        .limit(1)
+        .eq("created_at", formDate());
       console.log(data);
       setLastGlucose(data[0].glucosa);
       setGlucose(data[0].medicion.measurement);
@@ -141,7 +159,8 @@ export default function Main() {
         .select("created_at, dosis, tipoDosis(tipoDosis)")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
-        .limit(1);
+        .limit(1)
+        .eq("created_at", formDate());
       console.log(data);
       setLastInsuline(data[0].dosis);
       setDose(data[0].tipoDosis.tipoDosis);
@@ -157,7 +176,8 @@ export default function Main() {
         .select("created_at, idEmocion")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
-        .limit(1);
+        .limit(1)
+        .eq("created_at", formDate());
       console.log(data);
       setLastEmotion(data[0].idEmocion);
     } catch (error) {
@@ -280,12 +300,31 @@ export default function Main() {
         .select("created_at, agua")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
-        .limit(1);
+        .limit(1)
+        .eq("created_at", formDate());
       console.log(data);
       setWaterTotal(data[0].agua * 250);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const setImage = (temp) => {
+    if (temp < 19) {
+      return temperatureL;
+    } else if (temp >= 19 && temp <= 25) {
+      return temperatureM;
+    }
+    return temperatureH;
+  };
+
+  const setWater = (water) => {
+    if (water < 500) {
+      return waterL;
+    } else if (water >= 500 && water <= 1500) {
+      return waterM;
+    }
+    return waterH;
   };
 
   useEffect(() => {
@@ -316,7 +355,7 @@ export default function Main() {
           </div>
 
           <div
-            className="flex items-center  justify-between rounded-lg mr-5"
+            className="flex items-center justify-between rounded-lg mr-5"
             style={{ width: "20%" }}
           >
             <p className="cursor-pointer hover:text-azulSecundario hover:underline">
@@ -368,7 +407,11 @@ export default function Main() {
             style={{ width: "18%", backgroundColor: "#57A3E2" }}
           >
             <div className="flex items-center justify-center h-1/2">
-              <img src={clouds} alt="clouds" className="w-14 mr-5" />
+              <img
+                src={setImage(temperature)}
+                alt="clouds"
+                className="w-12 mr-3 mt-3"
+              />
               <p className="text-white text-4xl">{temperature}°</p>
             </div>
             <div className="flex h-1/2 mt-2 items-center justify-center">
@@ -382,7 +425,7 @@ export default function Main() {
           style={{ height: 350 }}
         >
           <div
-            className="border-2 rounded-lg shadow-lg"
+            className="border-2 rounded-lg shadow-lg "
             style={{ width: "78.5%" }}
           >
             <ReactApexChart
@@ -398,7 +441,7 @@ export default function Main() {
             style={{ width: "18%" }}
           >
             <h4 className="text-xl font-semibold">Agua Consumida</h4>
-            <img src={water} alt="water" className="w-36" />
+            <img src={setWater(waterTotal)} alt="water" className="w-36" />
             <p className="" style={{ fontSize: "3rem" }}>
               {waterTotal}
               <span className="text-3xl font-normal">ml</span>
