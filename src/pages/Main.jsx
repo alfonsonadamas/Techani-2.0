@@ -5,6 +5,7 @@ import calendar from "../assets/img/calendar.png";
 import clouds from "../assets/img/clouds.png";
 import water from "../assets/img/water.png";
 import loc from "../assets/img/location.png";
+import idea from "../assets/img/idea.png";
 import ReactApexChart from "react-apexcharts";
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
@@ -20,6 +21,10 @@ export default function Main() {
   };
   const [lastGlucose, setLastGlucose] = useState(0);
   const [lastInsuline, setLastInsuline] = useState(0);
+  const [lastEmotion, setLastEmotion] = useState(null);
+  const [dose, setDose] = useState(null);
+  const [glucose, setGlucose] = useState(null);
+  const [waterTotal, setWaterTotal] = useState(0);
 
   const [temperature, setTemperature] = useState(0);
   const [location, setLocation] = useState(null);
@@ -83,12 +88,13 @@ export default function Main() {
     try {
       const { data } = await supabase
         .from("registroGlucosa")
-        .select("*")
+        .select("created_at, glucosa, medicion(measurement)")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
         .limit(1);
       console.log(data);
       setLastGlucose(data[0].glucosa);
+      setGlucose(data[0].medicion.measurement);
     } catch (error) {
       console.error(error);
     }
@@ -132,12 +138,151 @@ export default function Main() {
     try {
       const { data } = await supabase
         .from("registroInsulina")
-        .select("*")
+        .select("created_at, dosis, tipoDosis(tipoDosis)")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
         .limit(1);
       console.log(data);
       setLastInsuline(data[0].dosis);
+      setDose(data[0].tipoDosis.tipoDosis);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getEmotion = async () => {
+    try {
+      const { data } = await supabase
+        .from("emociones")
+        .select("created_at, idEmocion")
+        .eq("uid", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      console.log(data);
+      setLastEmotion(data[0].idEmocion);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const mapEmotionToEmoji = (idEmocion) => {
+    switch (idEmocion) {
+      case 1:
+        return "😊"; // Alegría
+      case 2:
+        return "😎"; // Orgullo
+      case 3:
+        return "🥹"; // Depresión
+      case 4:
+        return "😰"; // Miedo
+      case 5:
+        return "😡"; // Ira
+      case 6:
+        return "🤗"; // Gratitud
+      case 7:
+        return "🙏"; // Esperanza
+      case 8:
+        return "😌"; // Satisfacción
+      case 9:
+        return "💪"; // Valentía
+      case 10:
+        return "😉"; // Optimismo
+      case 11:
+        return "😁"; // Entusiasmo
+      case 12:
+        return "😟"; // Frustración
+      case 13:
+        return "😩"; // Desesperación
+      case 14:
+        return "😟"; // Ansiedad
+      case 15:
+        return "😔"; // Culpa
+      case 16:
+        return "😳"; // Vergüenza
+      case 17:
+        return "😐"; // Apatía
+      case 18:
+        return "😔"; // Aislamiento
+      case 19:
+        return "😢"; // Vulnerabilidad
+      case 20:
+        return "😒"; // Desconfianza
+      case 21:
+        return "🤨"; // Escepticismo
+      case 22:
+        return "😠"; // Resentimiento
+      case 23:
+        return "😖"; // Estrés
+      default:
+        return "❓"; // Emoji por defecto o mensaje de error
+    }
+  };
+
+  const mapNameEmotion = (idEmocion) => {
+    switch (idEmocion) {
+      case 1:
+        return "Alegría";
+      case 2:
+        return "Orgullo";
+      case 3:
+        return "Depresión";
+      // Agrega más casos según tus necesidades
+      case 4:
+        return "Miedo";
+      case 5:
+        return "Ira";
+      case 6:
+        return "Gratitud";
+      case 7:
+        return "Esperanza";
+      case 8:
+        return "Satisfacción";
+      case 9:
+        return "Valentía";
+      case 10:
+        return "Optimismo";
+      case 11:
+        return "Entusiasmo";
+      case 12:
+        return "Frustración";
+      case 13:
+        return "Desesperación";
+      case 14:
+        return "Ansiedad";
+      case 15:
+        return "Culpa";
+      case 16:
+        return "Vergüenza";
+      case 17:
+        return "Apatía";
+      case 18:
+        return "Aislamiento";
+      case 19:
+        return "Vulnerabilidad";
+      case 20:
+        return "Desconfianza";
+      case 21:
+        return "Escepticismo";
+      case 22:
+        return "Resentimiento";
+      case 23:
+        return "Estrés";
+
+      default:
+        return "❓"; // Emoji por defecto o mensaje de error
+    }
+  };
+
+  const getWater = async () => {
+    try {
+      const { data } = await supabase
+        .from("registroAgua")
+        .select("created_at, agua")
+        .eq("uid", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      console.log(data);
+      setWaterTotal(data[0].agua * 250);
     } catch (error) {
       console.error(error);
     }
@@ -148,14 +293,17 @@ export default function Main() {
     getGlucose();
     getInsuline();
     getDataGlucose();
+    getEmotion();
+    getWater();
+    console.log("usuario ", user);
   }, [user]);
 
   return (
-    <div className="w-full h-screen" style={{ backgroundColor: "#F7F7F7" }}>
+    <div className="w-full h-full bg-[#F7F7F7]">
       <SideBar />
 
       <div
-        className="p-16 pt-20 sm:ml-64 flex flex-col justify-center items-center"
+        className=" pt-20 sm:ml-64 flex flex-col justify-center items-center "
         style={{ paddingInline: 40 }}
       >
         <div
@@ -188,7 +336,7 @@ export default function Main() {
             style={{ width: "24%", height: 150 }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima glucosa</p>
-            <p className="mb-2">Nocturna</p>
+            <p className="mb-2">{glucose}</p>
             <p className="text-4xl font-medium">
               {lastGlucose}
               <span className="text-lg font-normal">mg/dl</span>
@@ -199,7 +347,7 @@ export default function Main() {
             style={{ width: "24%" }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima insulina</p>
-            <p className="mb-2">Correccion</p>
+            <p className="mb-2">{dose}</p>
             <p className="text-4xl font-medium">
               {lastInsuline}
               <span className="text-lg font-normal">u</span>
@@ -210,8 +358,10 @@ export default function Main() {
             style={{ width: "24%" }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Emocion</p>
-            <p className="mb-2">Orgullo</p>
-            <p className="text-4xl font-medium">😎</p>
+            <p className="mb-2">{mapNameEmotion(lastEmotion)}</p>
+            <p className="text-4xl font-medium">
+              {mapEmotionToEmoji(lastEmotion)}
+            </p>
           </div>
           <div
             className="bg-white w-full border-2 rounded-lg shadow-lg flex flex-col items-center justify-center"
@@ -250,8 +400,49 @@ export default function Main() {
             <h4 className="text-xl font-semibold">Agua Consumida</h4>
             <img src={water} alt="water" className="w-36" />
             <p className="" style={{ fontSize: "3rem" }}>
-              500<span className="text-3xl font-normal">ml</span>
+              {waterTotal}
+              <span className="text-3xl font-normal">ml</span>
             </p>
+          </div>
+        </div>
+        <div className="w-full flex pb-5 mt-5 h-[350px]">
+          <div className="w-[15%] bg-[#57A3E2]  flex flex-col justify-center shadow-lg rounded-lg border-2 mr-5">
+            <div className="flex justify-center">
+              <img src={idea} alt="idea" className="w-10 mr-2" />
+              <h3 className="text-3xl font-semibold text-white">Tips</h3>
+            </div>
+            <p className="text-white p-3 mt-3">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores
+              voluptatem officiis{" "}
+            </p>
+          </div>
+          <div className="w-[85%] shadow-lg rounded-lg border-2 pl-10 pt-5">
+            <div className="">
+              <h3 className="font-semibold text-2xl">Citas Medicas Próximas</h3>
+            </div>
+            <div className="">
+              <h3 className="font-semibold mt-7">Consulta de seguimiento</h3>
+              <div className="pl-3 ml-2 mt-2 border-l-2 border-l-black">
+                <div className="flex ">
+                  <div className="mr-7">
+                    <p className="text-xs font-semibold">Fecha</p>
+                    <p>2024-09-15</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold">Hora</p>
+                    <p>10:30</p>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <p className="text-xs font-semibold">Lugar</p>
+                  <p className="w-36">Hospital central, Consultorio 12B</p>
+                </div>
+                <div className="mt-3">
+                  <p className="text-xs font-semibold">Nombre del Doctor</p>
+                  <p>Dr. Juan Perez</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@ export default function GlucoseRegisterMain() {
             <div className="flex border-2 mb-5 border-gray-200 hover:shadow-2xl transition-all duration-300 rounded-lg md:w-2/5  w-full max-w-md mx-auto md:h-52 h-auto">
               <div className="flex flex-col md:flex-row justify-center items-center">
                 <div className=" w-1/2 flex justify-center items-center">
-                  <div className="md:w-10 md:h-20 mt-5 flex justify-center items-center">
+                  <div className="md:w-10 md:h-20 lg:h-full lg:w-full mt-5 flex justify-center items-center">
                     <img
                       className="w-2/3 h-4/5 mb-5"
                       src={LogoGlucoseRegister}
@@ -109,7 +109,7 @@ export default function GlucoseRegisterMain() {
             <div className="flex border-2 mb-5 border-gray-200 hover:shadow-2xl transition-all duration-300 rounded-lg md:w-2/5  w-full max-w-md mx-auto md:h-52 h-auto">
               <div className="flex flex-col md:flex-row justify-center items-center">
                 <div className="w-1/2 flex justify-center items-center">
-                  <div className="md:w-10 md:h-20 mt-5 flex justify-center items-center">
+                  <div className="md:w-10 md:h-20 lg:h-full lg:w-full mt-5 flex justify-center items-center">
                     <img
                       className="w-2/3 h-4/5 mb-5"
                       src={LogoInsulineRegister}
@@ -160,7 +160,7 @@ export default function GlucoseRegisterMain() {
             <div className="flex border-2 mb-5 border-gray-200 hover:shadow-2xl transition-all duration-300 rounded-lg md:w-2/5  w-full max-w-md mx-auto md:h-52 h-auto">
               <div className="flex flex-col md:flex-row justify-center items-center">
                 <div className="w-1/2 flex justify-center items-center">
-                  <div className="md:w-10 md:h-20 mt-5 flex justify-center items-center">
+                  <div className="md:w-10 md:h-20 lg:h-full lg:w-full mt-5 flex justify-center items-center">
                     <img
                       className="w-2/3 h-4/5 mb-5"
                       src={LogoWaterRegister}
@@ -211,7 +211,7 @@ export default function GlucoseRegisterMain() {
             <div className="flex border-2 mb-5 border-gray-200 hover:shadow-2xl transition-all duration-300 rounded-lg md:w-2/5  w-full max-w-md mx-auto md:h-52 h-auto">
               <div className="flex flex-col md:flex-row justify-center items-center">
                 <div className="w-1/2 flex justify-center items-center">
-                  <div className="md:w-10 md:h-20 mt-5 flex justify-center items-center">
+                  <div className="md:w-10 md:h-20 lg:h-full lg:w-full mt-5 flex justify-center items-center">
                     <img
                       className="w-2/3 h-4/5 mb-5"
                       src={LogoEmotionRegister}

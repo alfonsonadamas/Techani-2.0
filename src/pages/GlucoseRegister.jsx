@@ -121,7 +121,7 @@ export default function GlucoseRegister() {
   }, [user]);
 
   return (
-    <div className="w-full h-screen" style={{ backgroundColor: "#F7F7F7" }}>
+    <div className="w-full h-screen">
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
         <div className="w-full h-60 flex justify-center items-center">
