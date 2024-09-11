@@ -292,7 +292,6 @@ export default function AllFoodsRegister() {
                                                         </button>
                                                     </div>
                                                 )}
-                                                
                                             </li>
                                         ))}
                                     </ul>
