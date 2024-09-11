@@ -271,7 +271,9 @@ export default function AllFoodsRegister() {
                                     <ul>
                                         {comida.meal.map(alimento => (
                                             <li key={alimento.idAlimentos} className="flex items-center pb-2">
-                                                <a className="cursor-pointer hover:underline" onClick={ () => handleBoton(alimento.idAlimentos)}> {alimento.portion} {alimento.BancoAlimentos.food} </a>
+                                                <a className="cursor-pointer hover:underline" onClick={ () => handleBoton(alimento.idAlimentos)}> 
+                                                    {alimento.portion} {alimento.BancoAlimentos.food}
+                                                </a>
                                                 {IDmeal === alimento.idAlimentos && (
                                                     <div className="flex" data-aos="fade-left" data-aos-duration="250">
                                                         <button
@@ -296,7 +298,7 @@ export default function AllFoodsRegister() {
                                         ))}
                                     </ul>
                                 </div>
-                            ))}
+                            ))} 
                         </div>
                         <Modal
                             isOpen={modalIsOpen}
