@@ -3,56 +3,48 @@ import SideBar from "../components/SideBar";
 import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
+import { toast, ToastContainer } from "react-toastify";
+import * as Yup from "yup";
 
 export default function Files() {
   const [caracteres, setCaracteres] = useState(200);
   const [file, setFile] = useState(null);
   const { user } = useUserContext();
-  const [url, setUrl] = useState("");
-
-  const getUrl = async (filename) => {
-    try {
-      const { data, error } = supabase.storage
-        .from("analisis_archivos")
-        .getPublicUrl(
-          `${user.id}/${filename}${file.type === "image/png" ? ".png" : ".pdf"}`
-        );
-      console.log("link:");
-      console.log(data.publicUrl, error);
-      setUrl(data.publicUrl);
-    } catch (error) {}
-  };
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const onSubmit = async (
     { filename, date, observation },
-    { setSubmitting, setErrors }
+    { setErrors, resetForm }
   ) => {
     try {
-      setSubmitting(true);
-      const { data, error } = await supabase.storage
+      setLoading(true);
+      const { error } = await supabase.storage
         .from("analisis_archivos")
-        .upload(
-          `${user.id}/${filename}${
-            file.type === "image/png" ? ".png" : ".pdf"
-          }`,
-          file
-        );
-      getUrl(filename);
-      const { dataUpload, errorUpload } = await supabase
-        .from("analisisArchivos")
-        .insert({
+        .upload(`${user.id}/${file.name}`, file);
+
+      if (error && error.error === "Duplicate") {
+        toast.error("El archivo ya existe");
+      } else {
+        const { data, error } = supabase.storage
+          .from("analisis_archivos")
+          .getPublicUrl(`${user.id}/${file.name}`);
+        console.log("link:");
+        console.log(data.publicUrl, error);
+
+        await supabase.from("analisisArchivos").insert({
           title: filename,
           date: date,
           observations: observation,
           uid: user.id,
-          file: url,
+          file: data.publicUrl,
         });
-      console.log("Archivo subido: ", dataUpload, errorUpload);
-      if (error) throw error;
+        toast.success("Archivo subido correctamente");
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Error", error);
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -67,14 +59,45 @@ export default function Files() {
       setCaracteres(maxLength - currentLength);
     }
   };
+  //función que verifica el archivo que se está subiendo tiene el peso y el formato adecuado
+  const validationFile = (e) => {
+    const selectedFile = e.target.files[0];
+    const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
+    const extensions = ["jpg", "png", "jpeg"];
+    console.log(typeOfFile);
+    if (extensions.includes(typeOfFile)) {
+      if (selectedFile.size <= 300000) {
+        setFile(selectedFile);
+        setError(null);
+      } else {
+        setError("El tamaño de la imágen es demasiado grande, elige otra.");
+        setFile(null);
+        e.target.value = null;
+      }
+    } else {
+      setFile(null);
+      setError("El tipo de archivo no es valido.");
+      e.target.value = null;
+    }
+  };
+
+  const validationSchema = Yup.object().shape({
+    filename: Yup.string()
+      .required("Ingresa el Tipo de Analisis"),
+
+    date: Yup.string()
+    .required("La Fecha es requerida"),
+  });
 
   return (
     <div>
       <SideBar></SideBar>
-      <div className="p-16 pt-24 ml-64">
+      <div className="p-16 pt-24 ml-64" data-aos="fade-up">
+        <h2 className="text-2xl mb-5 font-semibold">Subir nuevo archivo</h2>
         <Formik
           initialValues={{ filename: "", date: "", observation: "" }}
           onSubmit={onSubmit}
+          validationSchema={validationSchema}
         >
           {({
             values,
@@ -84,8 +107,10 @@ export default function Files() {
             touched,
             handleBlur,
             isSubmitting,
+            resetForm,
           }) => (
             <form onSubmit={handleSubmit}>
+              <ToastContainer />
               <div className="flex">
                 <div className="flex-1 mr-2">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -94,6 +119,7 @@ export default function Files() {
                   <input
                     type="text"
                     name="filename"
+                    maxLength={40}
                     autoComplete="off"
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -105,15 +131,22 @@ export default function Files() {
                     }
                     placeholder="Ingresa el nombre del Análisis"
                   />
+                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.filename &&
+                          touched.filename &&
+                          errors.filename}
+                      </p>
                 </div>
                 <div className="flex-1 ml-2">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Fecha de los Análisis
                   </label>
+
                   <input
                     type="date"
                     name="date"
                     autoComplete="off"
+                    min={new Date().toISOString().split("T")[0]}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     aria-describedby="helper-text-explanation"
@@ -124,6 +157,11 @@ export default function Files() {
                     }
                     placeholder="Fecha del Análisis"
                   />
+                  <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        {errors.date &&
+                          touched.date &&
+                          errors.date}
+                      </p>
                 </div>
               </div>
               <div>
@@ -132,22 +170,22 @@ export default function Files() {
                 </label>
                 <input
                   type="file"
-                  name="filename"
-                  accept="image/jpeg, application/pdf, image/png"
+                  name="file"
+                  accept="image/jpeg,image/png"
                   autoComplete="off"
-                  onChange={(e) => {
-                    setFile(e.target.files[0]);
-                  }}
+                  onChange={validationFile}
                   onBlur={handleBlur}
                   aria-describedby="helper-text-explanation"
                   className={
-                    errors.glucose
+                    error
                       ? "bg-gray-50 mb-2 border border-red-500  text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full "
                       : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full "
                   }
                   placeholder="Ingresa el nombre del Análisis"
                 />
+                <p className="text-red-500 text-xs rounded-lg">{error}</p>
               </div>
+
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white ">
                   Observaciones
@@ -168,7 +206,8 @@ export default function Files() {
               </div>
               <button
                 type="submit"
-                className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
+                className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white disabled:opacity-50"
+                disabled={loading}
               >
                 Guardar
               </button>

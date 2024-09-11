@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../assets/img/Techani (1).png";
 import { useUserContext } from "../context/UserContext";
+import act1 from "../assets/img/yoga.png";
+import act2 from "../assets/img/ejercicio.png";
 
 export default function SideBar() {
   const { user } = useUserContext();
@@ -72,48 +74,117 @@ export default function SideBar() {
     }
   }, [user, name]);
   return (
-    <div>
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 ">
-        <div className="px-3 py-3 lg:px-5 lg:pl-3">
-          <div className=" flex items-center justify-between">
-            <div className="  flex items-center justify-start rtl:justify-end">
+    <div className="bg-white z-10 py-3 top-0 left-0 right-0 shadow-md fixed">
+      <div className=" flex items-center justify-between">
+        <div className="  flex items-center justify-start rtl:justify-end">
+          <button className="ml-5" onClick={toogleResponsive}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </button>
+
+          <div className="ml-5">
+            <Link to={"/dashboard"} className="flex ms-2 md:me-24">
+              <img src={Logo} alt="techanilogo" className="h-10 me-3" />
+              <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+                Techani
+              </span>
+            </Link>
+          </div>
+
+          <h2 className="hidden sm:block">Bienvenido, {name}</h2>
+        </div>
+
+        <div className="mr-5">
+          <Link to={"/profile"}>
+            <img
+              className="rounded-full"
+              src={picture}
+              alt="perfil"
+              width={40}
+            />
+          </Link>
+        </div>
+      </div>
+
+      <div
+        style={{
+          backgroundColor: "#ffff",
+          border: "2px solid #E5E5E5",
+          minHeight: "100vh",
+          width: "15rem",
+          position: "fixed",
+          top: 0,
+          left: 0,
+        }}
+        className={`${responsive ? "hidden" : "flex"}`}
+      >
+        <div style={{ paddingTop: "3px" }}>
+          <div className="  flex items-center justify-start rtl:justify-end">
+            <div className=" md:hidden">
+              <button style={{ margin: "10px" }} onClick={toogleResponsive}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="ml-5 mt-3">
               <Link to={"/dashboard"} className="flex ms-2 md:me-24">
                 <img src={Logo} alt="techanilogo" className="h-10 me-3" />
                 <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
                   Techani
                 </span>
               </Link>
-              <h2 className="hidden sm:block">Bienvenido, {name}</h2>
             </div>
-            <Link to={"/profile"}>
-              <img
-                className="rounded-full"
-                src={picture}
-                alt="perfil"
-                width={40}
-              />
-            </Link>
           </div>
-        </div>
-      </nav>
-      <div className="sidebar fixed top-14 bottom-0 lg:left-0 left-[-300px] p-2 w-[230px] overflow-y-auto text-center border-r border-gray-200">
-        {/* Aqui empieza el menu desplegable */}
-        <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
-          <svg
-            className="w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-6 h-6"
+
+          {/*SIDE BAR */}
+          <div
+            className={`${
+              responsive ? "hidden" : "block"
+            } fixed top-14 bottom-0 p-2 w-[230px] overflow-y-auto text-center`}
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-            />
-          </svg>
+            {/* Aqui empieza el menu desplegable */}
+
+            <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
+              <svg
+                className="w-7 h-7 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                />
+              </svg>
 
           <div
             className="flex justify-between w-full items-center"
@@ -359,47 +430,53 @@ export default function SideBar() {
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADRUlEQVR4nO2XR2iUURDHf9HYUA+2g70Q7A1sKKLYT4qIFw3oQSKC2FA8CKK5xJOKBY2CUZBgPWiiXjwowYKKIGIFS2JEFCyxYU1WBv4fjMtu8q1uNoXvB8u3b16d92bmzYOIiIiIiIiI5kk/4ABQCfzUt1DyJsNs4BMQS/Az+SyaAP2dEmeBsUB7fUsk/wj0pZFzwCmRiECZ/XHybsBgoA2NhEotdEyS+nGqr1B5CnDbmZ6d1l6gDw3MDy2oQ5L6jqr/Dsxw7c0cy51CJj8IDKCBeBHyRKzdQ2dmgUkNAY4Cv1X3CzgCDCTDFGoB5guJKFX9PadQqwTtcoAihe6YFCsGhpIh+rmoVaoT6KBvqfOD4H9BiPEKnQlWAyeBUZlQZpYWm+geMflM4JbK40OO2RvYDXxTvxrgTC0mnDb6yvYrtJv23eei0WMtaFCK43YHtgNf3OacBybSQJzUIlY4WRdgLdA5RH+7d7bFZRAXFc4zyiJNftXJ1of0G48pnQ98cApdVmjPCO2AKk0chNY5Kt/4h/HsfloDvHYKXQPmAlnUM0WacIvK7eVP5sjXJZ8AtEhhTIuQG4E3TqGbwLz6VGiaJnriJilLEOneyqeWAz1Djm0XrLV/6ca5CywBWqZbkRaKZjEXdbaqXKYo9zROqRrlZgVy7Ow65mgLrHTzBJfxonQrdFiDWwQypqpsphVgPrQauAB8jVPsHbALGFnHPK2BPOCZ6/tIJ1TXZtTJMF1wtsvTJZvszCDZDtvDbYfL1WIuSOTJ8ZNhi17q7rGYTn2ZlE2ZVi59NxNCCwgmsJAahtHAHuC9W9hn4BAwqZZ+ZlaLgfuuX7myjpTId45u0co4IdkdhedUsJPKBS7phIPF2ULXAV1r8dOFmjNITmvbgL8YrvS8WqZkrNJAVcp8/4ccBYNXTiF7/xxXHpgonGe5zU2WuSdN9XeqPN7dHwtIH9m6P0q0cYFS5vCbgV5x7Qeq/kHYCU6rQ66SwOBlaMlgfdED2CRTjjkzOgfMlxLFkp8KO2iuGyh4Z1xJ8sBKN1m6iIvdk8D/vimahmaDEj1T5ljIjDfddJJv2uX7XO+bEUFlrJn8aDaKREREREREREREUC/8Ae4ZfBBuF8VKAAAAAElFTkSuQmCC"
               />
 
-              <span className="ml-3">Nuevo Registro</span>
-            </Link>
-          </div>
-          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/newActivitie"} className="flex cursor-pointer p-2 ">
+                  <span className="ml-3">Nuevo Registro</span>
+                </Link>
+              </div>
+
+              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link to={"/MyExercise"} className="flex cursor-pointer p-2 ">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
+                    />
+                  </svg>
+
+                  <span className="ml-3">Mis Registros</span>
+                </Link>
+              </div>
+
+              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link to={"/newActivity"} className="flex cursor-pointer p-2 ">
+                  <img alt="diabetes" className="h-5 w-5" src={act1} />
+
+                  <span className="ml-3">Nuevo Ejercicio</span>
+                </Link>
+              </div>
+
+              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link to={"/viewActivity"} className="flex cursor-pointer p-2 ">
+                  <img alt="diabetes" className="h-5 w-5" src={act2} />
+
+                  <span className="ml-3">Mis Ejercicios</span>
+                </Link>
+              </div>
+            </div>
+            <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
               <img
-                alt="exercise"
-                className="w-5 h-5"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADIklEQVR4nO2ZXYhMYRjHf8taZFfJR3Jhdyk3tMlHaeXGZ3EhpJQLJNkLCWG5lNYiF0L7cUOE5EKZUYpyo8TaRAl31q4pVmLWxxrt7uit/6m348yM3T0z+x7Nv97OnPM+857nP8/7fL0DRRQco4gwSoDtwAsgDXQAu4kYZgMPRMCMPuvzTiKAUuAQ8FNKfwS2AmXALj17jeOYD7Rbv/xlYLI1PxroB3pxFOOAE8BvEXgLrAnwl3rNP8dBLAPeSMF+4CxQ7pOpBu5ZvrIehzARaAYGpOBLYIlPxmylfcB3yXwCNuAQ1gLvpJzZTieBsT6ZecBjy19uAlNxBNOAK5Zyj4C5Ppkx8oVfkkkM1QrrgDYgZb0w7PEN2BuQrWuBV5a/XAAqhkoiX8p7ysWBSt97jbLnNZ8WmaUMA0+1UL0S0Ej4y/EAfxk0erSgP/zlA8Zxr1rWMtu5JqzF27To0TxbxJQc3XrXD+CAQm2oZg7DFx5mecc1S+4+MCs89f8m8ySEqJUJXgLcobLDWaSzECnRnCHjPNI5LJJr3sYcYA8QAz4rOTYWKqIOxyKTgE1AqyrgTNvWVMpOESlVNj+mcqXPp3C3gsM2YIZkvbLFCSJm3AK++hRPqb09AiwIKGFWSO6DC0S8qOUN04ucU3k0wSc/Xg3WGeCSVcIcLgCPnM58Crih/rsygGgNcFCNVK+13oAsWEeBMJioZDAF2CwH7wwoMtvVr6wMowYLk4gJncul3LOArfYeuAhsEckRQzYiG3VwYCtuaq27wP6AJgvXiBhfuGPNmc+ntV3MCYqTSPuI1FmHB1905GnCapX8okt9iLm26LmTRLzi8zowXc9WW72Pf/QAq3CQiP++2iJxG1ik/GGuMT1PBoRm54i0WiSCENO8OfNymkiX7hdm+P5izZs+3mkiqRznAhWaN+daThPp/EeLdOA4kRbdG18IQlzzTThOpMqKWnFZoFzXuBW1ZuI4EZQnkhnySFIZnygQQXmiWdEppWuTC5YYLBHnkS4ScQz/jUUSUrxW/3F4XV/k0BgQUhuIIMpEJiFLNBTwT6MiiiBk/AElsZmxUBZWTAAAAABJRU5ErkJggg=="
+                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                alt="bread"
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABoklEQVR4nO2WMU7DQBBFnwsKcIRAosE+BwoFJRU3oOUWHAK4ERWkoOAElIgSilAQIhhksZGcKLF3BzsenP3SSJGsn9m3O7szEDWnITACJoB4xhi4BY4xBDENAFiMwnuCAY3cgq6BNMA3AK6c9wEDmrjFhEDMtAW8A1/ALh1rViJavTj/IcZB6r5HkI05kaFnT6haaN2TWwUiNVGs6x44aqondAUiLj6rYDQ9Yd2lNQBunOeuyZ7QxR0ZOM+HNqmlyy5V/9sGSJ3MgEydZxud3pz/oGuQR+e5JFwXzvsMJF2DnALfzlcMgK+eMS7lOw/M2QpIoTPgKaAHSOkkNBCtgcy0B+wHxF8kbYKsU+ILknjuavmS+nq0vkQDsuNZ5+UpIA24HxpfGkH43Yls4Yhzj53Nl5SGxpc3eSLFb1YkXrWgZYOnxpdGEHpcWhJfLbp/fpO+NETrkjZPRCtzIwoBIwqWRxTzIJnn216bwAMktzCiNAGSen7bbJCsL6UlisuuBRFrr5YZkETZEDUgJkcUUYA0nkf6BiL/KJaqNyBRUVHM6QciXeXEDvcO8gAAAABJRU5ErkJggg=="
               ></img>
-
-              <span className="ml-3">Nueva Actividad</span>
-            </Link>
-          </div>
-          <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
-            <Link to={"/myRecords"} className="flex cursor-pointer p-2 ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-5 h-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-                />
-              </svg>
-
-              <span className="ml-3">Mis Registros</span>
-            </Link>
-          </div>
-        </div>
-        <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
-          <img
-            className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            alt="bread"
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABoklEQVR4nO2WMU7DQBBFnwsKcIRAosE+BwoFJRU3oOUWHAK4ERWkoOAElIgSilAQIhhksZGcKLF3BzsenP3SSJGsn9m3O7szEDWnITACJoB4xhi4BY4xBDENAFiMwnuCAY3cgq6BNMA3AK6c9wEDmrjFhEDMtAW8A1/ALh1rViJavTj/IcZB6r5HkI05kaFnT6haaN2TWwUiNVGs6x44aqondAUiLj6rYDQ9Yd2lNQBunOeuyZ7QxR0ZOM+HNqmlyy5V/9sGSJ3MgEydZxud3pz/oGuQR+e5JFwXzvsMJF2DnALfzlcMgK+eMS7lOw/M2QpIoTPgKaAHSOkkNBCtgcy0B+wHxF8kbYKsU+ILknjuavmS+nq0vkQDsuNZ5+UpIA24HxpfGkH43Yls4Yhzj53Nl5SGxpc3eSLFb1YkXrWgZYOnxpdGEHpcWhJfLbp/fpO+NETrkjZPRCtzIwoBIwqWRxTzIJnn216bwAMktzCiNAGSen7bbJCsL6UlisuuBRFrr5YZkETZEDUgJkcUUYA0nkf6BiL/KJaqNyBRUVHM6QciXeXEDvcO8gAAAABJRU5ErkJggg=="
-          ></img>
 
           <div
             className="flex justify-between w-full items-center"

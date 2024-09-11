@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import "../dist/output.css";
 import SideBar from "../components/SideBar";
 import { useUserContext } from "../context/UserContext";
 import { supabase } from "../config/supabase";
@@ -43,7 +42,7 @@ export default function Grapics() {
       colors: ["#fff"],
     },
     title: {
-      text: "100% Stacked Bar",
+      text: "Tiempo en rango",
     },
     xaxis: {
       categories: [2024],
@@ -129,7 +128,7 @@ export default function Grapics() {
         colors: ["#fff"],
       },
       title: {
-        text: "100% Stacked Bar",
+        text: "Tiempo en rango",
       },
       xaxis: {
         categories: [2024],

@@ -30,25 +30,21 @@ export default function GlucoseRegister() {
       return;
     }
 
-    if (records.length > 0) {
-      // if (records.idMedicion === parseInt(meditionType)) {
-      //   console.log("Ya existe un registro con este tipo de medición");
-      //   return;
-      // }
-      records.forEach((record) => {
-        if (record.idMedicion === parseInt(meditionType)) {
-          setErrors({
-            meditionType: "Ya existe un registro con este tipo de medición",
-          });
-          return;
-        }
-        return;
-      });
-      return;
-    }
+    // if (records.length > 0) {
+    //   records.forEach((record) => {
+    //     if (record.idMedicion === parseInt(meditionType)) {
+    //       setErrors({
+    //         meditionType: "Ya existe un registro con este tipo de medición",
+    //       });
+    //       return;
+    //     }
+    //     return;
+    //   });
+    //   return;
+    // }
 
     const date = new Date().toLocaleDateString();
-
+    console.log(date);
     var parts = date.split("/");
     var year = parts[2];
     var month = parts[1];
@@ -66,20 +62,20 @@ export default function GlucoseRegister() {
         },
       ]);
 
-      // await emailjs.send(
-      //   "service_gb8sr3f",
-      //   "template_jt5p6ui",
-      //   {
-      //     to_email: user.email,
-      //     from_name: "Techani",
-      //     to_name: user.user_metadata.full_name,
-      //     message: `
-      //   Glucosa: ${glucose}
-      //   Tipo de medición: ${meditionType}`,
-      //   },
-      //   "RBjxGi8gd0qdpEToN"
-      // );
-      setSubmited(true);
+      //   // await emailjs.send(
+      //   //   "service_gb8sr3f",
+      //   //   "template_jt5p6ui",
+      //   //   {
+      //   //     to_email: user.email,
+      //   //     from_name: "Techani",
+      //   //     to_name: user.user_metadata.full_name,
+      //   //     message: `
+      //   //   Glucosa: ${glucose}
+      //   //   Tipo de medición: ${meditionType}`,
+      //   //   },
+      //   //   "RBjxGi8gd0qdpEToN"
+      //   // );
+      //   setSubmited(true);
     } catch (error) {
       console.log(error);
     } finally {
@@ -125,7 +121,7 @@ export default function GlucoseRegister() {
   }, [user]);
 
   return (
-    <div>
+    <div className="w-full h-screen">
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
         <div className="w-full h-60 flex justify-center items-center">
@@ -225,7 +221,6 @@ export default function GlucoseRegister() {
                       </button>
                     </div>
                   </form>
-
                 )}
               </Formik>
             ) : (
