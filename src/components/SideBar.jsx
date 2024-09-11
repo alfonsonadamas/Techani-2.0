@@ -17,15 +17,6 @@ export default function SideBar() {
   const [name, setName] = useState("");
   const [picture, setPicture] = useState("");
 
-  // try {
-  //   const { error } = await supabase.auth.signOut();
-  //   navigate("/login");
-  //   setPicture("");
-  //   console.log(error);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-
   const dropDown = () => {
     setIsHidden(!isHidden);
   };
