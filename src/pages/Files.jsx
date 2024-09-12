@@ -63,7 +63,7 @@ export default function Files() {
     const selectedFile = e.target.files[0];
     const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
     const extensions = ["jpg","png","jpeg"];  
-    console.log(typeOfFile);
+    console.log(selectedFile)
     if(extensions.includes(typeOfFile)){
       if(selectedFile.size <= 300000){
         setFile(selectedFile);
