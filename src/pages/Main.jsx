@@ -388,9 +388,9 @@ export default function Main() {
             style={{ width: "24%", height: 150 }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima glucosa</p>
-            <p className="mb-2">{glucose}</p>
+            <p className="mb-2">{glucose && glucose}</p>
             <p className="text-4xl font-medium">
-              {lastGlucose}
+              {lastGlucose && lastGlucose}
               <span className="text-lg font-normal">mg/dl</span>
             </p>
           </div>
@@ -399,7 +399,7 @@ export default function Main() {
             style={{ width: "24%" }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima insulina</p>
-            <p className="mb-2">{dose}</p>
+            <p className="mb-2">{dose && dose}</p>
             <p className="text-4xl font-medium">
               {lastInsuline}
               <span className="text-lg font-normal">u</span>
@@ -456,7 +456,7 @@ export default function Main() {
             <h4 className="text-xl font-semibold">Agua Consumida</h4>
             <img src={setWater(waterTotal)} alt="water" className="w-36" />
             <p className="" style={{ fontSize: "3rem" }}>
-              {waterTotal}
+              {waterTotal && waterTotal}
               <span className="text-3xl font-normal">ml</span>
             </p>
           </div>
