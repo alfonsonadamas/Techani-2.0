@@ -24,9 +24,13 @@ export default function AllFoodsRegister() {
 
     const [daySelect, setDaySelect] = useState("");
     const [editMeal, setEditMeal] = useState(null);
+    const [editDateMeal,setEditDateMeal] = useState(null);
     const [hourMeal,setHourMeal] = useState();
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [modalDateIsOpen, setModalDateIsOpen] = useState(false);
     const [IDmeal,setIDmeal] = useState(null);
+    const [IDmealtype,setIDmealtype] = useState(null);
+    
 
     const openModal = (record) => {
         setEditMeal(record);
@@ -37,6 +41,16 @@ export default function AllFoodsRegister() {
     const closeModal = () => {
         setModalIsOpen(false);
         setEditMeal(null);
+    };
+
+    const openModalDate = (record) =>{
+        setEditDateMeal(record);
+        setModalDateIsOpen(true);
+    }
+
+    const closeModalDate = () => {
+        setModalDateIsOpen(false);
+        setEditDateMeal(null);
     };
 
     const getFoods = async () => {
@@ -72,7 +86,7 @@ export default function AllFoodsRegister() {
             // const isoDate = new Date(day).toISOString();
             // idAlimentos,idBancoAlimentos,created_at,hour,idTipoComida,portion,uid
             console.log("id:",id,"date:",datameal[0].id,"portion:",porcion);
-            console.log(datameal);
+            // console.log(datameal);
             const idBankAliments = datameal[0].id;
 
             const {data,error} = await supabase
@@ -113,8 +127,33 @@ export default function AllFoodsRegister() {
     };
 
     const deletemeal = async (id) => {
-        console.log("Comida:",id);
+        try {
+            setLoading(true);
+            await supabase
+                .from("alimentos")
+                .delete()
+                .eq("uid",user.id)
+                .eq("idAlimentos",id);
+        } catch (error) {
+            console.log(error);
+        } finally{
+            setLoading(false);
+            filterDay();
+            getFoods();
+        }
     };
+
+    const updatedate = async (alimentos) => {
+        console.log(alimentos);
+        // try {
+        //     setLoading(true);
+            
+        // } catch (error) {
+        //     console.log(error);
+        // } finally{
+        //     setLoading(false);
+        // }
+    }
 
     const getMealsType = async () =>{
         try {
@@ -193,6 +232,12 @@ export default function AllFoodsRegister() {
 
     const handleBoton = (id) => {
         setIDmeal(preID => preID === id ? null : id);
+        setIDmealtype(null);
+    }
+
+    const handleBotonMealType = (id) => {
+        setIDmealtype(preID => preID === id ? null : id);
+        setIDmeal(null);
     }
 
     const validationSchema = Yup.object().shape({
@@ -267,43 +312,84 @@ export default function AllFoodsRegister() {
                             )}
                             {meals.length > 0 && meals.map(comida => (
                                 <div className="mb-6" key={comida.tipoComida.idTipocomida}>
-                                    <h3 className="text-xl font-semibold">{comida.tipoComida.meal} - {comida.hour}</h3>
-                                    <ul>
-                                        {comida.meal.map(alimento => (
-                                            <li key={alimento.idAlimentos} className="flex items-center pb-2">
-                                                <a className="cursor-pointer hover:underline" onClick={ () => handleBoton(alimento.idAlimentos)}> 
-                                                    {alimento.portion} {alimento.BancoAlimentos.food}
-                                                </a>
-                                                {IDmeal === alimento.idAlimentos && (
-                                                    <div className="flex" data-aos="fade-left" data-aos-duration="250">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => openModal(alimento)}
-                                                            className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
-                                                        >
-                                                            <img src={edit} alt="editar" className="h-5" />
-                                                            <p className="px-2">Editar</p>
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => deletemeal(alimento.idAlimentos)}
-                                                            className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
-                                                        >
-                                                            <img src={delate} alt="borrar" className="h-5" />
-                                                            <p className="px-2">Borrar</p>
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    <div className="flex items-center">
+                                        <h3 className="text-xl font-semibold cursor-pointer hover:underline" onClick={() =>handleBotonMealType(comida.tipoComida.idTipocomida)}>{comida.tipoComida.meal} - {comida.hour}</h3>
+                                        {IDmealtype === comida.tipoComida.idTipocomida && (
+                                            <div className="flex" data-aos="fade-left" data-aos-duration="250">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>openModalDate(comida)}
+                                                    className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
+                                                >
+                                                    <img src={edit} alt="editar" className="h-5" />
+                                                    <p className="px-2">Editar</p>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>updatedate(comida)}
+                                                    className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
+                                                >
+                                                    <img src={delate} alt="borrar" className="h-5" />
+                                                    <p className="px-2">Borrar</p>
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className='border-solid border-l-2 border-black pl-2'>
+                                        <ul>
+                                            {comida.meal.map(alimento => (
+                                                <li key={alimento.idAlimentos} className="flex items-center pb-2">
+                                                    <a className="cursor-pointer hover:underline" onClick={ () => handleBoton(alimento.idAlimentos)}> 
+                                                        {alimento.portion} {alimento.BancoAlimentos.food}
+                                                    </a>
+                                                    {IDmeal === alimento.idAlimentos && (
+                                                        <div className="flex" data-aos="fade-left" data-aos-duration="250">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => openModal(alimento)}
+                                                                className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
+                                                            >
+                                                                <img src={edit} alt="editar" className="h-5" />
+                                                                <p className="px-2">Editar</p>
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => deletemeal(alimento.idAlimentos)}
+                                                                className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
+                                                            >
+                                                                <img src={delate} alt="borrar" className="h-5" />
+                                                                <p className="px-2">Borrar</p>
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 </div>
                             ))} 
                         </div>
                         <Modal
+                            isOpen={modalDateIsOpen}
+                            onClose={closeModalDate}
+                            title={"Editar"}
+                            width={"max-w-4xl"}
+                        >
+                            {editDateMeal && (
+                            <div>
+                                <div className="w-full mb-2 items-center">
+                                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                                        Tipo de alimento:
+                                    </label>
+
+                                </div>
+                            </div>    
+                            )}
+                        </Modal>
+                        <Modal
                             isOpen={modalIsOpen}
                             onClose={closeModal}
-                            title={"Alimento"}
+                            title={"Editar"}
                             width={"max-w-4xl"}
                         >
 
@@ -342,7 +428,7 @@ export default function AllFoodsRegister() {
                                                         <div className="relative">
                                                             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                                                 <svg
-                                                                    className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                                                                    className="ml-3 w-4 h-4 text-gray-500 dark:text-gray-400"
                                                                     aria-hidden="true"
                                                                     xmlns="http://www.w3.org/2000/svg"
                                                                     fill="none"
