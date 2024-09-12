@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SideBar from "../components/SideBar";
 import { useUserContext } from "../context/UserContext";
 import paisaje from "../assets/img/paisaje.png";
+import pdf from "../assets/img/pdf.png"
 import { supabase } from "../config/supabase";
 
 export default function MyFiles() {
@@ -10,11 +11,11 @@ export default function MyFiles() {
 
   const deleteFile = async (id, file) => {
     try {
-      // const { data, error } = await supabase
-      //   .from("analisisArchivos")
-      //   .delete()
-      //   .eq("idArchivo", id);
-      // console.log(data);
+       const { data, errorDelete } = await supabase
+         .from("analisisArchivos")
+         .delete()
+         .eq("idArchivo", id);
+       console.log(data);
 
       const fileName = file.substring(file.lastIndexOf("/") + 1);
       console.log(fileName);
@@ -26,6 +27,25 @@ export default function MyFiles() {
       console.log(error);
     }
   };
+
+  const getFileExtentions = (file) => {
+    // URL proporcionada
+    const url = file;
+    // Partimos el enlace para obtener la última parte (el nombre del archivo)
+    const partes = url.split('/');
+
+    // Obtenemos la última parte del arreglo, que es el nombre del archivo
+    const archivo = partes[partes.length - 1];
+
+    // Obtenemos el formato (extensión) del archivo
+    const extension = archivo.split('.').pop();
+
+    // Mostramos la extensión en consola
+    console.log("La extensión del archivo es:", extension);
+
+    return extension;
+
+  }
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -70,19 +90,18 @@ export default function MyFiles() {
                 files.slice(0, 4).map((file) => (
                   <div className="bg-white shadow-md rounded-lg p-4 w-full">
                     <div className="flex items-center">
-                      <img src={paisaje} className="w-16 h-16 mr-4" alt="paisaje" />
+                      <img src={getFileExtentions(file.file) === "pdf" ? pdf : paisaje } className="w-16 h-16 mr-4" alt="paisaje" />
                       <div>
                         <h3 className="text-lg font-bold">{file.title}</h3>
                         <p className="text-sm text-gray-500 mb-1">Fecha:</p>
-                        <p className="text-sm text-gray-800">2024-07-10</p>
+                        <p className="text-sm text-gray-800">{file.date}</p>
                       </div>
                     </div>
 
                     <div className="mt-4">
                       <p className="text-sm text-gray-500 mb-1">Observaciones:</p>
                       <p className="text-sm text-gray-800 mb-4">
-                        Nivel de glucosa registrado: ___ mg/dL; Condiciones del paciente:
-                        (Ayuno / Postprandial); Fecha y hora de la toma.
+                        {file.observations}
                       </p>
 
                       <div className="flex justify-end space-x-4">

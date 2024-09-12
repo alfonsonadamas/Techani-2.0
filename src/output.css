@@ -762,6 +762,21 @@ select:not([size]){
   outline: 1px auto inherit;
 }
 
+input[type=file]::-webkit-file-upload-button{
+  color: white;
+  background: #1F2937;
+  border: 0;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 2rem;
+  padding-right: 1rem;
+  margin-inline-start: -1rem;
+  margin-inline-end: 1rem;
+}
+
 input[type=file]::file-selector-button{
   color: white;
   background: #1F2937;
@@ -777,8 +792,17 @@ input[type=file]::file-selector-button{
   margin-inline-end: 1rem;
 }
 
+input[type=file]::-webkit-file-upload-button:hover{
+  background: #374151;
+}
+
 input[type=file]::file-selector-button:hover{
   background: #374151;
+}
+
+:is([dir=rtl]) input[type=file]::-webkit-file-upload-button{
+  padding-right: 2rem;
+  padding-left: 1rem;
 }
 
 :is([dir=rtl]) input[type=file]::file-selector-button{
@@ -786,9 +810,18 @@ input[type=file]::file-selector-button:hover{
   padding-left: 1rem;
 }
 
+.dark input[type=file]::-webkit-file-upload-button{
+  color: white;
+  background: #4B5563;
+}
+
 .dark input[type=file]::file-selector-button{
   color: white;
   background: #4B5563;
+}
+
+.dark input[type=file]::-webkit-file-upload-button:hover{
+  background: #6B7280;
 }
 
 .dark input[type=file]::file-selector-button:hover{
@@ -1079,10 +1112,6 @@ input:checked + .toggle-bg{
 
 .relative{
   position: relative;
-}
-
-.sticky{
-  position: sticky;
 }
 
 .inset-0{
@@ -1481,10 +1510,6 @@ input:checked + .toggle-bg{
   margin-top: 2rem;
 }
 
-.mt-auto{
-  margin-top: auto;
-}
-
 .block{
   display: block;
 }
@@ -1630,6 +1655,7 @@ input:checked + .toggle-bg{
 }
 
 .h-fit{
+  height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
 }
@@ -1799,6 +1825,7 @@ input:checked + .toggle-bg{
 }
 
 .w-fit{
+  width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
 }
@@ -2105,10 +2132,6 @@ input:checked + .toggle-bg{
 
 .gap-4{
   gap: 1rem;
-}
-
-.gap-3{
-  gap: 0.75rem;
 }
 
 .-space-x-4 > :not([hidden]) ~ :not([hidden]){
@@ -2588,6 +2611,31 @@ input:checked + .toggle-bg{
 .border-l-gray-400{
   --tw-border-opacity: 1;
   border-left-color: rgb(156 163 175 / var(--tw-border-opacity));
+}
+
+.bg-\[\#116C09\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(17 108 9 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#277BC0\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(39 123 192 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#57A3E2\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(87 163 226 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#AB1A1A\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(171 26 26 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#F7F7F7\]{
+  --tw-bg-opacity: 1;
+  background-color: rgb(247 247 247 / var(--tw-bg-opacity));
 }
 
 .bg-azul{
@@ -3283,11 +3331,6 @@ input:checked + .toggle-bg{
   padding-bottom: 2rem;
 }
 
-.py-6{
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-}
-
 .pb-2{
   padding-bottom: 0.5rem;
 }
@@ -3429,11 +3472,6 @@ input:checked + .toggle-bg{
 .text-4xl{
   font-size: 2.25rem;
   line-height: 2.5rem;
-}
-
-.text-5xl{
-  font-size: 3rem;
-  line-height: 1;
 }
 
 .text-\[12px\]{
