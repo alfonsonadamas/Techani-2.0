@@ -94,14 +94,15 @@ export default function Profile() {
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+  
     const filePath = `${user.id}/${file.name}`;
     const { data, error } = await supabase.storage
       .from("avatars")
       .upload(filePath, file);
-
+  
     if (error) {
-      toast.error("Error al subir la imagen");
+      console.error("Error al subir la imagen:", error);
+      toast.error("Error al subir la imagen: " + error.message);
     } else {
       const { publicURL } = supabase.storage
         .from("avatars")
@@ -187,7 +188,7 @@ export default function Profile() {
                     alt="img_perfil"
                     className="rounded-full border-4 border-blue-300 shadow-lg"
                     width={200}
-                    onError={handleImageError}
+                    onError={() => setProfile((prevState) => ({ ...prevState, picture: "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" }))}
                   />
                   <label
                     htmlFor="fileUpload"
