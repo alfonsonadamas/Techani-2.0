@@ -335,7 +335,7 @@ export default function AllFoodsRegister() {
                                             </div>
                                         )}
                                     </div>
-                                    <div className='border-solid border-l-2 border-black pl-2'>
+                                    <div className='border-solid border-l-2 border-l-black pl-2'>
                                         <ul>
                                             {comida.meal.map(alimento => (
                                                 <li key={alimento.idAlimentos} className="flex items-center pb-2">
