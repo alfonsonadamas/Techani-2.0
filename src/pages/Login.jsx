@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// npm install axios
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { supabase } from "../config/supabase";
@@ -22,15 +21,19 @@ export default function Login() {
         email,
         password,
       });
-      console.log(user);
+      if (user.error.message === "Invalid login credentials") {
+        return setErrors({ validate: "Correo o contraseña incorrectos" });
+      }
+      if (user.error.message === "Email not confirmed") {
+        return setErrors({ validate: "Correo Electronico no confirmado" });
+      }
+
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
     } finally {
       setSubmitting(false);
     }
-
-    //console.log(idpatient);
   };
 
   const handleLoginGoogle = async (e) => {
@@ -49,14 +52,14 @@ export default function Login() {
   const handleLoginFacebook = async (e) => {
     e.preventDefault();
     setloading(true);
-    // try {
-    //   const { data, error } = await supabase.auth.signInWithOAuth({
-    //     provider: "facebook",
-    //   });
-    //   console.log(data, error);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "facebook",
+      });
+      console.log(data, error);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const validationSchema = Yup.object({
@@ -149,8 +152,11 @@ export default function Login() {
                 <div className="w-1/2 ">
                   <div className="flex flex-col pl-20 py-20 justify-center border-l-2 border-l-gray-400 w-7/12">
                     <button
-                      onClick={handleLoginGoogle}
-                      class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center mb-5"
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                      className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center justify-center mb-5 disabled:opacity-20 disabled:cursor-default"
+                      disabled={loading}
                     >
                       <img
                         src="https://img.icons8.com/color/16/000000/google-logo.png"
@@ -161,8 +167,11 @@ export default function Login() {
                     </button>
 
                     <button
-                      onClick={handleLoginFacebook}
-                      class="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center"
+                      onClick={(e) => {
+                        e.preventDefault();
+                      }}
+                      className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center justify-center disabled:opacity-20 disabled:cursor-default"
+                      disabled={loading}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -181,8 +190,8 @@ export default function Login() {
                           y2="40.615"
                           gradientUnits="userSpaceOnUse"
                         >
-                          <stop offset="0" stop-color="#2aa4f4"></stop>
-                          <stop offset="1" stop-color="#007ad9"></stop>
+                          <stop offset="0" stopColor="#2aa4f4"></stop>
+                          <stop offset="1" stopColor="#007ad9"></stop>
                         </linearGradient>
                         <path
                           fill="url(#Ld6sqrtcxMyckEl6xeDdMa_uLWV5A9vXIPu_gr1)"

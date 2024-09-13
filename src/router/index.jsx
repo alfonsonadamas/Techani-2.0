@@ -26,10 +26,11 @@ import InsulineRegister from "../pages/InsulineRegister";
 import WaterRegister from "../pages/WaterRegister";
 import AtipicDay from "../pages/AtipicDayRegister";
 import Files from "../pages/Files";
-import AllFiles from "../pages/AllFiles";
 import MyDates from "../pages/MyDates";
 import Grapics from "../pages/Graphics";
 import MyExercise from "../pages/MyExercise";
+import MyFiles from "../pages/MyFiles";
+import Pagina1Registro from "../pages/Pagina1Registro";
 
 export const router = createBrowserRouter([
   {
@@ -271,7 +272,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllFiles />,
+            element: <MyFiles />,
           },
         ],
       },
@@ -290,6 +291,15 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Grapics />,
+          },
+        ],
+      },
+      {
+        path: "/registroTemp",
+        children: [
+          {
+            index: true,
+            element: <Pagina1Registro />,
           },
         ],
       },

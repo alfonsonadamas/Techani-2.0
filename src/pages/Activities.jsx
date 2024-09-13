@@ -3,8 +3,10 @@ import SideBar from "../components/SideBar";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { supabase } from "../config/supabase";
+import { useUserContext } from "../context/UserContext";
 
 export default function Activities() {
+  const { user } = useUserContext();
   const [submitted, setSubmitted] = useState(false);
   const [activitieDuplicated, setActivitieDuplicated] = useState(false);
   const onSubmit = async (
@@ -14,17 +16,17 @@ export default function Activities() {
     setSubmitted(false);
     try {
       setSubmitting(true);
-      const { data, error } = await supabase
-        .from("actividades")
-        .select("name_activity")
-        .ilike("name_activity", `%${name}%`);
-      if (error) throw error;
+      const { data: existingData, error: selectError } = await supabase
+        .from("actividadesUsuario")
+        .select("nameActivity")
+        .ilike("nameActivity", `%${name}%`);
+      if (selectError) throw selectError;
 
-      if (data.length === 0) {
-        const { data, error } = await supabase
-          .from("actividades")
-          .insert([{ name_activity: name }]);
-        if (error) throw error;
+      if (existingData.length === 0) {
+        const { data, error: insertError } = await supabase
+          .from("actividadesUsuario")
+          .insert([{ nameActivity: name, uid: user.id }]);
+        if (insertError) throw insertError;
         setSubmitted(true);
         console.log(data);
       } else {

@@ -64,13 +64,17 @@ export default function ViewEstados() {
         .from("emociones")
         .select()
         .eq("uid", user.id)
-        .order("created_at", { ascending: false }); // Ordenar por created_at de forma descendente
+        .order("created_at", { ascending: false }) // Ordenar por created_at de forma descendente
+        .limit(5); //limitar registros
 
-      if (error) console.log("error", error);
-
-      setRecords(data);
+      if (error) {
+        console.log("error", error);
+      } else {
+        console.log("data", data); // Verifica lo que devuelve la consulta
+        setRecords(data);
+      }
     } catch (error) {
-      console.log(error);
+      console.log("catch error", error);
     } finally {
       setLoading(false);
     }
