@@ -24,10 +24,11 @@ export default function AllFoodsRegister() {
 
     const [daySelect, setDaySelect] = useState("");
     const [editMeal, setEditMeal] = useState(null);
-    const [editDateMeal,setEditDateMeal] = useState(null);
-    const [hourMeal,setHourMeal] = useState();
+    const [editTimeMeal,setEditTimeMeal] = useState(null);
+    const [editMealType,setEditMealType] = useState(null);
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalDateIsOpen, setModalDateIsOpen] = useState(false);
+    const [modalTimeIsOpen, setModalTimeIsOpen] = useState(false);
+    const [modalMealTypeIsOpen,setModalMealTypeIsOpen] = useState(false);
     const [IDmeal,setIDmeal] = useState(null);
     const [IDmealtype,setIDmealtype] = useState(null);
     
@@ -43,15 +44,26 @@ export default function AllFoodsRegister() {
         setEditMeal(null);
     };
 
-    const openModalDate = (record) =>{
-        setEditDateMeal(record);
-        setModalDateIsOpen(true);
+    const openModalTime = (record) => {
+        setEditTimeMeal(record);
+        console.log(record);
+        setModalTimeIsOpen(true);
     }
 
-    const closeModalDate = () => {
-        setModalDateIsOpen(false);
-        setEditDateMeal(null);
+    const closeModalTime = () => {
+        setModalTimeIsOpen(false);
+        setEditTimeMeal(null);
     };
+
+    const openModalMealType = (record) => {
+        setEditMealType(record);
+        setModalMealTypeIsOpen(true);
+    }
+
+    const closeModalMealType = () => {
+        setModalMealTypeIsOpen(false);
+        setEditMealType(null);
+    }
 
     const getFoods = async () => {
         try {
@@ -107,6 +119,104 @@ export default function AllFoodsRegister() {
         }
     };
 
+    const updatehour = async (
+        {
+            comidas,time
+        },
+        {setSubmitting, setErrors, resetForm}
+    ) => {
+        try {
+            setSubmitting(true);
+            console.log("comidas:",comidas,"time:",time);
+            await Promise.all(
+                comidas.meal.map(async (comida) =>{
+                await supabase
+                    .from("alimentos")
+                    .update({
+                        hour:time
+                    })
+                    .eq("uid",user.id)
+                    .eq("idAlimentos",comida.idAlimentos);
+                })
+            );
+            closeModalTime();
+        } catch (error) {
+            console.log(error);
+        } finally{
+            setSubmitting(false);
+            filterDay();
+            getFoods();
+        }
+    }
+
+    const updateMealType = async (
+        { comidas, mealType },
+        { setSubmitting, setErrors, resetForm }
+    ) => {
+        try {
+            setSubmitting(true);
+            console.log("Comidas:", comidas, "IdComidas", comidas.tipoComida.idTipocomida, "Mealtype:", mealType, "foods:", foods);
+    
+            const idTipocomida = comidas.tipoComida.idTipocomida;
+            if (idTipocomida != mealType) {
+                const mealsfilter = foods.filter((food) => {
+                    return (
+                        food.tipoComida.idTipocomida === Number(mealType) &&
+                        food.created_at === comidas.date
+                    );
+                });
+                console.log(mealsfilter);
+    
+                await Promise.all(
+                    comidas.meal.map(async (comida) => {
+                        // Filtrar para obtener los elementos que coinciden con comida
+                        const matchingMeals = mealsfilter.filter(item => comida.BancoAlimentos.idBancoAlimentos === item.BancoAlimentos.idBancoAlimentos);
+    
+                        if (matchingMeals.length > 0) {
+                            await Promise.all(matchingMeals.map(async (matchingMeal) => {
+                                console.log("Existe", matchingMeal.BancoAlimentos.food);
+                                console.log("Porción pasa de:", comida.portion, " a ", comida.portion + 1);
+                                
+                                const { error } = await supabase
+                                    .from("alimentos")
+                                    .update({
+                                        portion: matchingMeal.portion + comida.portion
+                                    })
+                                    .eq("uid", user.id)
+                                    .eq("idAlimentos", matchingMeal.idAlimentos);//se cambia la porcion a +1 de las seccion del tipo de comida seleccionada
+    
+                                if (!error) {
+                                    // Solo si la actualización fue exitosa, ejecutar `deletemeal`
+                                    deletemeal(comida.idAlimentos); // se borra de la sección del tipo de comida de origen
+                                } else {
+                                    console.log("Error al actualizar la porción para el alimento con id:", matchingMeal.idAlimentos);
+                                }
+                            }));
+                        } else {
+                            console.log("No existe", comida.BancoAlimentos.food);
+                            await supabase
+                                .from("alimentos")
+                                .update({
+                                    idTipoComida: mealType,
+                                    hour:mealsfilter[0].hour
+                                })
+                                .eq("uid", user.id)
+                                .eq("idAlimentos", comida.idAlimentos); // se traslada el id del tipo de comida
+                        }
+                    })
+                );
+            }
+            closeModalMealType();
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setSubmitting(false);
+            filterDay();
+            getFoods();
+        }
+    };
+    
+
     const getMeals = async () => {
         try{
             setLoading(true);
@@ -143,16 +253,24 @@ export default function AllFoodsRegister() {
         }
     };
 
-    const updatedate = async (alimentos) => {
+    const deletemeals = async (alimentos) => {
         console.log(alimentos);
-        // try {
-        //     setLoading(true);
-            
-        // } catch (error) {
-        //     console.log(error);
-        // } finally{
-        //     setLoading(false);
-        // }
+        try {
+            setLoading(true);
+            await Promise.all(
+                alimentos.meal.map(async (alimento) =>{
+                    await supabase
+                    .from("alimentos")
+                    .delete()
+                    .eq("uid",user.id)
+                    .eq("idAlimentos",alimento.idAlimentos);
+                })
+            )
+        } catch (error) {
+            console.log(error);
+        } finally{
+            setLoading(false);
+        }
     }
 
     const getMealsType = async () =>{
@@ -204,6 +322,7 @@ export default function AllFoodsRegister() {
                             meal: data.tipoComida.meal
                         },
                         hour: {},
+                        date: {},
                         meal: []
                     });
                     seenMealIds.add(data.tipoComida.idTipocomida);
@@ -244,6 +363,14 @@ export default function AllFoodsRegister() {
         porcion:Yup.number().required("Este campo es requerido")
     })
 
+    const validationSchemaTime = Yup.object().shape({
+        time:Yup.string().required("Este campo es requerido")
+    })
+
+    const validationSchemaMealtype = Yup.object().shape({
+        mealType:Yup.string().required("Este campo es requerido"),
+    })
+
     useEffect(() => {
         getFoods();
         getMeals();
@@ -258,6 +385,7 @@ export default function AllFoodsRegister() {
                 return {
                     ...comida,
                     hour: filterFoods[0]?.hour || {}, // Toma la primera hora de los alimentos filtrados
+                    date: filterFoods[0]?.created_at || {},
                     meal: filterFoods.map(food => ({
                         idAlimentos: food.idAlimentos,
                         BancoAlimentos: {
@@ -318,15 +446,23 @@ export default function AllFoodsRegister() {
                                             <div className="flex" data-aos="fade-left" data-aos-duration="250">
                                                 <button
                                                     type="button"
-                                                    onClick={() =>openModalDate(comida)}
+                                                    onClick={() =>openModalTime(comida)}
                                                     className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
                                                 >
                                                     <img src={edit} alt="editar" className="h-5" />
-                                                    <p className="px-2">Editar</p>
+                                                    <p className="px-2">Cambiar hora</p>
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() =>updatedate(comida)}
+                                                    onClick={() =>openModalMealType(comida)}
+                                                    className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
+                                                >
+                                                    <img src={edit} alt="editar" className="h-5" />
+                                                    <p className="px-2">Cambiar tipo de comida</p>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>deletemeals(comida)}
                                                     className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
                                                 >
                                                     <img src={delate} alt="borrar" className="h-5" />
@@ -370,19 +506,19 @@ export default function AllFoodsRegister() {
                             ))} 
                         </div>
                         <Modal
-                            isOpen={modalDateIsOpen}
-                            onClose={closeModalDate}
-                            title={"Editar"}
-                            width={"max-w-4xl"}
+                            isOpen={modalTimeIsOpen}
+                            onClose={closeModalTime}
+                            title={"Editar hora"}
+                            width={"max-w-md"}
                         >
-                            {editDateMeal && (
+                            {editTimeMeal && (
                             <div>
                                 <Formik
                                     initialValues={{
-                                        comidas:editDateMeal,
-                                        time:editDateMeal.hour
+                                        comidas:editTimeMeal,
+                                        time:editTimeMeal.hour
                                     }}
-                                    // validationSchema={validationSchemaTime}
+                                    validationSchema={validationSchemaTime}
                                     onSubmit={updatehour}
                                 >
                                     {({
@@ -394,13 +530,90 @@ export default function AllFoodsRegister() {
                                         handleSubmit,
                                     }) =>(
                                         <form onSubmit={handleSubmit}>
-                                <div className="w-full mb-2 items-center">
-                                    <label className="text-sm font-medium text-gray-900 dark:text-white">
-                                        Tipo de alimento:
-                                    </label>
-
-                                </div>
+                                            <div className="w-full mb-2 items-center">
+                                                <label className="text-sm font-medium text-gray-900 dark:text-white">
+                                                    Hora:
+                                                </label>
+                                                <input
+                                                    type="time"
+                                                    id="time"
+                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    value={values.time}
+                                                />
+                                                <button
+                                                    type="submit"
+                                                    className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+                                                >
+                                                    Editar
+                                                </button>
+                                            </div>    
+                                        </form>
+                                    )}
+                                </Formik>
+                                
                             </div>    
+                            )}
+                        </Modal>
+
+                        <Modal
+                            isOpen={modalMealTypeIsOpen}
+                            onClose={closeModalMealType}
+                            title={"Editar tipo de comida"}
+                            width={"max-w-md"}
+                        >
+                            {editMealType && (
+                                <div>
+                                    <Formik
+                                        initialValues={{
+                                            comidas:editMealType,
+                                            mealType:editMealType.tipoComida.idTipocomida
+                                        }}
+                                        // validationSchema={validationSchemaMealtype}
+                                        onSubmit={updateMealType}
+                                    >
+                                        {({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleBlur,
+                                            handleChange,
+                                            handleSubmit,
+                                        }) =>(
+                                            <form onSubmit = {handleSubmit}>
+                                                <div className="w-full mb-2 items-center">
+                                                    <label className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        Tipo de Comida:
+                                                    </label>
+                                                    <select
+                                                        name="mealType" id="mealType"
+                                                        defaultValue={values.mealType}
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    >
+                                                        <option value="">Selecciona...</option>
+                                                        {mealsType.map((comida) =>
+                                                            <option
+                                                                key={comida.idTipocomida}
+                                                                value={comida.idTipocomida}
+                                                            >
+                                                                {comida.meal}
+                                                            </option>
+                                                        )}
+                                                    </select>
+                                                    <button
+                                                        type="submit"
+                                                        className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        )}
+                                    </Formik>
+                                </div>
                             )}
                         </Modal>
                         <Modal
