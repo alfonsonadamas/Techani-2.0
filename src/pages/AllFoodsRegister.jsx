@@ -377,6 +377,23 @@ export default function AllFoodsRegister() {
                         >
                             {editDateMeal && (
                             <div>
+                                <Formik
+                                    initialValues={{
+                                        comidas:editDateMeal,
+                                        time:editDateMeal.hour
+                                    }}
+                                    // validationSchema={validationSchemaTime}
+                                    onSubmit={updatehour}
+                                >
+                                    {({
+                                        values,
+                                        errors,
+                                        touched,
+                                        handleBlur,
+                                        handleChange,
+                                        handleSubmit,
+                                    }) =>(
+                                        <form onSubmit={handleSubmit}>
                                 <div className="w-full mb-2 items-center">
                                     <label className="text-sm font-medium text-gray-900 dark:text-white">
                                         Tipo de alimento:
