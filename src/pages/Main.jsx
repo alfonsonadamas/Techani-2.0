@@ -30,6 +30,7 @@ export default function Main() {
   const [dose, setDose] = useState(null);
   const [glucose, setGlucose] = useState(null);
   const [waterTotal, setWaterTotal] = useState(0);
+  const [tips, setTips] = useState([]);
 
   const [temperature, setTemperature] = useState(0);
   const [location, setLocation] = useState(null);
@@ -177,7 +178,7 @@ export default function Main() {
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .eq("created_at", formDate());
+        .eq("created_at", new Date().toLocaleTimeString());
       console.log(data);
       setLastEmotion(data[0].idEmocion);
     } catch (error) {
@@ -327,6 +328,16 @@ export default function Main() {
     return waterH;
   };
 
+  const getTips = async () => {
+    try {
+      const { data } = await supabase.from("tips").select("*");
+      setTips(data);
+      console.log("Tips ", data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     getApi();
     getGlucose();
@@ -334,6 +345,8 @@ export default function Main() {
     getDataGlucose();
     getEmotion();
     getWater();
+    getTips();
+
     console.log("usuario ", user);
   }, [user]);
 
@@ -375,9 +388,9 @@ export default function Main() {
             style={{ width: "24%", height: 150 }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima glucosa</p>
-            <p className="mb-2">{glucose}</p>
+            <p className="mb-2">{glucose && glucose}</p>
             <p className="text-4xl font-medium">
-              {lastGlucose}
+              {lastGlucose && lastGlucose}
               <span className="text-lg font-normal">mg/dl</span>
             </p>
           </div>
@@ -386,7 +399,7 @@ export default function Main() {
             style={{ width: "24%" }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima insulina</p>
-            <p className="mb-2">{dose}</p>
+            <p className="mb-2">{dose && dose}</p>
             <p className="text-4xl font-medium">
               {lastInsuline}
               <span className="text-lg font-normal">u</span>
@@ -443,7 +456,7 @@ export default function Main() {
             <h4 className="text-xl font-semibold">Agua Consumida</h4>
             <img src={setWater(waterTotal)} alt="water" className="w-36" />
             <p className="" style={{ fontSize: "3rem" }}>
-              {waterTotal}
+              {waterTotal && waterTotal}
               <span className="text-3xl font-normal">ml</span>
             </p>
           </div>
@@ -454,10 +467,11 @@ export default function Main() {
               <img src={idea} alt="idea" className="w-10 mr-2" />
               <h3 className="text-3xl font-semibold text-white">Tips</h3>
             </div>
-            <p className="text-white p-3 mt-3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores
-              voluptatem officiis{" "}
-            </p>
+            {tips.map((tip) => (
+              <div className="mt-3">
+                <p className="text-white p-3 mt-3">{tip.tip}</p>
+              </div>
+            ))}
           </div>
           <div className="w-[85%] shadow-lg rounded-lg border-2 pl-10 pt-5">
             <div className="">

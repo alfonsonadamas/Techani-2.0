@@ -5,16 +5,21 @@ import SideBar from "../components/SideBar";
 import Modal from "../components/ModalCitas"; // Asegúrate de tener el componente Modal creado
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
 
 function MyDates() {
-  //const [citas, setCitas] = useState([{ idCita: null }]);
   const [citas, setCitas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingCita, setEditingCita] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const { user } = useUserContext();
+
+  const formattedDate = () => {
+    const dateObj = new Date();
+    return `${dateObj.getFullYear()}-${
+      dateObj.getMonth() + 1
+    }-${dateObj.getDate()}`;
+  };
 
   async function obtenerCitas() {
     setIsLoading(true);
@@ -33,6 +38,42 @@ function MyDates() {
       setIsLoading(false);
     }
   }
+
+  const setNextDates = () => {
+    const nextDates = citas.filter((cita) => cita.state === "proximo");
+    console.log(nextDates);
+    return nextDates;
+  };
+
+  const setPastDates = () => {
+    const pastDates = citas.filter((cita) => cita.state === "pasado");
+    console.log(pastDates);
+    return pastDates;
+  };
+
+  const setAssitedDates = () => {
+    const assitedDates = citas.filter((cita) => cita.state === "asistido");
+    console.log(assitedDates);
+    return assitedDates;
+  };
+
+  const setState = async () => {
+    for (let i = 0; i < citas.length; i++) {
+      if (citas[i].date < formattedDate() && citas[i].state === "proximo") {
+        const { data, error } = await supabase
+          .from("citasMedicas")
+          .update({ state: "pasado" })
+          .eq("idCita", citas[i].idCita);
+        if (error) {
+          console.error(
+            "Error al actualizar el estado de la cita:",
+            error.message
+          );
+        }
+        console.log("No asistidos", data);
+      }
+    }
+  };
 
   const handleEliminarCita = async (idCita) => {
     try {
@@ -71,58 +112,198 @@ function MyDates() {
     }
   };
 
+  const updateDate = async (idCita) => {
+    const { data, error } = await supabase
+      .from("citasMedicas")
+      .update({ state: "asistido" })
+      .eq("idCita", idCita);
+    if (error) {
+      console.error("Error al actualizar el estado de la cita:", error.message);
+    }
+    console.log(data);
+    obtenerCitas();
+  };
+
   useEffect(() => {
     obtenerCitas();
+    setState();
+    console.log(setNextDates().length);
   }, [user]);
 
   return (
     <div>
       <SideBar />
-      <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-        <label className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
-          Mis citas
-        </label>
-        <ul className="mt-4">
-          {citas.map((cita) => (
-            <li key={cita.idCita} className="mb-4">
-              <div className="bg-white shadow-lg rounded-lg p-4 mb-4 dark:bg-gray-800">
-                <div className="mb-4">
-                  <p>
-                    Fecha: <span className="font-semibold">{cita.date}</span>
-                  </p>
-                  <p>
-                    Hora: <span className="font-semibold">{cita.time}</span>
-                  </p>
-                  <p>
-                    Tipo de cita:{" "}
-                    <span className="font-semibold">{cita.typecites}</span>
-                  </p>
-                  <p>
-                    Lugar: <span className="font-semibold">{cita.place}</span>
-                  </p>
-                  <p>
-                    Nombre del Doctor:{" "}
-                    <span className="font-semibold">{cita.doctorName}</span>
-                  </p>
+      <div className="p-16 pt-20 sm:ml-64 h-screen" data-aos="fade-up">
+        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+          Próximas citas
+        </h2>
+
+        <div className="flex overflow-x-auto">
+          {setNextDates().length === 0 ? (
+            <div className="flex justify-center items-center w-full h-36">
+              <h3 className="text-gray-400 text-2xl">No hay citas próximas</h3>
+            </div>
+          ) : (
+            <div>
+              {setNextDates().map((cita) => (
+                <div className="mx-5 mb-5">
+                  <h3 className="font-semibold w-52">{cita.typecites}</h3>
+                  <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
+                    <div className="flex ">
+                      <div className="mr-7">
+                        <p className="text-xs font-semibold">Fecha</p>
+                        <p>{cita.date}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold">Hora</p>
+                        <p>{cita.time}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-xs font-semibold">Lugar</p>
+                      <p className="w-36">{cita.place}</p>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-xs font-semibold">Nombre del Doctor</p>
+                      <p>{cita.doctorName}</p>
+                    </div>
+                  </div>
+                  <div className="w-full mt-5">
+                    <button
+                      onClick={() => updateDate(cita.idCita)}
+                      className="bg-[#116C09] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#319927] transition-all duration-300"
+                    >
+                      Completado
+                    </button>
+                    <buttton
+                      onClick={() => handleAbrirModalEdicion(cita)}
+                      className="bg-[#277BC0] px-3 py-1 mx-5 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
+                    >
+                      Editar
+                    </buttton>
+                    <buttton
+                      onClick={() => handleEliminarCita(cita.idCita)}
+                      className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
+                    >
+                      Eliminar
+                    </buttton>
+                  </div>
                 </div>
-                <div className="flex justify-end space-x-2">
+              ))}
+            </div>
+          )}
+        </div>
+        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+          Asistido
+        </h2>
+        <div className="flex overflow-x-auto">
+          {setAssitedDates().length === 0 ? (
+            <div className="flex justify-center items-center w-full h-36">
+              <h3 className="text-gray-400 text-2xl">No hay citas asistidas</h3>
+            </div>
+          ) : (
+            <div>
+              {setAssitedDates().map((cita) => (
+                <div className="mx-5 mb-5">
+                  <h3 className="font-semibold w-52">{cita.typecites}</h3>
+                  <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
+                    <div className="flex ">
+                      <div className="mr-7">
+                        <p className="text-xs font-semibold">Fecha</p>
+                        <p>{cita.date}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold">Hora</p>
+                        <p>{cita.time}</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-xs font-semibold">Lugar</p>
+                      <p className="w-36">{cita.place}</p>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-xs font-semibold">Nombre del Doctor</p>
+                      <p>{cita.doctorName}</p>
+                    </div>
+                  </div>
+                  <div className="w-full mt-5">
+                    <buttton
+                      onClick={() => handleAbrirModalEdicion(cita)}
+                      className="bg-[#277BC0] px-3 py-1 mx-5 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
+                    >
+                      Editar
+                    </buttton>
+                    <buttton
+                      onClick={() => handleEliminarCita(cita.idCita)}
+                      className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
+                    >
+                      Eliminar
+                    </buttton>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+          No asistido
+        </h2>
+        {setPastDates().length === 0 ? (
+          <div className="flex justify-center items-center w-full h-36">
+            <h3 className="text-gray-400 text-2xl">
+              No hay citas no asistidas
+            </h3>
+          </div>
+        ) : (
+          <div className="flex overflow-x-auto">
+            {setPastDates().map((cita) => (
+              <div className="mx-5 mb-5">
+                <h3 className="font-semibold w-52">{cita.typecites}</h3>
+                <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
+                  <div className="flex ">
+                    <div className="mr-7">
+                      <p className="text-xs font-semibold">Fecha</p>
+                      <p>{cita.date}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold">Hora</p>
+                      <p>{cita.time}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold">Lugar</p>
+                    <p className="w-36">{cita.place}</p>
+                  </div>
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold">Nombre del Doctor</p>
+                    <p>{cita.doctorName}</p>
+                  </div>
+                </div>
+                <div className="w-full mt-5">
                   <button
-                    className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition ease-in duration-200"
-                    onClick={() => handleEliminarCita(cita.idCita)}
+                    onClick={() => updateDate(cita.idCita)}
+                    className="bg-[#116C09] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#319927] transition-all duration-300"
                   >
-                    Eliminar
+                    Completado
                   </button>
-                  <button
-                    className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition ease-in duration-200"
+                  <buttton
                     onClick={() => handleAbrirModalEdicion(cita)}
+                    className="bg-[#277BC0] px-3 py-1 mx-5 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
                   >
                     Editar
-                  </button>
+                  </buttton>
+                  <buttton
+                    onClick={() => handleEliminarCita(cita.idCita)}
+                    className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
+                  >
+                    Eliminar
+                  </buttton>
                 </div>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+        )}
       </div>
       <Modal open={modalIsOpen} onClose={() => setModalIsOpen(!modalIsOpen)}>
         {editingCita && (
