@@ -14,9 +14,13 @@ import {
   FaTrash,
   FaPlus,
 } from "react-icons/fa";
+import { Form } from "react-router-dom";
 
 export default function Profile() {
   const { user } = useUserContext();
+  const [sendForm, setSendForm] = useState(false);
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({
     picture:
       "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
@@ -30,6 +34,8 @@ export default function Profile() {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [showAddFamilyForm, setShowAddFamilyForm] = useState(false);
   const [editingFamilyMember, setEditingFamilyMember] = useState(null);
+  const [datosInsulina, setDatosInsulina] = useState([]);
+  const [nombreInsulina, setNombreInsulina] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -44,7 +50,104 @@ export default function Profile() {
         picture: avatarUrl,
       });
     }
+    mInsulina();
+    veriInsulina();
+
+    if (datosInsulina.length > 0) {
+      nomIns(datosInsulina[0].marcaInsulina); // Pasa el id de la marca de insulina
+    }
   }, [user]);
+
+  const mInsulina = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("marcaInsulina")
+        .select()
+        .order("nombreInsulina", { ascending: true });
+
+      if (error) console.log("error", error);
+
+      setRecords(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSubmit1 = async (
+    { marcaInsulina, bajo, alto },
+    { setSubmitting, setErrors, resetForm }
+  ) => {
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.from("datosAdicionales").insert([
+        {
+          marcaInsulina: marcaInsulina,
+          alto: alto,
+          bajo: bajo,
+          uid: user.id,
+        },
+      ]);
+      if (error) {
+        throw error;
+      }
+      console.log("Se guardo aca bien mamalon", data);
+      toast.success("Datos Adicionales Guardados");
+      setShowAdditionalData(!showAdditionalData);
+      veriInsulina();
+    } catch (error) {
+      setErrors(
+        "Error al guardar el estado de ánimo en la base de datos, verifique su conexión"
+      );
+      console.error(error);
+    } finally {
+      resetForm();
+    }
+  };
+
+  const veriInsulina = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("datosAdicionales")
+        .select()
+        .eq("uid", user.id);
+      if (error) throw error;
+      setDatosInsulina(data);
+      console.log("Datos de datosInsuluna", datosInsulina);
+      console.log("Datos de data", data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const nomIns = async (idNInsulina) => {
+    try {
+      const { data, error } = await supabase
+        .from("marcaInsulina")
+        .select("nombreInsulina")
+        .eq("id", idNInsulina);
+      if (error) throw error;
+      setNombreInsulina(data[0].nombreInsulina);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteDatosAdicionales = async (idEL) => {
+    try {
+      await supabase
+        .from("datosAdicionales")
+        .delete()
+        .eq("uid", user.id)
+        .eq("id", idEL);
+    } catch (error) {
+      console.log(error);
+      toast.success("Perfil actualizado correctamente");
+      veriInsulina();
+      setShowAdditionalData(true);
+    }
+  };
 
   const onSubmit = async (values, { setSubmitting }) => {
     try {
@@ -128,6 +231,31 @@ export default function Profile() {
       6,
       "La contraseña debe tener al menos 6 caracteres"
     ),
+    marcaInsulina: Yup.string().required(
+      "El nombre de la marca es obligatorio"
+    ),
+    alto: Yup.number()
+      .required("El registro alto es obligatorio")
+      .typeError("El registro alto debe de ser un numero entero")
+      .positive("El rango debe de ser positivo"),
+    bajo: Yup.number()
+      .required("El registro bajo es obligatorio")
+      .typeError("El registro bajo debe de ser un numero entero")
+      .positive("El rango debe de ser positivo"),
+  });
+
+  const validationSchemaDatosAdicionales = Yup.object({
+    marcaInsulina: Yup.string().required(
+      "El nombre de la marca es obligatorio"
+    ),
+    alto: Yup.number()
+      .required("El registro alto es obligatorio")
+      .typeError("El registro alto debe de ser un numero entero")
+      .positive("El rango debe de ser positivo"),
+    bajo: Yup.number()
+      .required("El registro bajo es obligatorio")
+      .typeError("El registro bajo debe de ser un numero entero")
+      .positive("El rango debe de ser positivo"),
   });
 
   const familyValidationSchema = Yup.object({
@@ -312,253 +440,336 @@ export default function Profile() {
                   </button>
                 </div>
               </div>
-              <hr className="w-full my-8 border-gray-300" />
-              <div className="flex flex-col w-full">
-                <button
-                  type="button"
-                  onClick={() => setShowAdditionalData(!showAdditionalData)}
-                  className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
-                >
-                  DATOS ADICIONALES{" "}
-                  {showAdditionalData ? <FaCaretUp /> : <FaCaretDown />}
-                </button>
-                {showAdditionalData && (
-                  <div className="mt-4 bg-white p-4 rounded shadow-md">
-                    <div className="flex flex-col w-full mb-4">
-                      <label htmlFor="insulinBrand" className="font-bold mb-2">
-                        Marca de Insulina
-                      </label>
-                      <select
-                        id="insulinBrand"
-                        name="insulinBrand"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      >
-                        <option value="">Seleccione una opción</option>
-                        <option value="Marca 1">Marca 1</option>
-                        <option value="Marca 2">Marca 2</option>
-                        <option value="Marca 3">Marca 3</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col w-full mb-4">
-                      <label htmlFor="glucoseRange" className="font-bold mb-2">
-                        Glucosa en Rango
-                      </label>
-                      <div className="flex space-x-4">
-                        <div className="flex flex-col w-1/2">
-                          <label
-                            htmlFor="lowGlucose"
-                            className="font-bold mb-2"
-                          >
-                            Bajo
-                          </label>
-                          <input
-                            id="lowGlucose"
-                            type="number"
-                            name="lowGlucose"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                          />
-                        </div>
-                        <div className="flex flex-col w-1/2">
-                          <label
-                            htmlFor="highGlucose"
-                            className="font-bold mb-2"
-                          >
-                            Alto
-                          </label>
-                          <input
-                            id="highGlucose"
-                            type="number"
-                            name="highGlucose"
-                            className="bg-gray-50 borderborder-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end mt-4">
-                      <button
-                        type="button"
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                      >
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <hr className="w-full my-8 border-gray-300" />
-              <div className="flex flex-col w-full">
-                <button
-                  type="button"
-                  onClick={() => setShowSupportingFamily(!showSupportingFamily)}
-                  className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
-                >
-                  FAMILIARES DE APOYO{" "}
-                  {showSupportingFamily ? <FaCaretUp /> : <FaCaretDown />}
-                </button>
-                {showSupportingFamily && (
-                  <div className="mt-4 bg-white p-4 rounded shadow-md">
-                    <div className="flex justify-end mb-4">
-                      <button
-                        type="button"
-                        onClick={() => setShowAddFamilyForm(!showAddFamilyForm)}
-                        className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                      >
-                        <FaPlus />
-                        <span>Agregar Familiar</span>
-                      </button>
-                    </div>
-                    {showAddFamilyForm && (
-                      <Formik
-                        initialValues={{
-                          familyName: "",
-                          familyPhone: "",
-                          familyEmail: "",
-                          familyRelation: "",
-                        }}
-                        validationSchema={familyValidationSchema}
-                        onSubmit={(values) => {
-                          handleAddFamily(values);
-                        }}
-                      >
-                        {({
-                          handleSubmit,
-                          handleChange,
-                          values,
-                          errors,
-                          touched,
-                        }) => (
-                          <form onSubmit={handleSubmit}>
-                            <div className="flex flex-wrap">
-                              <div className="flex flex-col w-1/2 pr-2 mb-4">
-                                <label
-                                  htmlFor="familyName"
-                                  className="font-bold mb-2"
-                                >
-                                  Nombre
-                                </label>
-                                <input
-                                  id="familyName"
-                                  type="text"
-                                  name="familyName"
-                                  value={values.familyName}
-                                  onChange={handleChange}
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                />
-                                {errors.familyName && touched.familyName && (
-                                  <div className="text-red-500 text-sm">
-                                    {errors.familyName}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex flex-col w-1/2 pl-2 mb-4">
-                                <label
-                                  htmlFor="familyPhone"
-                                  className="font-bold mb-2"
-                                >
-                                  Teléfono
-                                </label>
-                                <input
-                                  id="familyPhone"
-                                  type="text"
-                                  name="familyPhone"
-                                  value={values.familyPhone}
-                                  onChange={handleChange}
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                />
-                                {errors.familyPhone && touched.familyPhone && (
-                                  <div className="text-red-500 text-sm">
-                                    {errors.familyPhone}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex flex-col w-1/2 pr-2 mb-4">
-                                <label
-                                  htmlFor="familyEmail"
-                                  className="font-bold mb-2"
-                                >
-                                  Correo Electrónico
-                                </label>
-                                <input
-                                  id="familyEmail"
-                                  type="email"
-                                  name="familyEmail"
-                                  autoComplete="off"
-                                  value={values.familyEmail}
-                                  onChange={handleChange}
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                />
-                                {errors.familyEmail && touched.familyEmail && (
-                                  <div className="text-red-500 text-sm">
-                                    {errors.familyEmail}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex flex-col w-1/2 pl-2 mb-4">
-                                <label
-                                  htmlFor="familyRelation"
-                                  className="font-bold mb-2"
-                                >
-                                  Parentesco
-                                </label>
-                                <input
-                                  id="familyRelation"
-                                  type="text"
-                                  name="familyRelation"
-                                  value={values.familyRelation}
-                                  onChange={handleChange}
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                />
-                                {errors.familyRelation &&
-                                  touched.familyRelation && (
-                                    <div className="text-red-500 text-sm">
-                                      {errors.familyRelation}
-                                    </div>
-                                  )}
-                              </div>
-                              <div className="flex justify-end w-full">
-                                <button
-                                  type="submit"
-                                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                >
-                                  Guardar
-                                </button>
-                              </div>
-                            </div>
-                          </form>
-                        )}
-                      </Formik>
-                    )}
-                    <div className="mt-4">
-                      {familyMembers.map((member, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between border-b border-gray-300 pb-2 mb-2"
-                        >
-                          <div>
-                            <div>{member.familyName}</div>
-                            <div>{member.familyPhone}</div>
-                            <div>{member.familyEmail}</div>
-                            <div>{member.familyRelation}</div>
-                          </div>
-                          <div>
-                            <FaEdit
-                              onClick={() => handleEditFamily(index)}
-                              className="cursor-pointer mr-2 text-blue-500 hover:text-blue-600"
-                            />
-                            <FaTrash
-                              onClick={() => handleDeleteFamily(index)}
-                              className="cursor-pointer text-red-500 hover:text-red-600"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
             </form>
           )}
         </Formik>
+        <hr className="w-full my-8 border-gray-300" />
+        <div className="flex flex-col w-full">
+          <button
+            type="button"
+            onClick={() => setShowAdditionalData(!showAdditionalData)}
+            className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
+          >
+            DATOS ADICIONALES{" "}
+            {showAdditionalData ? <FaCaretUp /> : <FaCaretDown />}
+          </button>
+          {datosInsulina.length != 0 && datosInsulina.length != 0 ? (
+            <div>
+              {datosInsulina.map((item) => {
+                return (
+                  <div className="flex flex-row mt-7">
+                    <div className="w-[40%] flex flex-col justify-start items-center">
+                      <p className="font-bold">
+                        Nombre de la insulina utilizada:
+                      </p>
+                      <p className="text-xl"> {nombreInsulina}</p>
+                    </div>
+                    <div className="w-[40%] flex flex-col justify-center items-center">
+                      <p className="font-bold">Glucosa en rango:</p>
+                      <div className="flex flex-row w-[100%]">
+                        <div className="flex flex-col w-[50%] justify-center items-center">
+                          <p className="font-bold">Bajo</p>
+                          <p className="text-xl">{item.bajo}</p>
+                        </div>
+                        <div className="flex flex-col w-[50%] justify-center items-center">
+                          <p className="font-bold">Alto</p>
+                          <p className="text-xl">{item.alto}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-[20%] flex flex-row justify-center items-center">
+                      <button
+                        type="button"
+                        onClick={() => deleteDatosAdicionales(item.id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div>
+              {showAdditionalData && (
+                <Formik
+                  initialValues={{ marcaInsulina: "", bajo: "", alto: "" }}
+                  onSubmit={handleSubmit1}
+                  validationSchema={validationSchemaDatosAdicionales}
+                >
+                  {({
+                    handleSubmit,
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                    isSubmitting,
+                  }) => (
+                    <div className="mt-4 bg-white p-4 rounded shadow-md">
+                      <form onSubmit={handleSubmit}>
+                        <div className="flex flex-col w-full mb-4">
+                          <label
+                            htmlFor="insulinBrand"
+                            className="font-bold mb-2"
+                          >
+                            Marca de Insulina
+                          </label>
+                          <select
+                            id="marcaInsulina"
+                            name="marcaInsulina"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.marcaInsulina}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          >
+                            <option value="" disabled selected>
+                              Seleccione una opción
+                            </option>
+                            {records.map((record) => (
+                              <option
+                                key={record.id}
+                                defaultValue={null}
+                                value={record.id}
+                              >
+                                {record.nombreInsulina}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="flex flex-col w-full mb-4">
+                          <label
+                            htmlFor="glucoseRange"
+                            className="font-bold mb-2"
+                          >
+                            Glucosa en Rango
+                          </label>
+                          <div className="flex space-x-4">
+                            <div className="flex flex-col w-1/2">
+                              <label
+                                htmlFor="lowGlucose"
+                                className="font-bold mb-2"
+                              >
+                                Bajo
+                              </label>
+                              <input
+                                id="bajo"
+                                type="number"
+                                name="bajo"
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                required
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                              />
+                            </div>
+                            <div className="flex flex-col w-1/2">
+                              <label
+                                htmlFor="highGlucose"
+                                className="font-bold mb-2"
+                              >
+                                Alto
+                              </label>
+                              <input
+                                id="alto"
+                                type="number"
+                                name="alto"
+                                required
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end mt-4">
+                          <button
+                            type=""
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                          >
+                            Guardar
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </Formik>
+              )}
+            </div>
+          )}
+        </div>
+        <hr className="w-full my-8 border-gray-300" />
+        <div className="flex flex-col w-full">
+          <button
+            type="button"
+            onClick={() => setShowSupportingFamily(!showSupportingFamily)}
+            className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
+          >
+            FAMILIARES DE APOYO{" "}
+            {showSupportingFamily ? <FaCaretUp /> : <FaCaretDown />}
+          </button>
+          {showSupportingFamily && (
+            <div className="mt-4 bg-white p-4 rounded shadow-md">
+              <div className="flex justify-end mb-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddFamilyForm(!showAddFamilyForm)}
+                  className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                >
+                  <FaPlus />
+                  <span>Agregar Familiar</span>
+                </button>
+              </div>
+              {showAddFamilyForm && (
+                <Formik
+                  initialValues={{
+                    familyName: "",
+                    familyPhone: "",
+                    familyEmail: "",
+                    familyRelation: "",
+                  }}
+                  validationSchema={familyValidationSchema}
+                  onSubmit={(values) => {
+                    handleAddFamily(values);
+                  }}
+                >
+                  {({
+                    handleSubmit,
+                    handleChange,
+                    values,
+                    errors,
+                    touched,
+                  }) => (
+                    <form onSubmit={handleSubmit}>
+                      <div className="flex flex-wrap">
+                        <div className="flex flex-col w-1/2 pr-2 mb-4">
+                          <label
+                            htmlFor="familyName"
+                            className="font-bold mb-2"
+                          >
+                            Nombre
+                          </label>
+                          <input
+                            id="familyName"
+                            type="text"
+                            name="familyName"
+                            value={values.familyName}
+                            onChange={handleChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          />
+                          {errors.familyName && touched.familyName && (
+                            <div className="text-red-500 text-sm">
+                              {errors.familyName}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col w-1/2 pl-2 mb-4">
+                          <label
+                            htmlFor="familyPhone"
+                            className="font-bold mb-2"
+                          >
+                            Teléfono
+                          </label>
+                          <input
+                            id="familyPhone"
+                            type="text"
+                            name="familyPhone"
+                            value={values.familyPhone}
+                            onChange={handleChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          />
+                          {errors.familyPhone && touched.familyPhone && (
+                            <div className="text-red-500 text-sm">
+                              {errors.familyPhone}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col w-1/2 pr-2 mb-4">
+                          <label
+                            htmlFor="familyEmail"
+                            className="font-bold mb-2"
+                          >
+                            Correo Electrónico
+                          </label>
+                          <input
+                            id="familyEmail"
+                            type="email"
+                            name="familyEmail"
+                            autoComplete="off"
+                            value={values.familyEmail}
+                            onChange={handleChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          />
+                          {errors.familyEmail && touched.familyEmail && (
+                            <div className="text-red-500 text-sm">
+                              {errors.familyEmail}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col w-1/2 pl-2 mb-4">
+                          <label
+                            htmlFor="familyRelation"
+                            className="font-bold mb-2"
+                          >
+                            Parentesco
+                          </label>
+                          <input
+                            id="familyRelation"
+                            type="text"
+                            name="familyRelation"
+                            value={values.familyRelation}
+                            onChange={handleChange}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          />
+                          {errors.familyRelation && touched.familyRelation && (
+                            <div className="text-red-500 text-sm">
+                              {errors.familyRelation}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex justify-end w-full">
+                          <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                          >
+                            Guardar
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </Formik>
+              )}
+              <div className="mt-4">
+                {familyMembers.map((member, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between border-b border-gray-300 pb-2 mb-2"
+                  >
+                    <div>
+                      <div>{member.familyName}</div>
+                      <div>{member.familyPhone}</div>
+                      <div>{member.familyEmail}</div>
+                      <div>{member.familyRelation}</div>
+                    </div>
+                    <div>
+                      <FaEdit
+                        onClick={() => handleEditFamily(index)}
+                        className="cursor-pointer mr-2 text-blue-500 hover:text-blue-600"
+                      />
+                      <FaTrash
+                        onClick={() => handleDeleteFamily(index)}
+                        className="cursor-pointer text-red-500 hover:text-red-600"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
