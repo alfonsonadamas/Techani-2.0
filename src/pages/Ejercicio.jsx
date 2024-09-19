@@ -18,7 +18,15 @@ function ExerciseForm() {
     try {
       const { data, error } = await supabase.from("actividades").select();
       if (error) throw error;
-      setActivities(data);
+
+      // Filtrar los registros que no cumplan con los criterios
+      const filteredData = data.filter(
+        (activity) =>
+          activity.idActividades !== 12 ||
+          activity.nameActivity !== "actividadUsuario"
+      );
+      console.log("Ejercicios", filteredData);
+      setActivities(filteredData);
     } catch (error) {
       console.log(error);
     }
@@ -26,13 +34,20 @@ function ExerciseForm() {
 
   const getActivitiesUs = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from("actividadesUsuario")
-        .select();
-      if (error) throw error;
+        .select()
+        .eq("uid", user.id)
+        .order("idActividades", { ascending: true });
+
+      if (error) console.log("error", error);
       setActivitiesUs(data);
+      console.log(activitiesUs);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,8 +132,8 @@ function ExerciseForm() {
   });
 
   useEffect(() => {
-    getActivities();
     getActivitiesUs();
+    getActivities();
   }, []);
 
   return (
