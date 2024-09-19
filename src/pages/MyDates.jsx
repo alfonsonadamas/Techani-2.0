@@ -144,7 +144,7 @@ function MyDates() {
               <h3 className="text-gray-400 text-2xl">No hay citas próximas</h3>
             </div>
           ) : (
-            <div>
+            <div className="flex">
               {setNextDates().map((cita) => (
                 <div className="mx-5 mb-5">
                   <h3 className="font-semibold w-52">{cita.typecites}</h3>
@@ -193,16 +193,16 @@ function MyDates() {
             </div>
           )}
         </div>
-        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+        <h2 className=" block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
           Asistido
         </h2>
-        <div className="flex overflow-x-auto">
+        <div className="flex flex-col overflow-x-auto">
           {setAssitedDates().length === 0 ? (
             <div className="flex justify-center items-center w-full h-36">
               <h3 className="text-gray-400 text-2xl">No hay citas asistidas</h3>
             </div>
           ) : (
-            <div>
+            <div className="flex">
               {setAssitedDates().map((cita) => (
                 <div className="mx-5 mb-5">
                   <h3 className="font-semibold w-52">{cita.typecites}</h3>
