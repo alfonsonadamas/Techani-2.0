@@ -182,7 +182,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
       {
         path: "/citas",
         element: <LayoutPrivate />,

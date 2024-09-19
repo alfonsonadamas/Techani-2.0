@@ -91,7 +91,7 @@ export default function ViewActivity() {
 
   useEffect(() => {
     getRecords();
-  }, []);
+  }, [user]);
 
   return (
     <div>
@@ -182,6 +182,7 @@ export default function ViewActivity() {
                 isOpen={modalIsOpen}
                 onClose={closeModal}
                 title="Editar Ejercicio"
+                width={"max-w-2xl"}
               >
                 {editRecord && (
                   <div>

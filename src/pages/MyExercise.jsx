@@ -214,7 +214,7 @@ export default function MyExercise() {
     Ejercicios();
     getActivities();
     getActivitiesUs();
-  }, []);
+  }, [user]);
 
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
@@ -356,6 +356,7 @@ export default function MyExercise() {
               isOpen={modalIsOpen}
               onClose={closeModal}
               title="Editar mi ejercicio"
+              width={"max-w-2xl"}
             >
               {editRecord && (
                 <div>
