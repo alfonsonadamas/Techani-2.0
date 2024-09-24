@@ -30,6 +30,7 @@ import MyDates from "../pages/MyDates";
 import Grapics from "../pages/Graphics";
 import MyExercise from "../pages/MyExercise";
 import MyFiles from "../pages/MyFiles";
+import Pagina1Registro from "../pages/Pagina1Registro";
 
 export const router = createBrowserRouter([
   {
@@ -289,6 +290,15 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Grapics />,
+          },
+        ],
+      },
+      {
+        path: "/registroTemp",
+        children: [
+          {
+            index: true,
+            element: <Pagina1Registro />,
           },
         ],
       },

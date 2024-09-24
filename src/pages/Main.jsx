@@ -30,9 +30,13 @@ export default function Main() {
   const [dose, setDose] = useState(null);
   const [glucose, setGlucose] = useState(null);
   const [waterTotal, setWaterTotal] = useState(0);
+  const [tips, setTips] = useState([]);
+  const [fade, setFade] = useState(false);
+  const [nextDates, setNextDates] = useState([]);
 
   const [temperature, setTemperature] = useState(0);
   const [location, setLocation] = useState(null);
+  const [tip, setTip] = useState(null);
 
   const [dataGraf, setDataGraf] = useState({
     series: [
@@ -111,8 +115,8 @@ export default function Main() {
         .limit(1)
         .eq("created_at", formDate());
       console.log(data);
-      setLastGlucose(data[0].glucosa);
-      setGlucose(data[0].medicion.measurement);
+      setLastGlucose(data[0] ? data[0].glucosa : 0);
+      setGlucose(data[0] ? data[0].medicion.measurement : "No hay medicion");
     } catch (error) {
       console.error(error);
     }
@@ -162,8 +166,8 @@ export default function Main() {
         .limit(1)
         .eq("created_at", formDate());
       console.log(data);
-      setLastInsuline(data[0].dosis);
-      setDose(data[0].tipoDosis.tipoDosis);
+      setLastInsuline(data[0] ? data[0].dosis : 0);
+      setDose(data[0] ? data[0].tipoDosis.tipoDosis : "No hay dosis");
     } catch (error) {
       console.error(error);
     }
@@ -177,7 +181,7 @@ export default function Main() {
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .eq("created_at", formDate());
+        .eq("created_at", new Date().toLocaleTimeString());
       console.log(data);
       setLastEmotion(data[0].idEmocion);
     } catch (error) {
@@ -303,7 +307,7 @@ export default function Main() {
         .limit(1)
         .eq("created_at", formDate());
       console.log(data);
-      setWaterTotal(data[0].agua * 250);
+      setWaterTotal(data[0] ? data[0].agua * 250 : 0);
     } catch (error) {
       console.error(error);
     }
@@ -327,15 +331,50 @@ export default function Main() {
     return waterH;
   };
 
+  const getTips = async () => {
+    try {
+      const { data } = await supabase.from("tips").select("*");
+      setTips(data);
+      console.log("Tips ", data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const dates = async () => {
+    try {
+      const { data } = await supabase
+        .from("citasMedicas")
+        .select("*")
+        .eq("uid", user.id)
+        .eq("state", "proximo");
+      console.log("Citas medicas ", data);
+      setNextDates(data);
+    } catch (error) {}
+  };
+
   useEffect(() => {
     getApi();
-    getGlucose();
-    getInsuline();
-    getDataGlucose();
-    getEmotion();
-    getWater();
-    console.log("usuario ", user);
-  }, [user]);
+    if (user) {
+      getGlucose();
+      getInsuline();
+      getDataGlucose();
+      getEmotion();
+      getWater();
+      getTips();
+      dates();
+    }
+
+    const interval = setInterval(() => {
+      setFade(true);
+      setTimeout(() => {
+        setTip(tips[0] && tips[Math.floor(Math.random() * tips.length)].tip);
+        setFade(false);
+      }, 500);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="w-full h-full bg-[#F7F7F7]">
@@ -353,21 +392,6 @@ export default function Main() {
             <img src={calendar} alt="calendar" className="w-5 mr-5" />
             {formatDate.charAt(0).toUpperCase() + formatDate.slice(1)}
           </div>
-
-          <div
-            className="flex items-center justify-between rounded-lg mr-5"
-            style={{ width: "20%" }}
-          >
-            <p className="cursor-pointer hover:text-azulSecundario hover:underline">
-              Hoy
-            </p>
-            <p className="cursor-pointer hover:text-azulSecundario hover:underline">
-              Semana
-            </p>
-            <p className="cursor-pointer hover:text-azulSecundario hover:underline">
-              Mes
-            </p>
-          </div>
         </div>
         <div className="mt-5 w-full flex justify-between">
           <div
@@ -375,9 +399,9 @@ export default function Main() {
             style={{ width: "24%", height: 150 }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima glucosa</p>
-            <p className="mb-2">{glucose}</p>
+            <p className="mb-2">{glucose && glucose}</p>
             <p className="text-4xl font-medium">
-              {lastGlucose}
+              {lastGlucose && lastGlucose}
               <span className="text-lg font-normal">mg/dl</span>
             </p>
           </div>
@@ -386,7 +410,7 @@ export default function Main() {
             style={{ width: "24%" }}
           >
             <p className="text-xl font-semibold mb-2 mt-3">Ultima insulina</p>
-            <p className="mb-2">{dose}</p>
+            <p className="mb-2">{dose && dose}</p>
             <p className="text-4xl font-medium">
               {lastInsuline}
               <span className="text-lg font-normal">u</span>
@@ -443,7 +467,7 @@ export default function Main() {
             <h4 className="text-xl font-semibold">Agua Consumida</h4>
             <img src={setWater(waterTotal)} alt="water" className="w-36" />
             <p className="" style={{ fontSize: "3rem" }}>
-              {waterTotal}
+              {waterTotal && waterTotal}
               <span className="text-3xl font-normal">ml</span>
             </p>
           </div>
@@ -454,37 +478,57 @@ export default function Main() {
               <img src={idea} alt="idea" className="w-10 mr-2" />
               <h3 className="text-3xl font-semibold text-white">Tips</h3>
             </div>
-            <p className="text-white p-3 mt-3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores
-              voluptatem officiis{" "}
-            </p>
+
+            <div
+              className={`h-2/3 flex items-center transition-opacity duration-500 ease-in-out ${
+                fade ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              <p className="text-white p-3 mt-3">{tip}</p>
+            </div>
           </div>
           <div className="w-[85%] shadow-lg rounded-lg border-2 pl-10 pt-5">
             <div className="">
               <h3 className="font-semibold text-2xl">Citas Medicas Próximas</h3>
             </div>
             <div className="">
-              <h3 className="font-semibold mt-7">Consulta de seguimiento</h3>
-              <div className="pl-3 ml-2 mt-2 border-l-2 border-l-black">
-                <div className="flex ">
-                  <div className="mr-7">
-                    <p className="text-xs font-semibold">Fecha</p>
-                    <p>2024-09-15</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold">Hora</p>
-                    <p>10:30</p>
-                  </div>
+              {nextDates.length > 0 ? (
+                <div>
+                  {nextDates.map((date) => (
+                    <div>
+                      <h3 className="font-semibold mt-7">{date.typecites}</h3>
+                      <div className="pl-3 ml-2 mt-2 border-l-2 border-l-black">
+                        <div className="flex ">
+                          <div className="mr-7">
+                            <p className="text-xs font-semibold">Fecha</p>
+                            <p>{date.date}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">Hora</p>
+                            <p>{date.time}</p>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <p className="text-xs font-semibold">Lugar</p>
+                          <p className="w-36">{date.place}</p>
+                        </div>
+                        <div className="mt-3">
+                          <p className="text-xs font-semibold">
+                            Nombre del Doctor
+                          </p>
+                          <p>{date.doctorName}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-3">
-                  <p className="text-xs font-semibold">Lugar</p>
-                  <p className="w-36">Hospital central, Consultorio 12B</p>
+              ) : (
+                <div className="flex justify-center items-center w-full h-36">
+                  <h3 className="text-gray-400 text-2xl">
+                    No hay citas proximas
+                  </h3>
                 </div>
-                <div className="mt-3">
-                  <p className="text-xs font-semibold">Nombre del Doctor</p>
-                  <p>Dr. Juan Perez</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

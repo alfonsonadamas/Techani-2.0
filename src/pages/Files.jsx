@@ -63,7 +63,7 @@ export default function Files() {
   const validationFile = (e) => {
     const selectedFile = e.target.files[0];
     const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
-    const extensions = ["jpg", "png", "jpeg"];
+    const extensions = ["jpg", "png", "jpeg","pdf"];
     console.log(typeOfFile);
     if (extensions.includes(typeOfFile)) {
       if (selectedFile.size <= 300000) {
@@ -171,7 +171,7 @@ export default function Files() {
                 <input
                   type="file"
                   name="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/png,application/pdf"
                   autoComplete="off"
                   onChange={validationFile}
                   onBlur={handleBlur}
