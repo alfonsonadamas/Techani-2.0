@@ -15,6 +15,7 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import { Form } from "react-router-dom";
+import Modal from "../components/Modal";
 
 export default function Profile() {
   const { user } = useUserContext();
@@ -33,9 +34,29 @@ export default function Profile() {
   const [showSupportingFamily, setShowSupportingFamily] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [showAddFamilyForm, setShowAddFamilyForm] = useState(false);
-  const [editingFamilyMember, setEditingFamilyMember] = useState(null);
+  const [editFamily, setEditFamily] = useState([]);
   const [datosInsulina, setDatosInsulina] = useState([]);
   const [nombreInsulina, setNombreInsulina] = useState([]);
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  // Obtiene la fecha actual
+  const fecha = new Date();
+  const año = fecha.getFullYear();
+  const mes = fecha.getMonth() + 1;
+  const dia = fecha.getDate();
+  const fechaActual = `${año}-${mes < 10 ? "0" : ""}${mes}-${dia}`;
+
+  const openModal = (record) => {
+    setEditFamily(record);
+    console.log(record)
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setEditFamily(null);
+  };
 
   useEffect(() => {
     if (user) {
@@ -51,6 +72,7 @@ export default function Profile() {
       });
     }
     mInsulina();
+    getFamily();
     veriInsulina();
 
     if (datosInsulina.length > 0) {
@@ -261,33 +283,96 @@ export default function Profile() {
 
   const familyValidationSchema = Yup.object({
     familyName: Yup.string().required("El nombre es obligatorio"),
-    familyPhone: Yup.string().required("El teléfono es obligatorio"),
+    familyPhone: Yup
+      .number()
+      .typeError("Solo se permiten numeros")
+      .min(1000000000, "El teléfono debe tener exactamente 10 dígitos")
+      .required("El teléfono es obligatorio"),
     familyEmail: Yup.string()
       .email("Correo electrónico no válido")
       .required("El correo electrónico es obligatorio"),
     familyRelation: Yup.string().required("El parentesco es obligatorio"),
   });
 
-  const handleAddFamily = (values) => {
-    const newMember = {
-      familyName: values.familyName,
-      familyPhone: values.familyPhone,
-      familyEmail: values.familyEmail,
-      familyRelation: values.familyRelation,
-    };
-    setFamilyMembers([...familyMembers, newMember]);
-    setShowAddFamilyForm(false);
+  const getFamily = async () =>{
+    try {
+      const {data,error} = await supabase
+      .from("Familiares")
+      .select("*")
+      .eq("uid",user.id)
+      .order("idFamiliares",{ascending:true});
+      setFamilyMembers(data);
+    } catch (error) {
+      console.error("Error al obtener los datos familiares:", error.message);
+    }
   };
 
-  const handleEditFamily = (index) => {
-    setEditingFamilyMember(index);
-    setShowAddFamilyForm(true);
+  const handleAddFamily = async (
+    {familyName,familyPhone,familyEmail,familyRelation},
+    { setSubmitting, setErrors, resetForm }
+  ) => {
+    try {
+      setSubmitting(true);
+      const {data,error} = await supabase
+        .from("Familiares")
+        .insert({
+          uid:user.id,
+          name:familyName,
+          phone:familyPhone,
+          email:familyEmail,
+          relation:familyRelation,
+          created_at:fechaActual
+        });
+        setShowAddFamilyForm(false);
+    } catch (error) {
+      console.error("Error al agregar los datos familiares:", error.message);
+    } finally{
+      setSubmitting(false);
+      getFamily();
+    }
   };
 
-  const handleDeleteFamily = (index) => {
-    const updatedFamilyMembers = [...familyMembers];
-    updatedFamilyMembers.splice(index, 1);
-    setFamilyMembers(updatedFamilyMembers);
+  const handleEditFamily = async (
+    { familyName,familyPhone,familyEmail,familyRelation,idFamiliares },
+    { setSubmitting, setErrors, resetForm }
+  ) => {
+    try {
+      setSubmitting(true);
+      await supabase
+      .from("Familiares")
+      .update({
+        name:familyName,
+        phone:familyPhone, 
+        email:familyEmail,
+        relation:familyRelation,
+        created_at:fechaActual
+      })
+      .eq("uid",user.id)
+      .eq("idFamiliares",idFamiliares);
+
+      closeModal();
+    } catch (error) {
+      console.error("Error al editar los datos familiares:", error.message);
+    } finally { 
+      setSubmitting(false);
+      getFamily();
+    }
+  };
+
+  const handleDeleteFamily = async (id) => {
+    try {
+      setLoading(true);
+      await supabase
+        .from("Familiares")
+        .delete()
+        .eq("uid",user.id)
+        .eq("idFamiliares",id)
+    } catch (error) {
+      console.error("Error al borrar los datos familiares:", error.message);
+    } finally{
+      getFamily();
+      setLoading(false);
+    }
   };
 
   return (
@@ -613,16 +698,18 @@ export default function Profile() {
           </button>
           {showSupportingFamily && (
             <div className="mt-4 bg-white p-4 rounded shadow-md">
-              <div className="flex justify-end mb-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddFamilyForm(!showAddFamilyForm)}
-                  className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                >
-                  <FaPlus />
-                  <span>Agregar Familiar</span>
-                </button>
-              </div>
+              {familyMembers.length < 3 && (
+                <div className="flex justify-end mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddFamilyForm(!showAddFamilyForm)}
+                    className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                  >
+                    <FaPlus />
+                    <span>Agregar Familiar</span>
+                  </button>
+                </div>
+              )}
               {showAddFamilyForm && (
                 <Formik
                   initialValues={{
@@ -632,13 +719,12 @@ export default function Profile() {
                     familyRelation: "",
                   }}
                   validationSchema={familyValidationSchema}
-                  onSubmit={(values) => {
-                    handleAddFamily(values);
-                  }}
+                  onSubmit={handleAddFamily}
                 >
                   {({
                     handleSubmit,
                     handleChange,
+                    handleBlur,
                     values,
                     errors,
                     touched,
@@ -658,6 +744,7 @@ export default function Profile() {
                             name="familyName"
                             value={values.familyName}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                           />
                           {errors.familyName && touched.familyName && (
@@ -678,7 +765,9 @@ export default function Profile() {
                             type="text"
                             name="familyPhone"
                             value={values.familyPhone}
+                            max={10}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                           />
                           {errors.familyPhone && touched.familyPhone && (
@@ -701,6 +790,7 @@ export default function Profile() {
                             autoComplete="off"
                             value={values.familyEmail}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                           />
                           {errors.familyEmail && touched.familyEmail && (
@@ -722,6 +812,7 @@ export default function Profile() {
                             name="familyRelation"
                             value={values.familyRelation}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                           />
                           {errors.familyRelation && touched.familyRelation && (
@@ -743,27 +834,47 @@ export default function Profile() {
                   )}
                 </Formik>
               )}
-              <div className="mt-4">
+              <div className="mt-4 flex justify-around w-full">
                 {familyMembers.map((member, index) => (
                   <div
                     key={index}
-                    className="flex justify-between border-b border-gray-300 pb-2 mb-2"
+                    className={index!==0 ? "border-l border-black px-6" : "px-6"}
                   >
                     <div>
-                      <div>{member.familyName}</div>
-                      <div>{member.familyPhone}</div>
-                      <div>{member.familyEmail}</div>
-                      <div>{member.familyRelation}</div>
+                        <div className="mb-4">
+                          <p className="text-xs text-gray-400">Nombre:</p>
+                          <p className="font-bold">{member.name}</p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs text-gray-400">Numero del contacto:</p>
+                          <p className="font-bold">{member.phone}</p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs text-gray-400">Correo:</p>
+                          <p className="font-bold">{member.email}</p>
+                        </div>
+                        <div className="mb-4">
+                          <p className="text-xs text-gray-400">Parentesco:</p>
+                          <p className="font-bold">{member.relation}</p>
+                        </div>
                     </div>
-                    <div>
-                      <FaEdit
-                        onClick={() => handleEditFamily(index)}
-                        className="cursor-pointer mr-2 text-blue-500 hover:text-blue-600"
-                      />
-                      <FaTrash
-                        onClick={() => handleDeleteFamily(index)}
-                        className="cursor-pointer text-red-500 hover:text-red-600"
-                      />
+                    <div className="flex">
+                      <button
+                        type="button"
+                        onClick={() => openModal(member)}
+                        className="mr-2 flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                      >
+                        <FaEdit />
+                        <span>Editar</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteFamily(member.idFamiliares)}
+                        className="flex items-center space-x-1 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                      >
+                        <FaTrash/>
+                        <span>Borrar</span>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -772,6 +883,139 @@ export default function Profile() {
           )}
         </div>
       </div>
+      <Modal
+        isOpen={modalIsOpen}
+        onClose={closeModal}
+        title={"Editar datos familiares"}
+      >
+        {editFamily && (
+          <div>
+            <Formik
+              initialValues={{
+                familyName: editFamily.name,
+                familyPhone: editFamily.phone,
+                familyEmail: editFamily.email,
+                familyRelation: editFamily.relation,
+                idFamiliares:editFamily.idFamiliares
+              }}
+              validationSchema={familyValidationSchema}
+              onSubmit={handleEditFamily}
+            >
+              {({
+                handleSubmit,
+                handleChange,
+                handleBlur,
+                values,
+                errors,
+                touched,
+              }) => (
+                <form onSubmit={handleSubmit}>
+                  <div className="flex flex-wrap">
+                    <div className="flex flex-col w-1/2 pr-2 mb-4">
+                      <label
+                        htmlFor="familyName"
+                        className="font-bold mb-2"
+                      >
+                        Nombre
+                      </label>
+                      <input
+                        id="familyName"
+                        type="text"
+                        name="familyName"
+                        value={values.familyName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      />
+                      {errors.familyName && touched.familyName && (
+                        <div className="text-red-500 text-sm">
+                          {errors.familyName}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col w-1/2 pl-2 mb-4">
+                      <label
+                        htmlFor="familyPhone"
+                        className="font-bold mb-2"
+                      >
+                        Teléfono
+                      </label>
+                      <input
+                        id="familyPhone"
+                        type="text"
+                        name="familyPhone"
+                        value={values.familyPhone}
+                        maxLength={10}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      />
+                      {errors.familyPhone && touched.familyPhone && (
+                        <div className="text-red-500 text-sm">
+                          {errors.familyPhone}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col w-1/2 pr-2 mb-4">
+                      <label
+                        htmlFor="familyEmail"
+                        className="font-bold mb-2"
+                      >
+                        Correo Electrónico
+                      </label>
+                      <input
+                        id="familyEmail"
+                        type="email"
+                        name="familyEmail"
+                        autoComplete="off"
+                        value={values.familyEmail}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      />
+                      {errors.familyEmail && touched.familyEmail && (
+                        <div className="text-red-500 text-sm">
+                          {errors.familyEmail}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col w-1/2 pl-2 mb-4">
+                      <label
+                        htmlFor="familyRelation"
+                        className="font-bold mb-2"
+                      >
+                        Parentesco
+                      </label>
+                      <input
+                        id="familyRelation"
+                        type="text"
+                        name="familyRelation"
+                        value={values.familyRelation}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      />
+                      {errors.familyRelation && touched.familyRelation && (
+                        <div className="text-red-500 text-sm">
+                          {errors.familyRelation}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-end w-full">
+                      <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              )}
+            </Formik>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
