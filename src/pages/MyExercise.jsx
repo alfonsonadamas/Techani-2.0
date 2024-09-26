@@ -21,17 +21,17 @@ export default function MyExercise() {
   const [activity, setActivity] = useState([]);
   const [dataAuxActivities, setDataAuxActivities] = useState([]);
   const [weightOption, setWeightOption] = useState("no");
-  const [submitting, setIsSubmitting] = useState(false);
 
   const openModal = (record) => {
-    setActivity([]);
-    setWeightOption(getWeightOption(record.weight));
-    console.log("record seleccionado: ", record);
-    const name = getNameActivity(record.idActividades, record.actividadUsuario);
-    if (record.idActividades === 12) {
-      setActivity([{ id: record.actividadUsuario, name: name }]);
-    } else {
-      setActivity([{ id: record.idActividades, name: name }]);
+    setActivity([])
+    setWeightOption(getWeightOption(record.weight))
+    console.log("record seleccionado: ",record)
+    const name = getNameActivity(record.idActividades,record.actividadUsuario);
+    if(record.idActividades === 12){
+      setActivity([{id: record.actividadUsuario, name: name}])
+    }
+    else {
+      setActivity([{id: record.idActividades, name: name}])
     }
     setEditRecord(record);
     setModalIsOpen(true);
@@ -73,20 +73,16 @@ export default function MyExercise() {
       .nullable(true)
       .typeError("El peso debe de ser un número")
       .notRequired(),
-    actividadUsuario: Yup.number().positive("debe ser positivo"),
+    actividadUsuario: Yup.number()
+      .positive("debe ser positivo"),
+    
   });
 
   const getActivities = async () => {
     try {
       const { data, error } = await supabase.from("actividades").select();
       if (error) throw error;
-      // Filtrar los registros que no cumplan con los criterios
-      const filteredData = data.filter(
-        (activity) =>
-          activity.idActividades !== 12 &&
-          activity.nameActivity !== "actividadUsuario"
-      );
-      setActivities(filteredData);
+      setActivities(data);
     } catch (error) {
       console.log(error);
     }
@@ -105,21 +101,21 @@ export default function MyExercise() {
   };
 
   const updateEjercicio = async (
-    { idEjercicio, idActividades, time, weight, actividadUsuario },
+    { idEjercicio, idActividad, time, weight, weightOption, actividadUsuario, nameActividad },
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
       setSubmitting(true);
 
       const weightValue = weightOption === "si" ? weight : null;
-      console.log("Peso:", weightOption);
+      console.log("Peso:",weightOption)
       let dataExercise = {
         time: time,
         weight: weightValue,
       };
 
       const selectedActivity = activity[0];
-      console.log(selectedActivity);
+      console.log(selectedActivity)
       if (!selectedActivity) {
         throw new Error("No se ha seleccionado una actividad.");
       }
@@ -140,7 +136,8 @@ export default function MyExercise() {
         .from("ejercicio")
         .update(dataExercise)
         .eq("uid", user.id)
-        .eq("idEjercicio", editRecord.idEjercicio);
+        .eq("idActividades", idActividad)
+        .eq("idEjercicio", idEjercicio);
 
       if (error) throw error;
 
@@ -150,7 +147,8 @@ export default function MyExercise() {
       console.log(error);
       setErrors({ submit: error.message });
     } finally {
-      setSubmitting(true);
+      setSubmitting(false);
+      Ejercicios(); // Actualiza
     }
   };
 
@@ -200,16 +198,23 @@ export default function MyExercise() {
     });
 
     // Ordenar los registros por fecha de creación de más reciente a más antiguo
-    filteredRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
+    filteredRecords.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
 
     return filteredRecords;
+  };
+
+  const formatDate = (fecha) => {
+    const fechaObjeto = new Date(fecha);
+    return fechaObjeto.toLocaleDateString();
   };
 
   useEffect(() => {
     Ejercicios();
     getActivities();
     getActivitiesUs();
-  }, [user]);
+  }, []);
 
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
@@ -237,16 +242,20 @@ export default function MyExercise() {
     }
   };
 
-  const getNanmeActivity = (id, actUs) => {
-    if (id === 12) {
-      let act = activitiesUs.find(
-        (activity) => activity.idActividades === actUs
-      );
-      return act ? act.nameActivity : "No encontrada";
-    } else {
-      let act = activities.find((activity) => activity.idActividades === id);
-      return act ? act.nameActivity : "Actividad no encontrada";
+  const getNameActivity = (id, actUs) => {
+    if(id === 12){
+      let act = activitiesUs.find((activity) => activity.idActividades === actUs);
+      return act ? act.nameActivity : 'No encontrada'
     }
+    else{
+      let act = activities.find((activity) => activity.idActividades === id);
+      return act ? act.nameActivity : 'Actividad no encontrada';
+    }
+  };
+  const getWeightOption = (weight) => {
+    if(weight !== null){
+      return "si"
+    } else return "no"
   };
 
   return (
@@ -312,11 +321,7 @@ export default function MyExercise() {
                           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADRUlEQVR4nO2XR2iUURDHf9HYUA+2g70Q7A1sKKLYT4qIFw3oQSKC2FA8CKK5xJOKBY2CUZBgPWiiXjwowYKKIGIFS2JEFCyxYU1WBv4fjMtu8q1uNoXvB8u3b16d92bmzYOIiIiIiIiI5kk/4ABQCfzUt1DyJsNs4BMQS/Az+SyaAP2dEmeBsUB7fUsk/wj0pZFzwCmRiECZ/XHybsBgoA2NhEotdEyS+nGqr1B5CnDbmZ6d1l6gDw3MDy2oQ5L6jqr/Dsxw7c0cy51CJj8IDKCBeBHyRKzdQ2dmgUkNAY4Cv1X3CzgCDCTDFGoB5guJKFX9PadQqwTtcoAihe6YFCsGhpIh+rmoVaoT6KBvqfOD4H9BiPEKnQlWAyeBUZlQZpYWm+geMflM4JbK40OO2RvYDXxTvxrgTC0mnDb6yvYrtJv23eei0WMtaFCK43YHtgNf3OacBybSQJzUIlY4WRdgLdA5RH+7d7bFZRAXFc4zyiJNftXJ1of0G48pnQ98cApdVmjPCO2AKk0chNY5Kt/4h/HsfloDvHYKXQPmAlnUM0WacIvK7eVP5sjXJZ8AtEhhTIuQG4E3TqGbwLz6VGiaJnriJilLEOneyqeWAz1Djm0XrLV/6ca5CywBWqZbkRaKZjEXdbaqXKYo9zROqRrlZgVy7Ow65mgLrHTzBJfxonQrdFiDWwQypqpsphVgPrQauAB8jVPsHbALGFnHPK2BPOCZ6/tIJ1TXZtTJMF1wtsvTJZvszCDZDtvDbYfL1WIuSOTJ8ZNhi17q7rGYTn2ZlE2ZVi59NxNCCwgmsJAahtHAHuC9W9hn4BAwqZZ+ZlaLgfuuX7myjpTId45u0co4IdkdhedUsJPKBS7phIPF2ULXAV1r8dOFmjNITmvbgL8YrvS8WqZkrNJAVcp8/4ccBYNXTiF7/xxXHpgonGe5zU2WuSdN9XeqPN7dHwtIH9m6P0q0cYFS5vCbgV5x7Qeq/kHYCU6rQ66SwOBlaMlgfdED2CRTjjkzOgfMlxLFkp8KO2iuGyh4Z1xJ8sBKN1m6iIvdk8D/vimahmaDEj1T5ljIjDfddJJv2uX7XO+bEUFlrJn8aDaKREREREREREREUC/8Ae4ZfBBuF8VKAAAAAElFTkSuQmCC"
                         />
                         <h3 className="text-center mt-2">
-                          Actividad:{" "}
-                          {getNanmeActivity(
-                            record.idActividades,
-                            record.actividadUsuario
-                          )}
+                          Actividad: {getNameActivity(record.idActividades,record.actividadUsuario)}
                         </h3>
                         <h3 className="text-center mt-2">
                           Fecha: {record.date}
@@ -351,7 +356,6 @@ export default function MyExercise() {
               isOpen={modalIsOpen}
               onClose={closeModal}
               title="Editar mi ejercicio"
-              width={"max-w-2xl"}
             >
               {editRecord && (
                 <div>
@@ -361,9 +365,9 @@ export default function MyExercise() {
                       idActividad: editRecord.idActividades,
                       time: editRecord.time,
                       weight: editRecord.weight,
-                      idActividades: editRecord.idActividades,
-                      time: editRecord.time,
-                      actividadUsuario: editRecord.actividadUsuario,
+                      weightOption: weightOption,
+                      actividadUsuario: edit.actividadUsuario,
+                      nameActividad: getNameActivity(editRecord.idActividades,editRecord.actividadUsuario)
                     }}
                     validationSchema={validationSchema}
                     onSubmit={updateEjercicio}
@@ -396,10 +400,8 @@ export default function MyExercise() {
                                 id="default-search"
                                 name="nameActividad"
                                 autoComplete="off"
-                                defaultValue={getNanmeActivity(
-                                  editRecord.idActividades,
-                                  editRecord.actividadUsuario
-                                )}
+                                defaultValue={values.nameActividad}
+                                
                                 onChange={handleSearch}
                                 className="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="Buscar actividad..."
@@ -467,7 +469,7 @@ export default function MyExercise() {
                             id="weightOption"
                             defaultValue={weightOption}
                             onChange={(event) =>
-                              setWeightOption(event.target.value)
+                                setWeightOption(event.target.value)
                             }
                             className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           >
@@ -498,7 +500,7 @@ export default function MyExercise() {
                           type="submit"
                           className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
                         >
-                          {submitting ? "Guardando..." : "Guardar"}
+                          Guardar
                         </button>
                       </form>
                     )}
