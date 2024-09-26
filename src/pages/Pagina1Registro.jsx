@@ -23,7 +23,9 @@ export default function Pagina1Registro() {
   };
 
   return (
+    
     <div>
+    
       <NavStepsRegistro />
       <Formik
         initialValues={{
