@@ -18,9 +18,10 @@ import { Form } from "react-router-dom";
 
 export default function Profile() {
   const { user } = useUserContext();
-  const [sendForm, setSendForm] = useState(false);
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [error, setError] = useState(null);
   const [profile, setProfile] = useState({
     picture:
       "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
@@ -31,10 +32,14 @@ export default function Profile() {
   });
   const [showAdditionalData, setShowAdditionalData] = useState(false);
   const [showSupportingFamily, setShowSupportingFamily] = useState(false);
+  const [showSupportingPhoto, setShowSupportingPhoto] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [file, setFile] = useState(null);
   const [showAddFamilyForm, setShowAddFamilyForm] = useState(false);
   const [editingFamilyMember, setEditingFamilyMember] = useState(null);
+  const [previewImage, setPreviewImage] = useState(profile.picture);
   const [datosInsulina, setDatosInsulina] = useState([]);
+  const [foto, setFoto] = useState([]);
   const [nombreInsulina, setNombreInsulina] = useState([]);
 
   useEffect(() => {
@@ -50,6 +55,10 @@ export default function Profile() {
         picture: avatarUrl,
       });
     }
+    verFoto();
+    if (foto.length > 0) {
+      console.log(foto);
+    }
     mInsulina();
     veriInsulina();
 
@@ -57,6 +66,78 @@ export default function Profile() {
       nomIns(datosInsulina[0].marcaInsulina); // Pasa el id de la marca de insulina
     }
   }, [user]);
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
+    const extensions = ["jpg", "png", "jpeg", "pdf"];
+    console.log(typeOfFile);
+    if (extensions.includes(typeOfFile)) {
+      if (selectedFile.size <= 300000) {
+        setFile(selectedFile);
+        setError(null);
+      } else {
+        setError("El tamaño de la imágen es demasiado grande, elige otra.");
+        setFile(null);
+        e.target.value = null;
+      }
+    } else {
+      setFile(null);
+      setError("El tipo de archivo no es valido.");
+      e.target.value = null;
+    } // Obtener el archivo seleccionado
+    if (selectedFile) {
+      setSelectedFile(selectedFile);
+
+      // Crear una vista previa del archivo
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result); // Actualizar la vista previa con la imagen seleccionada
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const verFoto = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("perfil")
+        .select()
+        .eq("uid", user.id);
+
+      if (error) console.log("error", error);
+      setFoto(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const submitFoto = async ({ filename }, { setErrors, resetForm }) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(`${user.id}/${file.name}`, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+      const { data, error2 } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(`${user.id}/${file.name}`);
+      console.log("link: ", data.publicUrl, error2);
+
+      await supabase.from("perfil").upsert({
+        uid: user.id,
+        picture: data.publicUrl,
+      });
+      toast.success("Foto actualizada");
+    } catch (error) {
+      console.log("Error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const mInsulina = async () => {
     try {
@@ -75,6 +156,7 @@ export default function Profile() {
       setLoading(false);
     }
   };
+
   const handleSubmit1 = async (
     { marcaInsulina, bajo, alto },
     { setSubmitting, setErrors, resetForm }
@@ -194,33 +276,6 @@ export default function Profile() {
     }));
   };
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-  
-    const filePath = `${user.id}/${file.name}`;
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file);
-  
-    if (error) {
-      console.error("Error al subir la imagen:", error);
-      toast.error("Error al subir la imagen: " + error.message);
-    } else {
-      const { publicURL } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(filePath);
-      await supabase.auth.updateUser({
-        data: { avatar_url: publicURL },
-      });
-      setProfile((prevState) => ({
-        ...prevState,
-        picture: publicURL,
-      }));
-      toast.success("Imagen de perfil actualizada");
-    }
-  };
-
   const validationSchema = Yup.object({
     fullName: Yup.string().required("El nombre es obligatorio"),
     email: Yup.string()
@@ -296,6 +351,69 @@ export default function Profile() {
       <div className="p-16 pt-16 sm:ml-64">
         <ToastContainer />
         <Formik
+          initialValues={{ image: profile.avatar }}
+          enableReinitialize={true}
+          // validationSchema={}
+          onSubmit={submitFoto}
+        >
+          {({
+            handleSubmit,
+            handleBlur,
+            handleChange,
+            values,
+            errors,
+            touched,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <div className="flex flex-col items-center mb-8">
+                <div className="relative">
+                  <img
+                    src={previewImage} // Mostrar la vista previa en lugar de la imagen original
+                    alt="img_perfil"
+                    className="rounded-full border-4 border-blue-300 shadow-lg"
+                    width={200}
+                    onError={() =>
+                      setProfile((prevState) => ({
+                        ...prevState,
+                        picture:
+                          "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+                      }))
+                    }
+                  />
+                  <label
+                    htmlFor="fileUpload"
+                    className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
+                  >
+                    <FaPencilAlt />
+                  </label>
+                  <input
+                    type="file"
+                    name="file"
+                    id="fileUpload"
+                    className="hidden"
+                    accept="image/jpeg,image/png"
+                    onChange={handleFileChange}
+                    onBlur={handleBlur}
+                  />
+                </div>
+                <div className="">
+                  <button
+                    type="submit"
+                    className={
+                      selectedFile
+                        ? "text-blue-500 underline hover:text-blue-600 mt-2"
+                        : "hidden"
+                    }
+                    disabled={!selectedFile}
+                  >
+                    Cambiar foto de perfil
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+        </Formik>
+        <Formik
           initialValues={{
             fullName: profile.name,
             email: profile.email,
@@ -309,29 +427,6 @@ export default function Profile() {
         >
           {({ handleSubmit, handleChange, values, errors, touched }) => (
             <form onSubmit={handleSubmit}>
-              <div className="flex flex-col items-center mb-8">
-                <div className="relative">
-                  <img
-                    src={profile.picture}
-                    alt="img_perfil"
-                    className="rounded-full border-4 border-blue-300 shadow-lg"
-                    width={200}
-                    onError={() => setProfile((prevState) => ({ ...prevState, picture: "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" }))}
-                  />
-                  <label
-                    htmlFor="fileUpload"
-                    className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
-                  >
-                    <FaPencilAlt />
-                  </label>
-                  <input
-                    type="file"
-                    id="fileUpload"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                </div>
-              </div>
               <div className="flex flex-wrap w-full">
                 <div className="flex flex-col w-1/2 pr-2 mb-4">
                   <label htmlFor="fullName" className="font-bold mb-2">
@@ -522,6 +617,7 @@ export default function Profile() {
                             name="marcaInsulina"
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            required
                             value={values.marcaInsulina}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                           >
@@ -538,6 +634,11 @@ export default function Profile() {
                               </option>
                             ))}
                           </select>
+                          {errors.marcaInsulina && touched.marcaInsulina && (
+                            <div className="text-red-500 text-sm">
+                              {errors.marcaInsulina}
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex flex-col w-full mb-4">
@@ -564,7 +665,13 @@ export default function Profile() {
                                 required
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                               />
+                              {errors.bajo && touched.bajo && (
+                                <div className="text-red-500 text-sm">
+                                  {errors.bajo}
+                                </div>
+                              )}
                             </div>
+
                             <div className="flex flex-col w-1/2">
                               <label
                                 htmlFor="highGlucose"
@@ -581,6 +688,11 @@ export default function Profile() {
                                 onBlur={handleBlur}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                               />
+                              {errors.alto && touched.alto && (
+                                <div className="text-red-500 text-sm">
+                                  {errors.alto}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -769,6 +881,20 @@ export default function Profile() {
                 ))}
               </div>
             </div>
+          )}
+        </div>
+        <hr className="w-full my-8 border-gray-300" />
+        <div className="flex flex-col w-full">
+          <button
+            type="button"
+            onClick={() => setShowSupportingPhoto(!showSupportingPhoto)}
+            className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
+          >
+            FOTO DE PERFIL{" "}
+            {showSupportingPhoto ? <FaCaretUp /> : <FaCaretDown />}
+          </button>
+          {showSupportingPhoto && (
+            <div className="mt-4 bg-white p-4 rounded shadow-md"></div>
           )}
         </div>
       </div>
