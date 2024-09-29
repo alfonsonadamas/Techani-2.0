@@ -79,10 +79,10 @@ export default function Pagina1Registro() {
                   ]}
                 />
 
-
-
                 <p className="text-sm mt-10">⚠️En caso de ser menor, llama a un padre o tutor para que te ayude a llenar el registro</p>
 
+
+                {/*BOTON PARA CAMBIAR DE DIV */}
                 <div className="flex justify-end ">
                   <button
                     type="submit"
@@ -92,6 +92,7 @@ export default function Pagina1Registro() {
                     SIGUIENTE <b className="text-lg text-white pl-2">&gt;</b>
                   </button>
                 </div>
+                {/* FIN BOTON PARA CAMBIAR DE DIV */} 
 
               </div>
 
@@ -99,6 +100,8 @@ export default function Pagina1Registro() {
           </div>
         </form>
       )}
+
+
     </Formik>
   );
   const Form2 = ({ onNext, onPrev }) => (
@@ -212,6 +215,158 @@ export default function Pagina1Registro() {
     </Formik>
   );
 
+
+  {/*AQUI INICIA EL FORMULARIO DE ALEJANDRO  FRAME 26 FIGMA */}
+  const Form3 = ({ onNext, onPrev }) => (
+    <Formik
+      initialValues={{
+
+      }}
+      onSubmit={(values) => {
+        onNext()
+      }
+      }
+    >
+      {({ handleSubmit,
+        handleChange,
+        values,
+        errors,
+        touched, }) => (
+        <form onSubmit={handleSubmit}>
+
+
+          <div className="bg-gray border-gray-700 w-fit shadow-lg flex flex-col items-center"
+            style={{ backgroundColor: "#E7E7E7", width: "auto", height: "100vh" }}
+          >
+            <div
+              className="bg-white border-radius rounded-xl  flex w-full h-full flex-col shadow-md"
+              style={{ maxWidth: "90%", maxHeight: "80%", marginBlockStart: "110px" }}
+            >
+              <div className="flex justify-end items-start h-10">
+                <label htmlFor="pageNumber" className="self-end mt-4 mr-4" style={{ color: "#C3C3C3" }}>3 de 5</label>
+              </div>
+              <div className="grid grid-flow-col justify-stretch"  >
+
+                {/*LADO IZQUIERDO DEL FORMULARIO */}
+                <div htmlFor="left-size" className="justify-self-start pl-20 mr-4" style={{maxWidth: "800px", borderRight: '1px solid black' }}>
+                  
+                  <InputType
+                    input="select"
+                    question={(
+                      <>
+                      ¿Cuanto tiempo duro la luna de miel de <br /> su diabetes tipo 1?
+                      </>
+                    )}
+                    options={[{option:"si", value:"Si"}, {option:"no", value:"No"}]}
+                  />
+                  
+                  
+                  <InputType
+                     input="select"
+                     question={(
+                    <>
+                    ¿Cuál era el tratamiento que utilizaba inicialmente<br /> para su diabetes tipo 1 y en qué dosis?
+                    </>
+                    )}
+                    options={[{option:"insulina lenta", value:"INSULINA LENTA"}, {option:"pendiente", value:"PENDIENTE"}]}
+                  />
+
+                  <InputType
+                    input="select"
+                    question="¿Donde sigue su tratamiento actualmente?"
+                    options={[{option:"hospital", value:"Hospital"}, {option:"pendiente", value:"PENDIENTE"}]}
+                  />
+
+                  <InputType
+                    input="date"
+                    question={(
+                      <>
+                      ¿Cuál es su ultima Hemoglobina glicosilada y<br /> fecha en que se obtuvo?
+                      </>
+                      )}
+                      
+                  />
+
+                  <InputType
+                    input="select"
+                    question="¿Cual es su estado civil?"
+                    options={[{option:"soltero", value:"Soltero"}, {option:"casado", value:"Casado"}, {option:"viudo", value:"Viudo"}]}
+                  />
+
+                  <button
+                    className="self-start font-light place-self text-white mt-4 px-4 rounded-lg  hover:bg-blue-200 flex items-center justify-center"
+                    style={{ backgroundColor: "#277BC0", border: "1px ridge #13BAFF" }} onClick={onPrev}
+                  >
+                    <b className="text-lg text-white pl-2">{"<"}</b>Anterior
+                  </button>
+
+                </div>
+                {/*FIN DE LADO IZQUIERDO DEL FORMULARIO */}
+
+
+                {/*LADO DERECHO  DEL FORMULARIO */}
+                <div htmlFor="right size"
+                    className="flex flex-col justify-self-start pl-20"
+                >
+                  <InputType
+                    input="text"
+                    question="¿Cual es su ocupacion?"
+                    
+                  />
+                  <InputType
+                    input="select"
+                    question="¿Cual es su peso?"
+                    options={[{option:"0", value:"o kg"}, {option:"70", value:"70 kg"}]}
+                  />
+                  <InputType
+                    input="text"
+                    question="¿Cual es su talla?"
+                  />
+  
+                  <InputType
+                    input="text"
+                    question={(
+                      <>
+                      ¿Cuál es su medicion de presion<br /> arterial el dia de hoy?
+                      </>
+                      )}
+                  />
+                  <InputType
+                    input="text"
+                    question={(
+                      <>
+                      ¿Cuál es su medicion de glucosa<br />en ayunas el dia de hoy?
+                      </>
+                      )}
+                   
+                  />
+
+
+                  <button
+                    type="submit"
+                    className="self-end font-light place-self text-white mt-4 mr-4 rounded-lg  hover:bg-blue-200 flex items-center justify-center"
+                    style={{ backgroundColor: "#277BC0", border: "1px ridge #13BAFF" }} onClick={onNext}
+                  >
+                    SIGUIENTE <b className="text-lg text-white pl-2">&gt;</b>
+                  </button>
+
+
+                </div>
+                {/*FIN DEL LADO DERECHO DEL FORMULARIO */}
+              </div>
+              <div className="flex justify-between ">
+
+
+              </div>
+
+            </div>
+          </div>
+        </form>
+      )}
+    </Formik>
+  );
+  {/*AQUI TERMINA EL FORMULARIO DE ALEJANDRO  FRAME 26 FIGMA*/}
+
   return (
     
     <div>
@@ -220,7 +375,7 @@ export default function Pagina1Registro() {
 
       {formIndex === 0 && <Form1 onNext={nextForm} />}
       {formIndex === 1 && <Form2 onNext={nextForm} onPrev={prevForm} />}
-
+      {formIndex === 2 && <Form3 onNext={nextForm} onPrev={prevForm} />}
     </div>
 
 
