@@ -31,6 +31,7 @@ import Grapics from "../pages/Graphics";
 import MyExercise from "../pages/MyExercise";
 import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
+import SleepHours from "../pages/SleepHours";
 
 export const router = createBrowserRouter([
   {
@@ -299,6 +300,15 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Pagina1Registro />,
+          },
+        ],
+      },
+      {
+        path: "/sleep",
+        children: [
+          {
+            index: true,
+            element: <SleepHours />,
           },
         ],
       },

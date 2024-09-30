@@ -30,13 +30,12 @@ export default function Main() {
   const [dose, setDose] = useState(null);
   const [glucose, setGlucose] = useState(null);
   const [waterTotal, setWaterTotal] = useState(0);
-  const [tips, setTips] = useState([]);
   const [fade, setFade] = useState(false);
   const [nextDates, setNextDates] = useState([]);
 
   const [temperature, setTemperature] = useState(0);
   const [location, setLocation] = useState(null);
-  const [tip, setTip] = useState(null);
+  const [tip, setTip] = useState("No hay tips");
 
   const [dataGraf, setDataGraf] = useState({
     series: [
@@ -112,9 +111,8 @@ export default function Main() {
         .select("created_at, glucosa, medicion(measurement)")
         .eq("uid", user.id)
         .order("created_at", { ascending: false })
-        .limit(1)
-        .eq("created_at", formDate());
-      console.log(data);
+        .limit(1);
+      console.log("Glucosa ", data);
       setLastGlucose(data[0] ? data[0].glucosa : 0);
       setGlucose(data[0] ? data[0].medicion.measurement : "No hay medicion");
     } catch (error) {
@@ -293,7 +291,7 @@ export default function Main() {
         return "Estrés";
 
       default:
-        return "❓"; // Emoji por defecto o mensaje de error
+        return "Sin emoción reciente"; // Emoji por defecto o mensaje de error
     }
   };
 
@@ -331,16 +329,6 @@ export default function Main() {
     return waterH;
   };
 
-  const getTips = async () => {
-    try {
-      const { data } = await supabase.from("tips").select("*");
-      setTips(data);
-      console.log("Tips ", data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const dates = async () => {
     try {
       const { data } = await supabase
@@ -354,6 +342,7 @@ export default function Main() {
   };
 
   useEffect(() => {
+    let tips = ["No hay tips"];
     getApi();
     if (user) {
       getGlucose();
@@ -361,18 +350,32 @@ export default function Main() {
       getDataGlucose();
       getEmotion();
       getWater();
-      getTips();
+
       dates();
     }
+
+    const getTips = async () => {
+      try {
+        const { data } = await supabase.from("tips").select("*");
+        tips = data;
+        console.log("Tips ", tips);
+        return data;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getTips();
 
     const interval = setInterval(() => {
       setFade(true);
       setTimeout(() => {
-        setTip(tips[0] && tips[Math.floor(Math.random() * tips.length)].tip);
+        const random = Math.floor(Math.random() * tips.length);
+        setTip(tips[random].tip);
         setFade(false);
       }, 500);
     }, 5000);
-
+    console.log(tip);
     return () => clearInterval(interval);
   }, []);
 
@@ -427,8 +430,8 @@ export default function Main() {
             </p>
           </div>
           <div
-            className="bg-white w-full border-2 rounded-lg shadow-lg flex flex-col items-center justify-center"
-            style={{ width: "18%", backgroundColor: "#57A3E2" }}
+            className="w-full border-2 rounded-lg shadow-lg flex flex-col items-center justify-center bg-azul"
+            style={{ width: "18%" }}
           >
             <div className="flex items-center justify-center h-1/2">
               <img
@@ -473,7 +476,7 @@ export default function Main() {
           </div>
         </div>
         <div className="w-full flex pb-5 mt-5 h-[350px]">
-          <div className="w-[15%] bg-[#57A3E2]  flex flex-col justify-center shadow-lg rounded-lg border-2 mr-5">
+          <div className="w-[15%] bg-azul  flex flex-col justify-center shadow-lg rounded-lg border-2 mr-5">
             <div className="flex justify-center">
               <img src={idea} alt="idea" className="w-10 mr-2" />
               <h3 className="text-3xl font-semibold text-white">Tips</h3>

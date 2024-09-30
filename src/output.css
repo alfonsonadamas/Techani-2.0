@@ -1162,6 +1162,10 @@ input:checked + .toggle-bg{
   right: 0px;
 }
 
+.start-0{
+  inset-inline-start: 0px;
+}
+
 .top-0{
   top: 0px;
 }
@@ -1291,6 +1295,11 @@ input:checked + .toggle-bg{
   margin-bottom: 0.75rem;
 }
 
+.my-4{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
 .my-6{
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
@@ -1379,6 +1388,10 @@ input:checked + .toggle-bg{
 
 .ml-64{
   margin-left: 16rem;
+}
+
+.ml-9{
+  margin-left: 2.25rem;
 }
 
 .ml-auto{
@@ -1589,6 +1602,10 @@ input:checked + .toggle-bg{
   height: 80%;
 }
 
+.h-48{
+  height: 12rem;
+}
+
 .h-5{
   height: 1.25rem;
 }
@@ -1644,10 +1661,6 @@ input:checked + .toggle-bg{
 
 .h-screen{
   height: 100vh;
-}
-
-.h-1\/3{
-  height: 33.333333%;
 }
 
 .max-h-\[90vh\]{
@@ -1798,6 +1811,10 @@ input:checked + .toggle-bg{
   width: 230px;
 }
 
+.w-\[32\.5\%\]{
+  width: 32.5%;
+}
+
 .w-\[40\%\]{
   width: 40%;
 }
@@ -1821,6 +1838,10 @@ input:checked + .toggle-bg{
 
 .w-full{
   width: 100%;
+}
+
+.w-\[31\.5\%\]{
+  width: 31.5%;
 }
 
 .max-w-2xl{
@@ -2392,6 +2413,10 @@ input:checked + .toggle-bg{
   border-top-width: 4px;
 }
 
+.border-solid{
+  border-style: solid;
+}
+
 .border-black{
   --tw-border-opacity: 1;
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
@@ -2718,6 +2743,11 @@ input:checked + .toggle-bg{
 .bg-gray-200{
   --tw-bg-opacity: 1;
   background-color: rgb(229 231 235 / var(--tw-bg-opacity));
+}
+
+.bg-gray-300{
+  --tw-bg-opacity: 1;
+  background-color: rgb(209 213 219 / var(--tw-bg-opacity));
 }
 
 .bg-gray-400{
@@ -3419,6 +3449,10 @@ input:checked + .toggle-bg{
   padding-inline-start: 2.5rem;
 }
 
+.ps-3{
+  padding-inline-start: 0.75rem;
+}
+
 .ps-5{
   padding-inline-start: 1.25rem;
 }
@@ -3948,6 +3982,11 @@ input:checked + .toggle-bg{
   --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.shadow-slate-800{
+  --tw-shadow-color: #1e293b;
+  --tw-shadow: var(--tw-shadow-colored);
 }
 
 .outline{

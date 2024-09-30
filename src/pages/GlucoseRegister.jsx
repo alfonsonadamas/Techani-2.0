@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import * as Yup from "yup";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function GlucoseRegister() {
   const { user } = useUserContext();
@@ -18,11 +19,34 @@ export default function GlucoseRegister() {
     setMeditionType(data);
   };
 
+  const getRecords = async () => {
+    var today = new Date().toLocaleDateString();
+    today = today.split("/").reverse();
+    if (today[1].length === 1) {
+      today[1] = "0" + today[1];
+    }
+    today = today.join("-");
+
+    try {
+      const { data, error } = await supabase
+        .from("registroGlucosa")
+        .select("*")
+        .eq("uid", user.id)
+        .eq("created_at", today);
+      if (error) throw error;
+      console.log(data);
+      setRecords(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const onSubmit = async (
-    { glucose, meditionType },
+    { glucose, meditionType, errors },
     { setSubmitting, setErrors, resetForm }
   ) => {
-    console.log(meditionType);
+    console.log(errors);
+    var duplicate = false;
 
     if (meditionType === "none") {
       setErrors({ meditionType: "Selecciona un tipo de medición" });
@@ -30,57 +54,45 @@ export default function GlucoseRegister() {
       return;
     }
 
-    // if (records.length > 0) {
-    //   records.forEach((record) => {
-    //     if (record.idMedicion === parseInt(meditionType)) {
-    //       setErrors({
-    //         meditionType: "Ya existe un registro con este tipo de medición",
-    //       });
-    //       return;
-    //     }
-    //     return;
-    //   });
-    //   return;
-    // }
+    if (records.length > 0) {
+      records.forEach((record) => {
+        if (record.idMedicion === parseInt(meditionType)) {
+          setErrors({
+            meditionType: "Ya existe un registro con este tipo de medición",
+          });
+          duplicate = true;
+        }
+      });
+    }
 
-    const date = new Date().toLocaleDateString();
-    console.log(date);
-    var parts = date.split("/");
-    var year = parts[2];
-    var month = parts[1];
-    var day = parts[0];
-    var formatDate = `${year}-${month}-${day}`;
+    const date = new Date();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const time = `${hours}:${minutes}:${seconds}`;
+    const created_at = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()} ${time}`;
 
     try {
       setSubmitting(true);
-      await supabase.from("registroGlucosa").insert([
-        {
-          uid: user.id,
-          created_at: formatDate,
-          glucosa: glucose,
-          idMedicion: meditionType,
-        },
-      ]);
-
-      //   // await emailjs.send(
-      //   //   "service_gb8sr3f",
-      //   //   "template_jt5p6ui",
-      //   //   {
-      //   //     to_email: user.email,
-      //   //     from_name: "Techani",
-      //   //     to_name: user.user_metadata.full_name,
-      //   //     message: `
-      //   //   Glucosa: ${glucose}
-      //   //   Tipo de medición: ${meditionType}`,
-      //   //   },
-      //   //   "RBjxGi8gd0qdpEToN"
-      //   // );
-      //   setSubmited(true);
+      if (!duplicate) {
+        await supabase.from("registroGlucosa").insert([
+          {
+            uid: user.id,
+            glucosa: glucose,
+            created_at: created_at,
+            idMedicion: meditionType,
+          },
+        ]);
+        toast.success("Registro exitoso");
+        resetForm();
+        getRecords();
+      }
     } catch (error) {
       console.log(error);
     } finally {
       setSubmitting(false);
-      resetForm();
     }
   };
 
@@ -95,28 +107,7 @@ export default function GlucoseRegister() {
 
   useEffect(() => {
     getMeditionType();
-    const getRecords = async () => {
-      var today = new Date().toLocaleDateString();
-      today = today.split("/").reverse();
-      if (today[1].length === 1) {
-        today[1] = "0" + today[1];
-      }
-      today = today.join("-");
 
-      try {
-        const { data, error } = await supabase
-          .from("registroGlucosa")
-          .select("*")
-          .eq("uid", user.id)
-          .eq("created_at", today);
-        if (error) throw error;
-        console.log(data);
-        console.log(today);
-        setRecords(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     getRecords();
   }, [user]);
 
@@ -124,6 +115,7 @@ export default function GlucoseRegister() {
     <div className="w-full h-screen">
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
+        <ToastContainer />
         <div className="w-full h-60 flex justify-center items-center">
           <div className=" w-full mt-20">
             {!submited ? (
@@ -190,7 +182,7 @@ export default function GlucoseRegister() {
                       </p>
 
                       <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                        Medición de glucosa
+                        Medición de glucosa (mg/dL)
                       </label>
                       <input
                         type="text"

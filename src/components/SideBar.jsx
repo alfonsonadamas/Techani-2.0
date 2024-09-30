@@ -4,6 +4,8 @@ import Logo from "../assets/img/Techani (1).png";
 import { useUserContext } from "../context/UserContext";
 import act1 from "../assets/img/yoga.png";
 import act2 from "../assets/img/ejercicio.png";
+import sleep from "../assets/img/sleep.png";
+import sleeping from "../assets/img/sleeping.png";
 
 export default function SideBar() {
   const { user } = useUserContext();
@@ -14,6 +16,7 @@ export default function SideBar() {
   const [isHidden5, setIsHidden5] = useState(true);
   const [isHidden6, setIsHidden6] = useState(true);
   const [isHidden7, setIsHidden7] = useState(true);
+  const [isHidden8, setIsHidden8] = useState(true);
   const [name, setName] = useState("");
   const [picture, setPicture] = useState("");
 
@@ -43,6 +46,10 @@ export default function SideBar() {
 
   const dropDown7 = () => {
     setIsHidden7(!isHidden7);
+  };
+
+  const dropDown8 = () => {
+    setIsHidden8(!isHidden8);
   };
 
   useEffect(() => {
@@ -798,6 +805,75 @@ export default function SideBar() {
                   />
 
                   <span className="ml-3">Ver Gráficas</span>
+                </Link>
+              </div>
+            </div>
+            <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
+              <img
+                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                alt="sleep"
+                src={sleep}
+              />
+
+              <div
+                className="flex justify-between w-full items-center"
+                onClick={dropDown8}
+              >
+                <span className="text-[15px] ml-2 font-semibold">Sueño</span>
+                <span
+                  className={
+                    isHidden8
+                      ? "text-sm duration-300"
+                      : "text-sm rotate-180 duration-300 "
+                  }
+                >
+                  <svg
+                    class="w-3 h-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m1 1 4 4 4-4"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div
+              className={
+                isHidden8
+                  ? "hidden text-left text-sm  mt-2 w-4/5 mx-auto"
+                  : " text-left text-sm  mt-2 w-4/5 mx-auto"
+              }
+            >
+              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link
+                  to={"/sleep"}
+                  className="flex items-center cursor-pointer p-2 "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+
+                  <span className="ml-3">Nuevo registro</span>
                 </Link>
               </div>
             </div>
