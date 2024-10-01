@@ -138,12 +138,31 @@ export default function Profile() {
   const submitFoto = async ({ filename }, { setErrors, resetForm }) => {
     try {
       setLoading(true);
-      const { error } = await supabase.storage
+      console.log(foto);
+      const oldPictureName = foto[0].picture.split("/").pop();
+      console.log(oldPictureName);
+
+      
+      const { error: deleteError } = await supabase.storage
+        .from("avatars")
+        .remove([`${user.id}/${oldPictureName}`]);
+
+      if (deleteError) {
+        console.log("Error al eliminar la imagen anterior:", deleteError);
+      }
+
+      const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(`${user.id}/${file.name}`, file, {
           cacheControl: "3600",
           upsert: false,
         });
+
+      if (uploadError) {
+        console.log("Error al subir la nueva imagen:", uploadError);
+        return;
+      }
+
       const { data, error2 } = supabase.storage
         .from("avatars")
         .getPublicUrl(`${user.id}/${file.name}`);
