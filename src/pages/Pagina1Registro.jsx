@@ -367,6 +367,160 @@ export default function Pagina1Registro() {
   );
   {/*AQUI TERMINA EL FORMULARIO DE ALEJANDRO  FRAME 26 FIGMA*/}
 
+
+    {/*AQUI INICIA EL FORMULARIO DE ALEJANDRO  FORMULARIO 5 */}
+    {/*HAY QUE ACOMODAR EL ORDEN DE LOS fOMRS*/}
+    const Form4 = ({ onNext, onPrev }) => (
+      <Formik
+        initialValues={{
+  
+        }}
+        onSubmit={(values) => {
+          onNext()
+        }
+        }
+      >
+        {({ handleSubmit,
+          handleChange,
+          values,
+          errors,
+          touched, }) => (
+          <form onSubmit={handleSubmit}>
+  
+  
+            <div className="bg-gray border-gray-700 w-fit shadow-lg flex flex-col items-center"
+              style={{ backgroundColor: "#E7E7E7", width: "auto", height: "100vh" }}
+            >
+              <div
+                className="bg-white border-radius rounded-xl  flex w-full h-full flex-col shadow-md"
+                style={{ maxWidth: "90%", maxHeight: "80%", marginBlockStart: "110px" }}
+              >
+                <div className="flex justify-end items-start h-10">
+                  <label htmlFor="pageNumber" className="self-end mt-4 mr-4" style={{ color: "#C3C3C3" }}>4 de 5</label>
+                </div>
+                <div className="grid grid-flow-col justify-stretch"  >
+  
+                  {/*LADO IZQUIERDO DEL FORMULARIO */}
+                  <div htmlFor="left-size" className="justify-self-start pl-20 mr-4" style={{maxWidth: "800px", borderRight: '1px solid black' }}>
+                    
+                    <InputType
+                      input="text"
+                      question={(
+                        <>
+                        ¿Cuál es la meta de glucosa inferior  <br/> establecida por su medico tratante? 
+                        
+                        </>
+                      )}
+                      options={[{option:"si", value:"Si"}, {option:"no", value:"No"}]}
+                    />
+                    
+                    
+                    <InputType
+                       input="select"
+                       question="¿Como lleva el control de alimentos? "
+                      
+                      options={[{option:"por raciones", value:"POR RACIONES, ESTABLECIDAS POR EL MEDICO"}, {option:"por cuenta de carbohidratos", value:"POR CUENTA DE CARBOHIDRATOS"}]}
+                    />
+  
+                    <InputType
+                      input="select"
+                      question="¿Realiza ejercicio? "
+                      options={[{option:"si", value:"SI"}, {option:"no", value:"NO"}]}
+                    />
+  
+                    <InputType
+                      input="number"
+                      question={(
+                        <>
+                        Por lo regular, ¿Cuánta agua consume<br /> al dia en litros?
+                        </>
+                        )}
+                        
+                    />
+  
+                    <InputType
+                      input="text"
+                      question="¿Que hace cuando tiene hiperglicemia?"
+                      
+                    />
+  
+                    <button
+                      className="self-start font-light place-self text-white mt-4 px-4 rounded-lg  hover:bg-blue-200 flex items-center justify-center"
+                      style={{ backgroundColor: "#277BC0", border: "1px ridge #13BAFF" }} onClick={onPrev}
+                    >
+                      <b className="text-lg text-white pl-2">{"<"}</b>Anterior
+                    </button>
+  
+                  </div>
+                  {/*FIN DE LADO IZQUIERDO DEL FORMULARIO */}
+  
+  
+                  {/*LADO DERECHO  DEL FORMULARIO */}
+                  <div htmlFor="right size"
+                      className="flex flex-col justify-self-start pl-20"
+                  >
+                    <InputType
+                      input="text"
+                      question="¿Que hace cuando tiene hipoglicemia?"
+                      
+                    />
+                    <InputType
+                      input="select"
+                      question="¿Ha tenido o tiene algún trastorno? "
+                      options={[{option:"ninguno", value:"NINGUNO"}, {option:"ansiedad", value:"ANSIEDAD"}, {option:"depresion", value:"DEPRESIÒN"},
+                                {option:"tdah", value:"TDAH"}, {option:"sindrome de asperger", value:"SINDROME DE ASPERGER"},
+                                {option:"sindrome de espectro autista", value:"SINDROME DE ASPECTO AUTISTA"}, {option:"otro", value:"OTRO:"}
+                      ]}
+                    />
+                    <InputType
+                          input="select"
+                          question={(
+                            <>
+                            ¿Sigue algún tratamiento para este<br /> trastorno? ¿Cual?
+                            </>
+                            )}
+                            options={[{option:"si", value:"SI"}, {option:"no", value:"NO"}]}
+
+                    />
+    
+                    <InputType
+                      input="select"
+                      question="¿Consume alcohol?"
+                      options={[{option:"si", value:"SI"}, {option:"no", value:"NO"}]}
+                    />
+
+
+                    <InputType
+                      input="select"
+                      question="¿Consume algún estupefaciente?"
+                      options={[{option:"si", value:"SI"}, {option:"no", value:"NO"}]}
+                    />
+  
+  
+                    <button
+                      type="submit"
+                      className="self-end font-light place-self text-white mt-4 mr-4 rounded-lg  hover:bg-blue-200 flex items-center justify-center"
+                      style={{ backgroundColor: "#277BC0", border: "1px ridge #13BAFF" }} onClick={onNext}
+                    >
+                      SIGUIENTE <b className="text-lg text-white pl-2">&gt;</b>
+                    </button>
+  
+  
+                  </div>
+                  {/*FIN DEL LADO DERECHO DEL FORMULARIO */}
+                </div>
+                <div className="flex justify-between ">
+  
+  
+                </div>
+  
+              </div>
+            </div>
+          </form>
+        )}
+      </Formik>
+    );
+    {/*AQUI TERMINA EL FORMULARIO DE ALEJANDRO  FORMULARIO 5*/}
   return (
     
     <div>
@@ -376,6 +530,7 @@ export default function Pagina1Registro() {
       {formIndex === 0 && <Form1 onNext={nextForm} />}
       {formIndex === 1 && <Form2 onNext={nextForm} onPrev={prevForm} />}
       {formIndex === 2 && <Form3 onNext={nextForm} onPrev={prevForm} />}
+      {formIndex === 3 && <Form4 onNext={nextForm} onPrev={prevForm} />}
     </div>
 
 
