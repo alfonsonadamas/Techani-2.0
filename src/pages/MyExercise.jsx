@@ -24,6 +24,15 @@ export default function MyExercise() {
   const [submitting, setIsSubmitting] = useState(false);
 
   const openModal = (record) => {
+    setActivity([]);
+    setWeightOption(getWeightOption(record.weight));
+    console.log("record seleccionado: ", record);
+    const name = getNameActivity(record.idActividades, record.actividadUsuario);
+    if (record.idActividades === 12) {
+      setActivity([{ id: record.actividadUsuario, name: name }]);
+    } else {
+      setActivity([{ id: record.idActividades, name: name }]);
+    }
     setEditRecord(record);
     setModalIsOpen(true);
   };
@@ -50,10 +59,21 @@ export default function MyExercise() {
     setActivity([]);
   };
 
-  const validationSchema = Yup.object({
-    excersiceName: Yup.string()
+  const validationSchema = Yup.object().shape({
+    idEjercicio: Yup.number(),
+    nameActividad: Yup.string()
       .matches(/^[^\d]+$/, "El campo debe ser texto")
       .required("Este campo es requerido"),
+    time: Yup.number()
+      .positive("El tiempo debe ser positivo")
+      .typeError("El tiempo debe de ser un número")
+      .required("El tiempo es requerido"),
+    weight: Yup.number()
+      .positive("El peso debe de ser positivo")
+      .nullable(true)
+      .typeError("El peso debe de ser un número")
+      .notRequired(),
+    actividadUsuario: Yup.number().positive("debe ser positivo"),
   });
 
   const getActivities = async () => {
@@ -89,17 +109,17 @@ export default function MyExercise() {
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
-      console.log("idEjercicio", editRecord.idEjercicio);
-      console.log(idActividades, time, weight, actividadUsuario);
       setSubmitting(true);
-      setIsSubmitting(true);
+
       const weightValue = weightOption === "si" ? weight : null;
+      console.log("Peso:", weightOption);
       let dataExercise = {
         time: time,
         weight: weightValue,
       };
 
       const selectedActivity = activity[0];
+      console.log(selectedActivity);
       if (!selectedActivity) {
         throw new Error("No se ha seleccionado una actividad.");
       }
@@ -118,20 +138,14 @@ export default function MyExercise() {
 
       const { data, error } = await supabase
         .from("ejercicio")
-        .update({
-          weight: weightValue,
-          idActividades: dataExercise.idActividades,
-          time: dataExercise.time,
-          actividadUsuario: dataExercise.actividadUsuario,
-        })
+        .update(dataExercise)
         .eq("uid", user.id)
         .eq("idEjercicio", editRecord.idEjercicio);
 
       if (error) throw error;
-      else console.log(data);
+
       closeModal();
       resetForm();
-      Ejercicios(); // Actualiza
     } catch (error) {
       console.log(error);
       setErrors({ submit: error.message });
@@ -178,7 +192,7 @@ export default function MyExercise() {
 
   const filterRecords = () => {
     const filteredRecords = records.filter((record) => {
-      const recordDate = new Date(record.date);
+      const recordDate = new Date(record.created_at);
       return (
         (!fechaini || recordDate >= fechaini) &&
         (!fechafin || recordDate <= fechafin)
@@ -195,7 +209,7 @@ export default function MyExercise() {
     Ejercicios();
     getActivities();
     getActivitiesUs();
-  }, []);
+  }, [user]);
 
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
@@ -204,7 +218,7 @@ export default function MyExercise() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from("ejercicio")
+        .from("emociones")
         .select()
         .eq("uid", user.id)
         .gte("created_at", fechaInicio)
@@ -282,7 +296,7 @@ export default function MyExercise() {
                 <p className="">No hay registros disponibles.</p>
               ) : (
                 filterRecords().map((record) => (
-                  <div key={record.idEmocion} className="p-5">
+                  <div key={record.idEjercicio} className="p-5">
                     <div className="bg-white rounded-md shadow-md ">
                       <div
                         style={{
@@ -337,17 +351,21 @@ export default function MyExercise() {
               isOpen={modalIsOpen}
               onClose={closeModal}
               title="Editar mi ejercicio"
+              width={"max-w-2xl"}
             >
               {editRecord && (
                 <div>
                   <Formik
                     initialValues={{
                       idEjercicio: editRecord.idEjercicio,
+                      idActividad: editRecord.idActividades,
+                      time: editRecord.time,
                       weight: editRecord.weight,
                       idActividades: editRecord.idActividades,
                       time: editRecord.time,
                       actividadUsuario: editRecord.actividadUsuario,
                     }}
+                    validationSchema={validationSchema}
                     onSubmit={updateEjercicio}
                   >
                     {({
@@ -376,7 +394,7 @@ export default function MyExercise() {
                               <input
                                 type="search"
                                 id="default-search"
-                                name="idActividades"
+                                name="nameActividad"
                                 autoComplete="off"
                                 defaultValue={getNanmeActivity(
                                   editRecord.idActividades,
@@ -447,6 +465,7 @@ export default function MyExercise() {
                           <select
                             name="weightOption"
                             id="weightOption"
+                            defaultValue={weightOption}
                             onChange={(event) =>
                               setWeightOption(event.target.value)
                             }
@@ -464,6 +483,7 @@ export default function MyExercise() {
                                 name="weight"
                                 onChange={handleChange}
                                 onBlur={handleBlur}
+                                defaultValue={values.weight}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                               />
                               <p className="text-red-500">
@@ -477,7 +497,6 @@ export default function MyExercise() {
                         <button
                           type="submit"
                           className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
-                          disabled={isSubmitting}
                         >
                           {submitting ? "Guardando..." : "Guardar"}
                         </button>

@@ -153,7 +153,7 @@ export default function Login() {
                   <div className="flex flex-col pl-20 py-20 justify-center border-l-2 border-l-gray-400 w-7/12">
                     <button
                       onClick={(e) => {
-                        e.preventDefault();
+                        handleLoginGoogle(e);
                       }}
                       className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center justify-center mb-5 disabled:opacity-20 disabled:cursor-default"
                       disabled={loading}

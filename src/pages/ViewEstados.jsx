@@ -66,7 +66,6 @@ export default function ViewEstados() {
         .eq("uid", user.id)
         .order("created_at", { ascending: false }) // Ordenar por created_at de forma descendente
         .limit(5); //limitar registros
-
       if (error) {
         console.log("error", error);
       } else {
@@ -99,10 +98,11 @@ export default function ViewEstados() {
     const fetchData = async () => {
       const emotionData = await getEmotions();
       setEmotions(emotionData);
+      emotions();
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   const deleteEmotion = async (id) => {
     try {
@@ -250,27 +250,6 @@ export default function ViewEstados() {
     return fechaObjeto.toLocaleDateString();
   };
 
-  useEffect(() => {
-    const emotions = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("emociones")
-          .select()
-          .eq("uid", user.id);
-        console.log(data);
-        if (error) console.log("error", error);
-
-        setRecords(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    emotions();
-  }, []);
-
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
     const fechaFin = document.getElementById("idFfin").value;
@@ -397,6 +376,7 @@ export default function ViewEstados() {
               isOpen={modalIsOpen}
               onClose={closeModal}
               title="Editar Emociones"
+              width={"max-w-2xl"}
             >
               {editRecord && (
                 <div>
