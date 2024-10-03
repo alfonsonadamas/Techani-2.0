@@ -15,6 +15,8 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import { Form } from "react-router-dom";
+import { addYears } from "flowbite-react/lib/esm/components/Datepicker/helpers";
+import { Toast } from "flowbite-react";
 
 export default function Profile() {
   const { user } = useUserContext();
@@ -36,9 +38,12 @@ export default function Profile() {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [file, setFile] = useState(null);
   const [showAddFamilyForm, setShowAddFamilyForm] = useState(false);
+  const [showAddDataAditional, setShowAddDataAditional] = useState(false);
+  const [showAddTypeInsuline, setAddTypeInsuline] = useState(false);
   const [editingFamilyMember, setEditingFamilyMember] = useState(null);
   const [previewImage, setPreviewImage] = useState(profile.picture);
   const [datosInsulina, setDatosInsulina] = useState([]);
+  const [datoRango, setDatoRango] = useState([]);
   const [foto, setFoto] = useState([]);
   const [nombreInsulina, setNombreInsulina] = useState([]);
 
@@ -61,6 +66,7 @@ export default function Profile() {
     }
     mInsulina();
     veriInsulina();
+    verRango();
 
     if (datosInsulina.length > 0) {
       nomIns(datosInsulina[0].marcaInsulina); // Pasa el id de la marca de insulina
@@ -157,31 +163,56 @@ export default function Profile() {
     }
   };
 
-  const handleSubmit1 = async (
-    { marcaInsulina, bajo, alto },
+  const handleSubRango = async (
+    { alto, bajo },
     { setSubmitting, setErrors, resetForm }
   ) => {
     setSubmitting(true);
+    console.log("Ya entre");
     try {
-      const { data, error } = await supabase.from("datosAdicionales").insert([
+      const { data, error } = await supabase.from("glucosaRango").insert([
         {
-          marcaInsulina: marcaInsulina,
-          alto: alto,
-          bajo: bajo,
           uid: user.id,
+          bajo: bajo,
+          alto: alto,
         },
       ]);
       if (error) {
         throw error;
       }
-      console.log("Se guardo aca bien mamalon", data);
+      toast.success("Glucosa en Rango Guardado");
+      setShowAddDataAditional(!showAddDataAditional);
+
+      verRango();
+    } catch (error) {}
+  };
+
+  const handleSubmit1 = async (
+    { marcaInsulina, tipoInsulina },
+    { setSubmitting, setErrors, resetForm }
+  ) => {
+    setSubmitting(true);
+    console.log("Aca ando");
+    try {
+      const { data, error } = await supabase.from("datosAdicionales").insert([
+        {
+          marcaInsulina: marcaInsulina,
+          uid: user.id,
+          tipoInsulina: tipoInsulina,
+        },
+      ]);
+      if (error) {
+        throw error;
+      }
       toast.success("Datos Adicionales Guardados");
-      setShowAdditionalData(!showAdditionalData);
+
+      setAddTypeInsuline(false);
       veriInsulina();
     } catch (error) {
       setErrors(
         "Error al guardar el estado de ánimo en la base de datos, verifique su conexión"
       );
+      toast.error("Bien mal");
       console.error(error);
     } finally {
       resetForm();
@@ -198,6 +229,22 @@ export default function Profile() {
       setDatosInsulina(data);
       console.log("Datos de datosInsuluna", datosInsulina);
       console.log("Datos de data", data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const verRango = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("glucosaRango")
+        .select()
+        .eq("uid", user.id);
+      if (error) throw error;
+      setDatoRango(data);
+      console.log("Datos de data R:", data);
+      console.log("Datos de setDato", setDatoRango);
+      console.log("");
     } catch (error) {
       console.log(error);
     }
@@ -225,7 +272,22 @@ export default function Profile() {
         .eq("id", idEL);
     } catch (error) {
       console.log(error);
-      toast.success("Perfil actualizado correctamente");
+      toast.success("Dato adicional eliminado");
+      veriInsulina();
+      setShowAdditionalData(true);
+    }
+  };
+
+  const deleteRango = async (idRa) => {
+    try {
+      await supabase
+        .from("glucosaRango")
+        .delete()
+        .eq("uid", user.id)
+        .eq("id", idRa);
+    } catch (error) {
+      console.log(error);
+      toast.success("Rango Eliminado");
       veriInsulina();
       setShowAdditionalData(true);
     }
@@ -287,9 +349,9 @@ export default function Profile() {
       6,
       "La contraseña debe tener al menos 6 caracteres"
     ),
-    marcaInsulina: Yup.string().required(
-      "El nombre de la marca es obligatorio"
-    ),
+  });
+
+  const validationRango = Yup.object({
     alto: Yup.number()
       .required("El registro alto es obligatorio")
       .typeError("El registro alto debe de ser un numero entero")
@@ -304,14 +366,7 @@ export default function Profile() {
     marcaInsulina: Yup.string().required(
       "El nombre de la marca es obligatorio"
     ),
-    alto: Yup.number()
-      .required("El registro alto es obligatorio")
-      .typeError("El registro alto debe de ser un numero entero")
-      .positive("El rango debe de ser positivo"),
-    bajo: Yup.number()
-      .required("El registro bajo es obligatorio")
-      .typeError("El registro bajo debe de ser un numero entero")
-      .positive("El rango debe de ser positivo"),
+    tipoInsulina: Yup.string().required("El tipo de insulina es obligatorio"),
   });
 
   const familyValidationSchema = Yup.object({
@@ -549,167 +604,308 @@ export default function Profile() {
             DATOS ADICIONALES{" "}
             {showAdditionalData ? <FaCaretUp /> : <FaCaretDown />}
           </button>
-          {datosInsulina.length != 0 && datosInsulina.length != 0 ? (
-            <div>
-              {datosInsulina.map((item) => {
-                return (
-                  <div className="flex flex-row mt-7">
-                    <div className="w-[40%] flex flex-col justify-start items-center">
-                      <p className="font-bold">
-                        Nombre de la insulina utilizada:
-                      </p>
-                      <p className="text-xl"> {nombreInsulina}</p>
-                    </div>
-                    <div className="w-[40%] flex flex-col justify-center items-center">
-                      <p className="font-bold">Glucosa en rango:</p>
-                      <div className="flex flex-row w-[100%]">
-                        <div className="flex flex-col w-[50%] justify-center items-center">
-                          <p className="font-bold">Bajo</p>
-                          <p className="text-xl">{item.bajo}</p>
+          {showAdditionalData && (
+            <div className="flex justify-end mt-4 p-4 bg-white rounded shadow-md flex-col">
+              <div className=" flex flex-row justify-center w-full">
+                <div className=" flex flex-row w-2/3 ">
+                  {datosInsulina.map((item) => {
+                    return (
+                      <div className="flex flex-col w-full border-r-2 border-slate-800">
+                        <div className="justify-start items-start ml-10">
+                          <p className="text-sm text-neutral-500 mb-1">
+                            Tipo de insulina
+                          </p>
+                          <p className="font-bold text-base mb-4">
+                            {item.tipoInsulina}
+                          </p>
+                          <p className="text-sm text-neutral-600 mb-1">
+                            Nombre de la insulina utilizada:
+                          </p>
+                          <p className="font-bold text-base mb-5">
+                            {nombreInsulina}
+                          </p>
                         </div>
-                        <div className="flex flex-col w-[50%] justify-center items-center">
-                          <p className="font-bold">Alto</p>
-                          <p className="text-xl">{item.alto}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-[20%] flex flex-row justify-center items-center">
-                      <button
-                        type="button"
-                        onClick={() => deleteDatosAdicionales(item.id)}
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div>
-              {showAdditionalData && (
-                <Formik
-                  initialValues={{ marcaInsulina: "", bajo: "", alto: "" }}
-                  onSubmit={handleSubmit1}
-                  validationSchema={validationSchemaDatosAdicionales}
-                >
-                  {({
-                    handleSubmit,
-                    handleChange,
-                    handleBlur,
-                    values,
-                    errors,
-                    touched,
-                    isSubmitting,
-                  }) => (
-                    <div className="mt-4 bg-white p-4 rounded shadow-md">
-                      <form onSubmit={handleSubmit}>
-                        <div className="flex flex-col w-full mb-4">
-                          <label
-                            htmlFor="insulinBrand"
-                            className="font-bold mb-2"
-                          >
-                            Marca de Insulina
-                          </label>
-                          <select
-                            id="marcaInsulina"
-                            name="marcaInsulina"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            required
-                            value={values.marcaInsulina}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                          >
-                            <option value="" disabled selected>
-                              Seleccione una opción
-                            </option>
-                            {records.map((record) => (
-                              <option
-                                key={record.id}
-                                defaultValue={null}
-                                value={record.id}
-                              >
-                                {record.nombreInsulina}
-                              </option>
-                            ))}
-                          </select>
-                          {errors.marcaInsulina && touched.marcaInsulina && (
-                            <div className="text-red-500 text-sm">
-                              {errors.marcaInsulina}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex flex-col w-full mb-4">
-                          <label
-                            htmlFor="glucoseRange"
-                            className="font-bold mb-2"
-                          >
-                            Glucosa en Rango
-                          </label>
-                          <div className="flex space-x-4">
-                            <div className="flex flex-col w-1/2">
-                              <label
-                                htmlFor="lowGlucose"
-                                className="font-bold mb-2"
-                              >
-                                Bajo
-                              </label>
-                              <input
-                                id="bajo"
-                                type="number"
-                                name="bajo"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                required
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                              />
-                              {errors.bajo && touched.bajo && (
-                                <div className="text-red-500 text-sm">
-                                  {errors.bajo}
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="flex flex-col w-1/2">
-                              <label
-                                htmlFor="highGlucose"
-                                className="font-bold mb-2"
-                              >
-                                Alto
-                              </label>
-                              <input
-                                id="alto"
-                                type="number"
-                                name="alto"
-                                required
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                              />
-                              {errors.alto && touched.alto && (
-                                <div className="text-red-500 text-sm">
-                                  {errors.alto}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-end mt-4">
+                        <div className="flex flex-row justify-center items-center">
                           <button
-                            type=""
-                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            type="button"
+                            onClick={() => deleteDatosAdicionales(item.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
                           >
-                            Guardar
+                            Eliminar
                           </button>
                         </div>
-                      </form>
-                    </div>
-                  )}
-                </Formik>
-              )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="w-1/3 flex flex-row justify-center ">
+                  {datoRango.map((item) => {
+                    return (
+                      <div className="w-full justify-center">
+                        <h3 className="text-center text-sm text-neutral-600 mb-1 mt-3">
+                          Glucosa en Rango
+                        </h3>
+                        <div className="flex flex-row w-full justify-center items-center gap-x-28 mt-5">
+                          <div className="flex flex-col">
+                            <p>Bajo</p>
+                            <p className="font-bold">{item.bajo}</p>
+                          </div>
+                          <div className="">
+                            <p>Alto:</p>
+                            <p className="font-bold">{item.alto}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-row justify-center items-center mt-7">
+                          <button
+                            type="button"
+                            onClick={() => deleteRango(item.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center "
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className=" flex flex-row justify-end">
+                {datosInsulina.length >= 0 && datosInsulina.length < 2 && (
+                  <div className="mr-4">
+                    {showAdditionalData && (
+                      <div className="">
+                        <div className="flex justify-end ">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAddTypeInsuline(!showAddTypeInsuline)
+                            }
+                            className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                          >
+                            <FaPlus></FaPlus>
+                            <span>Agregar Insulina</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {datoRango.length === 0 && (
+                  <div>
+                    {showAdditionalData && (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowAddDataAditional(!showAddDataAditional)
+                          }
+                          className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                        >
+                          <FaPlus></FaPlus>
+                          <span>Agregar rango de glucosa</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                {showAddTypeInsuline && (
+                  <Formik
+                    initialValues={{
+                      marcaInsulina: "",
+                      tipoInsulina: "",
+                    }}
+                    onSubmit={handleSubmit1}
+                    validationSchema={validationSchemaDatosAdicionales}
+                  >
+                    {({
+                      handleSubmit,
+                      handleChange,
+                      handleBlur,
+                      values,
+                      errors,
+                      touched,
+                      isSubmitting,
+                    }) => (
+                      <div className="mt-4 w-full bg-white p-4 rounded shadow-md">
+                        <form onSubmit={handleSubmit}>
+                          <div className="flex flex-col w-full mb-4">
+                            <label
+                              htmlFor="insulinBrand"
+                              className="font-bold mb-2"
+                            >
+                              Tipo de insulina
+                            </label>
+                            <select
+                              id="tipoInsulina"
+                              name="tipoInsulina"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              required
+                              value={values.tipoInsulina}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            >
+                              <option value="" disabled selected>
+                                Seleccione una opción
+                              </option>
+                              <option value="Acción Rápida">
+                                Acción Rápida
+                              </option>
+                              <option value="Acción Intermedia">
+                                Acción Intermedia
+                              </option>
+                              <option value="Acción Lenta">Acción Lenta</option>
+                            </select>
+                            {errors.marcaInsulina && touched.marcaInsulina && (
+                              <div className="text-red-500 text-sm">
+                                {errors.marcaInsulina}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col w-full mb-4">
+                            <label
+                              htmlFor="insulinBrand"
+                              className="font-bold mb-2"
+                            >
+                              Marca de Insulina
+                            </label>
+                            <select
+                              id="marcaInsulina"
+                              name="marcaInsulina"
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                              required
+                              value={values.marcaInsulina}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            >
+                              <option value="" disabled selected>
+                                Seleccione una opción
+                              </option>
+                              {records.map((record) => (
+                                <option
+                                  key={record.id}
+                                  defaultValue={null}
+                                  value={record.id}
+                                >
+                                  {record.nombreInsulina}
+                                </option>
+                              ))}
+                            </select>
+                            {errors.marcaInsulina && touched.marcaInsulina && (
+                              <div className="text-red-500 text-sm">
+                                {errors.marcaInsulina}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex justify-end mt-4">
+                            <button
+                              type="submit"
+                              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            >
+                              Guardar
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+                  </Formik>
+                )}
+              </div>
+
+              <div>
+                {showAddDataAditional && (
+                  <Formik
+                    initialValues={{
+                      bajo: "",
+                      alto: "",
+                    }}
+                    onSubmit={handleSubRango}
+                    validationSchema={validationRango}
+                  >
+                    {({
+                      handleSubmit,
+                      handleChange,
+                      handleBlur,
+                      values,
+                      errors,
+                      touched,
+                      isSubmitting,
+                    }) => (
+                      <div className="mt-4 w-full bg-white p-4 rounded shadow-md">
+                        <form onSubmit={handleSubmit}>
+                          <div className="flex flex-col w-full mb-4">
+                            <label
+                              htmlFor="glucoseRange"
+                              className="font-bold mb-2"
+                            >
+                              Glucosa en Rango
+                            </label>
+                            <div className="flex space-x-4">
+                              <div className="flex flex-col w-1/2">
+                                <label
+                                  htmlFor="lowGlucose"
+                                  className="font-bold mb-2"
+                                >
+                                  Bajo
+                                </label>
+                                <input
+                                  id="bajo"
+                                  type="number"
+                                  name="bajo"
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  required
+                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                />
+                                {errors.bajo && touched.bajo && (
+                                  <div className="text-red-500 text-sm">
+                                    {errors.bajo}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex flex-col w-1/2">
+                                <label
+                                  htmlFor="highGlucose"
+                                  className="font-bold mb-2"
+                                >
+                                  Alto
+                                </label>
+                                <input
+                                  id="alto"
+                                  type="number"
+                                  name="alto"
+                                  required
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                />
+                                {errors.alto && touched.alto && (
+                                  <div className="text-red-500 text-sm">
+                                    {errors.alto}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex justify-end mt-4">
+                            <button
+                              type="submit"
+                              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                            >
+                              Guardar
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+                  </Formik>
+                )}
+              </div>
             </div>
           )}
         </div>
