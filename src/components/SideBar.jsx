@@ -801,6 +801,20 @@ export default function SideBar() {
                 </Link>
               </div>
             </div>
+            <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link
+                  to={"/registro2"}
+                  className="flex items-center cursor-pointer p-2 "
+                >
+                  <img
+                    className="h-5 w-5"
+                    alt="expedient"
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADeElEQVR4nO2ZW4hNYRTHfzPut0GU5IEiJXlwSUgiCUXJ5WGIMB5EyLgmD5JSyoxbPCkvPLiWkDxIBpEH5VIIY3LNtUHuZmvVf2u122cMztmzd+Zfq85Za+2v9e1vff+11jnQhCb8d+gIXJGUkGEcAALJITKKmdrAe0kgXabQCnio4MuA+fr8ULbMYLECvw4US65Lt4gMoUpBz3K6WdKdJ0N4q6C7Ol1X6d6QYgwCXgMX9ea/Keg2zqetdF+BUvk+AwaSIhxxNBs4Gex8hubwSRUthwxVAdx1QVodCXHQ6R8A2/S5mhThk4Ky9GkGbNT3OmAZUO6+bwCau1SzZ1OD5wqqu9OtjUkj04XoLp3dk9TR7VSns5N57DZRo3oSYloa6Xihgrocqdy73Ua2O30r+QZ6NjUY5QI+DLSPbNBkgXTt5RPq7dnU0m+N2pTtTlchXU0W6LcSuJ+jXgRZo9/moti6mA1kkn7XpYV+i4DpwFngA/ASOA1MSSP9DgJ2ALcU7AvgjJo6zyxROa55vNHptwTYnyOPvdQCy4EeSoVyN7Zeakz67QSsdBT4AzgKjAHaKeAyMUmgk+oWWaOfpj37ZSRx+i0BNit9/CKflKtRdNbdCMfVDmmg3wnAU0d/dgcmAis0ANmpzIl5zoaicw18awWl3yKdQp3LaRtuiJmjbbEhMWt0ET0GOU6u4PTbDNgrxy/A6gj1eYRHfC2Hz2TZn7pLnBj9bpaTMcy4+hyB1u5yx6WY4ZTsNiTFoSD0O0F5b0P+SBqGMMVu5LCPlf1ODnve6bele7vG+Q2FXb6rkdrgUSy7pVAc8k6/pTLeq+dOFAJ5p98jMi4lWeSdfh/J2CfhjTzLN/1+lbEFyeLiP9DvhbgFP8polJok1v4D/a6JW/C2jNaeJwlr6Z/8Bf0+jowDv1Aph10kj+HAuz+gXxsRhuVarK9aEmsGx5M8+qsW/Y5+L8m3XqyXs92XeSSPYmAGcBJ45YK3zydka1CNK4ocqbXik8TdjYFA8teYrRk8cN3rFvViNjhlZiPhaLveMYqvsLfFHlvVCUxWkzkA6KnNdlY98LQZ6nsBvYERqh9LgE3APmBVvjcSwoIZrROpcvWmUFKrFM/7RqJoob/FSlXM9ugiGpvcFEW+kXx3wXx2+mo1iPbMMWCnTn+ufqAIUZW2vw6a8N/hJ34gD/Zl2MhwAAAAAElFTkSuQmCC"
+                  />
+
+                  <span className="ml-3">Expediente</span>
+                </Link>
+              </div>
 
             {/* Aqui acaba */}
           </div>

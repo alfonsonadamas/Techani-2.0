@@ -31,6 +31,7 @@ import Grapics from "../pages/Graphics";
 import MyExercise from "../pages/MyExercise";
 import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
+import Registro2 from "../pages/Registro2";
 
 export const router = createBrowserRouter([
   {
@@ -299,6 +300,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Pagina1Registro />,
+          },
+        ],
+      },
+      {
+        path: "/registro2",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Registro2 />,
           },
         ],
       },
