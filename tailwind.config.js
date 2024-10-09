@@ -39,6 +39,7 @@ module.exports = {
     "./src/components/ModalGlucosa.jsx",
     "./src/pages/Profile.jsx",
     "./src/pages/SleepHours.jsx",
+    "./src/pages/MyGlucoseRegister.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {

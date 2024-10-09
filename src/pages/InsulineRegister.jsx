@@ -5,12 +5,14 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import * as Yup from "yup";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function InsulineRegister() {
   const { user } = useUserContext();
   const [insulineTypes, setinsulineTypes] = useState([]);
   const [doseTypes, setdoseTypes] = useState([]);
   const [submited, setSubmited] = useState(false);
+  const [records, setRecords] = useState([]);
 
   const getInsulineType = async () => {
     const { data, error } = await supabase.from("insulina").select("*");
@@ -22,6 +24,28 @@ export default function InsulineRegister() {
     const { data, error } = await supabase.from("tipoDosis").select("*");
     if (error) throw error;
     setdoseTypes(data);
+  };
+
+  const getRecords = async () => {
+    var today = new Date().toLocaleDateString();
+    today = today.split("/").reverse();
+    if (today[1].length === 1) {
+      today[1] = "0" + today[1];
+    }
+    today = today.join("-");
+
+    try {
+      const { data, error } = await supabase
+        .from("registroInsulina")
+        .select("*")
+        .eq("uid", user.id)
+        .eq("created_at", today);
+      if (error) throw error;
+      console.log("Datos anteriores", data);
+      setRecords(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onSubmit = async (
@@ -43,6 +67,19 @@ export default function InsulineRegister() {
       return;
     }
 
+    var duplicate = false;
+
+    if (records.length > 0) {
+      records.forEach((record) => {
+        if (record.medicion === medition) {
+          setErrors({
+            medition: "Ya existe un registro con este tipo de medición",
+          });
+          duplicate = true;
+        }
+      });
+    }
+
     const date = new Date().toLocaleDateString();
     var parts = date.split("/");
     var year = parts[2];
@@ -51,41 +88,29 @@ export default function InsulineRegister() {
     var formatDate = `${year}-${month}-${day}`;
 
     try {
-      setSubmitting(true);
-      const { data, error } = await supabase.from("registroInsulina").insert([
-        {
-          created_at: formatDate,
-          uid: user.id,
-          dosis: dose,
-          tipoInsulina: insulineType,
-          tipoDosis: doseType,
-          medicion: medition,
-        },
-      ]);
+      if (!duplicate) {
+        setSubmitting(true);
+        const { data, error } = await supabase.from("registroInsulina").insert([
+          {
+            created_at: formatDate,
+            uid: user.id,
+            dosis: dose,
+            tipoInsulina: insulineType,
+            tipoDosis: doseType,
+            medicion: medition,
+          },
+        ]);
 
-      if (error) throw error;
-      console.log(data);
-
-      // await emailjs.send(
-      //   "service_gb8sr3f",
-      //   "template_jt5p6ui",
-      //   {
-      //     to_email: user.email,
-      //     from_name: "Techani",
-      //     to_name: user.user_metadata.full_name,
-      //     message: `
-      //      Dosis: ${dose}
-      //      Tipo de dosis: ${doseType}
-      //      Tipo de insulina: ${insulineType}`,
-      //   },
-      //   "RBjxGi8gd0qdpEToN"
-      // );
-      setSubmited(true);
+        if (error) throw error;
+        console.log(data);
+        toast.success("Registro exitoso");
+        resetForm();
+        getRecords();
+      }
     } catch (error) {
       console.log(error);
     } finally {
       setSubmitting(false);
-      resetForm();
     }
   };
 
@@ -97,23 +122,27 @@ export default function InsulineRegister() {
   });
 
   useEffect(() => {
-    getInsulineType();
-    getDoseType();
-  }, []);
+    if (user) {
+      getInsulineType();
+      getDoseType();
+      getRecords();
+    }
+  }, [user]);
 
   return (
     <div>
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
+        <ToastContainer />
         <div className="w-full h-60 flex justify-center items-center">
           <div className=" w-full mt-20">
             {!submited ? (
               <Formik
                 initialValues={{
                   dose: "",
-                  doseType: "none",
-                  insulineType: "none",
-                  medition: "none",
+                  doseType: "",
+                  insulineType: "",
+                  medition: "",
                 }}
                 onSubmit={onSubmit}
                 validationSchema={validationSchema}

@@ -32,6 +32,7 @@ import MyExercise from "../pages/MyExercise";
 import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
 import SleepHours from "../pages/SleepHours";
+import MyGlucoseRegister from "../pages/MyGlucoseRegister";
 
 export const router = createBrowserRouter([
   {
@@ -88,7 +89,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllGlucoseRegister />,
+            element: <MyGlucoseRegister />,
           },
         ],
       },
@@ -215,6 +216,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/newActivitie",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -224,6 +226,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dailyRecord",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -233,6 +236,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/insulineRegister",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -242,6 +246,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/waterRegister",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -251,6 +256,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/atipicDayRegister",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -260,6 +266,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/files",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -269,6 +276,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/myFiles",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -278,6 +286,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/exercise",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -287,6 +296,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/graphics",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -296,6 +306,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/registroTemp",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -305,6 +316,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/sleep",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,

@@ -377,7 +377,7 @@ export default function Main() {
     }, 5000);
     console.log(tip);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   return (
     <div className="w-full h-full bg-[#F7F7F7]">
