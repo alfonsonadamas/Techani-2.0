@@ -14,9 +14,7 @@ import {
   FaTrash,
   FaPlus,
 } from "react-icons/fa";
-import { Form } from "react-router-dom";
-import { addYears } from "flowbite-react/lib/esm/components/Datepicker/helpers";
-import { Toast } from "flowbite-react";
+
 import Modal from "../components/Modal";
 
 export default function Profile() {
@@ -48,6 +46,7 @@ export default function Profile() {
   const [datoRango, setDatoRango] = useState([]);
   const [foto, setFoto] = useState([]);
   const [nombreInsulina, setNombreInsulina] = useState([]);
+  const [hasMapped, setHasMapped] = useState(false);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -70,31 +69,47 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    if (user) {
-      const avatarUrl =
-        user.user_metadata.avatar_url ||
-        "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png";
-      setProfile({
-        name: user.user_metadata.full_name || "",
-        email: user.email || "",
-        birthday: user.user_metadata.birthday || "",
-        phone: user.user_metadata.phone || "",
-        picture: avatarUrl,
-      });
-    }
     verFoto();
-    if (foto.length > 0) {
-      console.log(foto);
-    }
     mInsulina();
     getFamily();
     veriInsulina();
     verRango();
 
+    // Usamos setTimeout para esperar unos segundos antes de continuar
+    setTimeout(() => {
+      if (user) {
+        setProfile({
+          name: user.user_metadata.full_name || "",
+          email: user.email || "",
+          birthday: user.user_metadata.birthday || "",
+          phone: user.user_metadata.phone || "",
+          picture:
+            foto[0]?.picture || // Usamos el operador ?. para evitar errores si `foto[0]` no existe todavía
+            "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
+        });
+      }
+    }, 5000);
+
     if (datosInsulina.length > 0) {
-      nomIns(datosInsulina[0].marcaInsulina); // Pasa el id de la marca de insulina
+      nomIns(datosInsulina[0].marcaInsulina);
     }
-  }, [user]);
+  }, [user, profile]);
+
+  const verFoto = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("perfil")
+        .select("picture")
+        .eq("uid", user.id);
+
+      if (error) console.log("error", error);
+
+      setFoto(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -127,25 +142,10 @@ export default function Profile() {
     }
   };
 
-  const verFoto = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("perfil")
-        .select()
-        .eq("uid", user.id);
-
-      if (error) console.log("error", error);
-      setFoto(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const submitFoto = async ({ filename }, { setErrors, resetForm }) => {
     try {
       setLoading(true);
-      console.log(foto);
+
       const oldPictureName = foto[0].picture.split("/").pop();
       console.log(oldPictureName);
 
@@ -178,6 +178,7 @@ export default function Profile() {
         uid: user.id,
         picture: data.publicUrl,
       });
+      verFoto();
       toast.success("Foto actualizada");
     } catch (error) {
       console.log("Error", error);
@@ -209,7 +210,6 @@ export default function Profile() {
     { setSubmitting, setErrors, resetForm }
   ) => {
     setSubmitting(true);
-    console.log("Ya entre");
     try {
       const { data, error } = await supabase.from("glucosaRango").insert([
         {
@@ -233,7 +233,7 @@ export default function Profile() {
     { setSubmitting, setErrors, resetForm }
   ) => {
     setSubmitting(true);
-    console.log("Aca ando");
+
     try {
       const { data, error } = await supabase.from("datosAdicionales").insert([
         {
@@ -268,8 +268,6 @@ export default function Profile() {
         .eq("uid", user.id);
       if (error) throw error;
       setDatosInsulina(data);
-      console.log("Datos de datosInsuluna", datosInsulina);
-      console.log("Datos de data", data);
     } catch (error) {
       console.log(error);
     }
@@ -283,9 +281,6 @@ export default function Profile() {
         .eq("uid", user.id);
       if (error) throw error;
       setDatoRango(data);
-      console.log("Datos de data R:", data);
-      console.log("Datos de setDato", setDatoRango);
-      console.log("");
     } catch (error) {
       console.log(error);
     }
@@ -396,11 +391,13 @@ export default function Profile() {
     alto: Yup.number()
       .required("El registro alto es obligatorio")
       .typeError("El registro alto debe de ser un numero entero")
-      .positive("El rango debe de ser positivo"),
+      .positive("El rango debe de ser positivo")
+      .max(1000, "Numero máximo de registro de glucosa es 1000"),
     bajo: Yup.number()
       .required("El registro bajo es obligatorio")
       .typeError("El registro bajo debe de ser un numero entero")
-      .positive("El rango debe de ser positivo"),
+      .positive("El rango debe de ser positivo")
+      .min(1, "Numero mínimo de registro de glucosa es 1"),
   });
 
   const validationSchemaDatosAdicionales = Yup.object({
@@ -524,17 +521,10 @@ export default function Profile() {
               <div className="flex flex-col items-center mb-8">
                 <div className="relative">
                   <img
-                    src={previewImage} // Mostrar la vista previa en lugar de la imagen original
+                    src={profile.picture} // Mostrar la vista previa en lugar de la imagen original
                     alt="img_perfil"
                     className="rounded-full border-4 border-blue-300 shadow-lg"
                     width={200}
-                    onError={() =>
-                      setProfile((prevState) => ({
-                        ...prevState,
-                        picture:
-                          "https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png",
-                      }))
-                    }
                   />
                   <label
                     htmlFor="fileUpload"
