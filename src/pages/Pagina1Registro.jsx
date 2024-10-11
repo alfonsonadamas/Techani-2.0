@@ -493,11 +493,7 @@ export default function Pagina1Registro() {
 
                   />
 
-                  <InputType
-                    input="select"
-                    question="¿Cual es su estado civil?"
-                    options={[{ option: "soltero", value: "Soltero" }, { option: "casado", value: "Casado" }, { option: "viudo", value: "Viudo" }]}
-                  />
+                  
 
                 </div>
                 {/*FIN DE LADO IZQUIERDO DEL FORMULARIO */}
