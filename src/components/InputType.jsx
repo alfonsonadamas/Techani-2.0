@@ -1,18 +1,31 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-export default function InputType({input, options, question, name, handleChange, emergent, placeholder}) {
-    return (
-    <div style={{maxWidth:"350px"}}>
-      <h2 className="font-semibold mt-0 ">{question}</h2> 
+export default function InputType({input, options, question, name, handleChange, disabled, placeholder}) {
+  
+    const [isDisabled, setIsDisabled] = useState(false);
+
+    const verifyIsDisabled = () =>{
+      {/*Preguntamos si es undefined porque es la priemra opción seleccionada en un select 
+        y si la opción que seleccionó es "no" también se desabilita la opción de respuesta extra.*/}
+      if(disabled === undefined || disabled === "no"){
+        setIsDisabled(true);
+      } else setIsDisabled(false)
+    }
+
+    useEffect(() =>{
+      verifyIsDisabled()
+    },[disabled])
+  return (
+    
+    <div className='w-11/12'>
+      <h2 className="font-semibold mt-0">{question}</h2> 
+    <div >
       { input === "select" ?(
         <select 
           id={name}
           name={name}
-          defaultValue="disabled"        
+          defaultValue="disabled" 
           className={
-            emergent === "si" ?
-            "bg-gray-500 border border-black text-gray-900 border-radius text-sm rounded-lg focus:ring-blue-700 focus:border-blue-700 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-700 dark:focus:border-blue-700 shadow-md"
-              : 
             "bg-white border border-black text-gray-900 border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md"
             }
           onChange={handleChange}
@@ -31,16 +44,20 @@ export default function InputType({input, options, question, name, handleChange,
         name={name}
         type={input} 
         placeholder={placeholder}
+        disabled={isDisabled}  
         className={
-          emergent ?
-          "bg-white border border-black text-gray-900 border-radius text-sm rounded-lg focus:ring-blue-700 focus:border-blue-700 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-700 dark:focus:border-blue-700 shadow-md"
-            : 
-          "bg-white border border-black text-gray-900 border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md"
+          `${isDisabled === true 
+            ? "bg-white border border-black text-gray-900"  // Clases si no está deshabilitado.
+            : "bg-gray-200 border border-gray-400 text-gray-500"} 
+          border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+          dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+          dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`
         }
         onChange={handleChange}
       />
       )}
         
+    </div>
     </div>
   )
 }

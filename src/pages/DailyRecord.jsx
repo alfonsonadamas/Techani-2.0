@@ -88,7 +88,7 @@ export default function GlucoseRegisterMain() {
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
-                        class={
+                        className={
                           mouseEnter
                             ? "ml-3 w-4 h-4 translate-x-1 duration-300 ease-out"
                             : "ml-3 w-4 h-4 duration-300 ease-out"
