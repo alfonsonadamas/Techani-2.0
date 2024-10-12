@@ -6,10 +6,10 @@ export default function InputType({input, options, question, name, handleChange,
 
     const verifyIsDisabled = () =>{
       {/*Preguntamos si es undefined porque es la priemra opción seleccionada en un select 
-        y si la opción que seleccionó es "no" también se desabilita la opción de respuesta extra.*/}
-      if(disabled === undefined || disabled === "no"){
-        setIsDisabled(true);
-      } else setIsDisabled(false)
+        y si la opción que seleccionó es "si" se habilita la genera que se habilite la opción.*/}
+      if(disabled === undefined || disabled === "si"){
+        setIsDisabled(false);
+      } else setIsDisabled(true)
     }
 
     useEffect(() =>{
@@ -46,7 +46,7 @@ export default function InputType({input, options, question, name, handleChange,
         placeholder={placeholder}
         disabled={isDisabled}  
         className={
-          `${isDisabled === true 
+          `${isDisabled === false 
             ? "bg-white border border-black text-gray-900"  // Clases si no está deshabilitado.
             : "bg-gray-200 border border-gray-400 text-gray-500"} 
           border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
