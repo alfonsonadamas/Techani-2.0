@@ -881,12 +881,12 @@ export default function SideBar() {
             
             <div className=" font-semibold w-full hover:bg-gray-200 duration-300 rounded-md mt-1 pl-2">
                 <Link
-                  to={"/registro2"}
+                  to={"/myRecord"}
                   className="flex items-center cursor-pointer p-2 "
                 >
                   <img
                     className="h-5 w-5"
-                    alt="expedient"
+                    alt="folder"
                     src={carpeta}
                   />
 

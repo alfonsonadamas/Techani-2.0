@@ -33,7 +33,7 @@ import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
 import SleepHours from "../pages/SleepHours";
 import MyGlucoseRegister from "../pages/MyGlucoseRegister";
-import Registro2 from "../pages/Registro2";
+import Expediente from "../pages/Expediente";
 
 export const router = createBrowserRouter([
   {
@@ -326,12 +326,12 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/registro2",
+        path: "/myRecord",
         element: <LayoutPrivate />,
         children: [
           {
             index: true,
-            element: <Registro2 />,
+            element: <Expediente />,
           },
         ],
       },

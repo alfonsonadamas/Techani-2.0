@@ -2,32 +2,35 @@ import React, { useEffect, useState } from 'react'
 import SideBar from '../components/SideBar';
 import InputType from "../components/InputType";
 import { Formik } from "formik";
-import * as Yup from "yup";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 
 
-export default function Registro2() {
-    /*const { user } = useUserContext();
-    const [items, setItems] = useState([]);
+export default function Expediente() {
+    const { user } = useUserContext();
+    const [personalInformation, setPersonalInformation] = useState({});
+    const [val, setVal] = useState({})
 
    useEffect(() => {
-        if (user) {
-            getData();
-        }
+        
+    initialPersonalInformation();
+
     }, [user]);
 
-    const getData = async () => {
-        if (user.id) {
-            console.log(user)
-        }
-    };*/
-
-    const FormInformacionPersonal = () => (
-        <div>
-            <Formik
-                initialValues={{
+    
+    const initialPersonalInformation  = async () => {
+            try {
+              const { data, error } = await supabase
+                .from("infromacionPersonal")
+                .select("*")
+                .eq("uid", user.id);
+              console.log("Datos ", data);
+              
+                console.log(data)
+              if(data === null || error){
+                setPersonalInformation({
                     fullName: '',
                     birthdate: '',
                     placeOfBirth: '',
@@ -46,13 +49,76 @@ export default function Registro2() {
                     actualState: '',
                     apgarScore: '',
                     complicationsInPregnancy: '',
-                    specificPregnancyProblem: '',
-                }}
-                onSubmit={(values) => {
-                    console.log(values)
+                    specificPregnancyProblem: ''
+                })
+              } else {setPersonalInformation(data)}
+              console.log(personalInformation)
+            } catch (error) {
+              console.log(error);
+            }
+    };
 
+    const submitPersonalInformation = async (
+         values  ,
+        { setErrors, resetForm })  =>{
+        
+            const { data, error } = await supabase
+                .from("informacionPersonal")
+                .insert({
+                    uid: user.id,
+                    fullName: values.fullName,
+                    birthdate: values.birthdate,
+                    placeOfBirth: values.placeOfBirth,
+                    weightAtBirth: values.weightAtBirth,
+                    typeOfDelivery: values.typeOfDelivery,
+                    bloodType: values.bloodType,
+        
+                    email: values.email,
+                    maritalStatus: values.maritalStatus,
+                    stateOfBirth: values.stateOfBirth,
+                    sizeAtBirth: values.sizeAtBirth,
+                    gestationalWeeks: values.gestationalWeeks,
+        
+                    biologicalSex: values.biologicalSex,
+                    ocupation: values.ocupation,
+                    actualState: values.actualState,
+                    apgarScore: values.apgarScore,
+                    complicationsInPregnancy: values.complicationsInPregnancy,
+                    specificPregnancyProblem: values.specificPregnancyProblem, 
+                    }
+                );
+                if (error) throw error;
+            toast.success("Datos Guardados");
+
+    }
+    const FormInformacionPersonal = () => (
+        <div>
+            <ToastContainer />
+            <Formik
+                initialValues={{
+                    fullName: personalInformation.fullName,
+                    birthdate: personalInformation.birthdate,
+                    placeOfBirth: personalInformation.placeOfBirth,
+                    weightAtBirth: personalInformation.weightAtBirth,
+                    typeOfDelivery: personalInformation.typeOfDelivery,
+                    bloodType: personalInformation.bloodType,
+
+                    email: personalInformation.email,
+                    maritalStatus: personalInformation.maritalStatus,
+                    stateOfBirth: personalInformation.stateOfBirth,
+                    sizeAtBirth: personalInformation.sizeAtBirth,
+                    gestationalWeeks: personalInformation.gestationalWeeks,
+
+                    biologicalSex: personalInformation.biologicalSex,
+                    ocupation: personalInformation.ocupation,
+                    actualState: personalInformation.actualState,
+                    apgarScore: personalInformation.apgarScore,
+                    complicationsInPregnancy: personalInformation.complicationsInPregnancy,
+                    specificPregnancyProblem: personalInformation.specificPregnancyProblem, 
+                    
                 }}
-                validationSchema={console.log("")}
+                onSubmit={submitPersonalInformation}
+                
             >
                 {({ handleSubmit,
                     handleChange,
@@ -82,17 +148,12 @@ export default function Registro2() {
                                 </p>
                             </div>
                             <div className="col-span-4 col-start-1 row-start-2">
-                                <InputType
+                                 <InputType
                                     name="birthdate"
                                     input="date"
                                     question="Fecha de Nacimiento"
                                     handleChange={handleChange}
                                 />
-                                <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                                    {errors.birthdate &&
-                                        touched.birthdate &&
-                                        errors.birthdate}{" "}
-                                </p>
                             </div>
                             <div className="col-span-4 col-start-1 row-start-3">
                                 <InputType
@@ -153,7 +214,14 @@ export default function Registro2() {
                                     input="email"
                                     question="Correo electrónico"
                                     handleChange={handleChange}
+                                    
                                 />
+                                <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                                    {errors.birthdate &&
+                                        touched.birthdate &&
+                                        errors.birthdate}{" "}
+                                </p>
+                               
                                 <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                                     {errors.email &&
                                         touched.email &&
@@ -165,7 +233,9 @@ export default function Registro2() {
                                     name="maritalStatus"
                                     input="select"
                                     question="Estado civil"
-                                    options={[{ option: "soltero", value: "Soltero" }, { option: "casado", value: "Casado" }, { option: "viudo", value: "Viudo" }]}
+                                    options={[{ option: "soltero", value: "Soltero" }, { option: "casado", value: "Casado" }, 
+                                              { option: "viudo", value: "Viudo" }]}
+                                    handleChange={handleChange}
                                 />
                                 <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                                     {errors.maritalStatus &&
@@ -207,9 +277,9 @@ export default function Registro2() {
                                     handleChange={handleChange}
                                 />
                                 <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                                    {errors.weeksAtBirth &&
-                                        touched.weeksAtBirth &&
-                                        errors.weeksAtBirth}{" "}
+                                    {errors.gestationalWeeks &&
+                                        touched.gestationalWeeks &&
+                                        errors.gestationalWeeks}{" "}
                                 </p>
                             </div>
                             {/*Fin del contenedor medio */}
@@ -234,15 +304,26 @@ export default function Registro2() {
                                     name="ocupation"
                                     input="text"
                                     question="¿Cual es su ocupacion?"
+                                    handleChange={handleChange}
                                 />
+                                <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                                    {errors.ocupation &&
+                                        touched.ocupation &&
+                                        errors.ocupation}{" "}
+                                </p>
                             </div>
                             <div className="col-span-4 col-start-9 row-start-3">
                                 <InputType
                                     name="actualState"
-                                    input="number"
+                                    input="text"
                                     question="Estado actual de residencia"
                                     handleChange={handleChange}
                                 />
+                                <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                                    {errors.actualState &&
+                                        touched.actualState &&
+                                        errors.actualState}{" "}
+                                </p>
                             </div>
                             <div className="col-span-4 col-start-9 row-start-4">
                                 <InputType
@@ -274,6 +355,11 @@ export default function Registro2() {
                                             ]}
                                             handleChange={handleChange}
                                         />
+                                        <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                                            {errors.complicationsInPregnancy &&
+                                                touched.complicationsInPregnancy &&
+                                                errors.complicationsInPregnancy}{" "}
+                                        </p>
                                     </div>
                                     <div className=' w-2/3 mr-3'>
                                         <InputType
@@ -286,6 +372,11 @@ export default function Registro2() {
                                         />
 
                                     </div>
+                                        <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                                            {errors.specificPregnancyProblem &&
+                                                touched.specificPregnancyProblem &&
+                                                errors.specificPregnancyProblem}{" "}
+                                        </p>
 
                                 </div>
 
@@ -320,7 +411,7 @@ export default function Registro2() {
                     console.log(values)
 
                 }}
-                validationSchema={console.log("3")}
+                validationSchema={console.log("validationSchema3")}
             >
                 {({ handleSubmit,
                     handleChange,
@@ -504,7 +595,7 @@ export default function Registro2() {
                             <div className="col-span-4 col-start-9 row-start-2">
                                 {/*Contenedor con dos inputs en linea*/}
                                 <div className='flex flex-auto'>
-                                    <p className='font-semibold mb-0'>Última medición de colesterol y fech</p>
+                                    <p className='font-semibold mb-0'>Última medición de colesterol y fecha</p>
                                 </div>
                                 <div className='col-span-4 col-start-1 row-start-2 grid-cols-4 flex flex-row items-start'>
                                     <div className=' w-1/3'>
