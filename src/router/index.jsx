@@ -33,6 +33,7 @@ import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
 import SleepHours from "../pages/SleepHours";
 import MyGlucoseRegister from "../pages/MyGlucoseRegister";
+import EditRecords from "../pages/EditRecords";
 
 export const router = createBrowserRouter([
   {
@@ -70,6 +71,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <GlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/editRecords",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <EditRecords />,
           },
         ],
       },
