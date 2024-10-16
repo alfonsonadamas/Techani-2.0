@@ -6,6 +6,7 @@ import act1 from "../assets/img/yoga.png";
 import act2 from "../assets/img/ejercicio.png";
 import sleep from "../assets/img/sleep.png";
 import sleeping from "../assets/img/sleeping.png";
+import carpeta from "../assets/img/carpeta-abierta.png";
 
 export default function SideBar() {
   const { user } = useUserContext();
@@ -897,6 +898,22 @@ export default function SideBar() {
                 </Link>
               </div>
             </div>
+            
+            <div className=" font-semibold w-full hover:bg-gray-200 duration-300 rounded-md mt-1 pl-2">
+                <Link
+                  to={"/myRecord"}
+                  className="flex items-center cursor-pointer p-2 "
+                >
+                  <img
+                    className="h-5 w-5"
+                    alt="folder"
+                    src={carpeta}
+                  />
+
+                  <span className="ml-3">Expediente</span>
+                </Link>
+              </div>
+            
 
             {/* Aqui acaba */}
           </div>

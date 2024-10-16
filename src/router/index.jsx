@@ -34,6 +34,7 @@ import Pagina1Registro from "../pages/Pagina1Registro";
 import SleepHours from "../pages/SleepHours";
 import MyGlucoseRegister from "../pages/MyGlucoseRegister";
 import EditRecords from "../pages/EditRecords";
+import Expediente from "../pages/Expediente";
 
 export const router = createBrowserRouter([
   {
@@ -332,6 +333,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <SleepHours />,
+          },
+        ],
+      },
+      {
+        path: "/myRecord",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Expediente />,
           },
         ],
       },
