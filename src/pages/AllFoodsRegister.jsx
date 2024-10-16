@@ -44,17 +44,6 @@ export default function AllFoodsRegister() {
         setEditMeal(null);
     };
 
-    const openModalTime = (record) => {
-        setEditTimeMeal(record);
-        console.log(record);
-        setModalTimeIsOpen(true);
-    }
-
-    const closeModalTime = () => {
-        setModalTimeIsOpen(false);
-        setEditTimeMeal(null);
-    };
-
     const openModalMealType = (record) => {
         setEditMealType(record);
         setModalMealTypeIsOpen(true);
@@ -118,36 +107,6 @@ export default function AllFoodsRegister() {
             getFoods();//actualiza
         }
     };
-
-    const updatehour = async (
-        {
-            comidas,time
-        },
-        {setSubmitting, setErrors, resetForm}
-    ) => {
-        try {
-            setSubmitting(true);
-            console.log("comidas:",comidas,"time:",time);
-            await Promise.all(
-                comidas.meal.map(async (comida) =>{
-                await supabase
-                    .from("alimentos")
-                    .update({
-                        hour:time
-                    })
-                    .eq("uid",user.id)
-                    .eq("idAlimentos",comida.idAlimentos);
-                })
-            );
-            closeModalTime();
-        } catch (error) {
-            console.log(error);
-        } finally{
-            setSubmitting(false);
-            filterDay();
-            getFoods();
-        }
-    }
 
     const updateMealType = async (
         { comidas, mealType, hora },
@@ -327,6 +286,7 @@ export default function AllFoodsRegister() {
         );
         // Actualizar el estado con los alimentos filtrados
         setFoods(mealFilter);
+
         // Procesar los alimentos filtrados para mostrar las comidas agrupadas
         const mealType = () => {
             const Mealstype = [];
@@ -389,10 +349,22 @@ export default function AllFoodsRegister() {
         mealType:Yup.string().required("Este campo es requerido"),
     })
 
+    let fecha = new Date(daySelect);
+    fecha.setDate(fecha.getDate() + 1);
+    let opciones = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+
+    let date = !isNaN(fecha) ? fecha.toLocaleDateString('es-ES', opciones) : null ;
+
     useEffect(() => {
         getFoods();
         getMeals();
         getMealsType();
+        console.log("food",foods);
     }, [user]);
 
     useEffect(() => {
@@ -439,7 +411,6 @@ export default function AllFoodsRegister() {
                         <button
                             onClick={filterDay}
                             className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
-                            // disabled={loading}
                         >
                             Filtrar
                         </button>
@@ -449,7 +420,9 @@ export default function AllFoodsRegister() {
                         >
                             Actualizar
                         </button>
-                        <div className="w-full mt-4">
+                        <p className="my-3"><span>⚠</span>Selecciona un alimento para ver más opciones</p>
+                        <h1 className="text-blue-500">{date}</h1>
+                        <div className="flex w-full mt-4">
                             {meals && meals.length === 0 &&(
                             <div>
                                 {loading && (
@@ -488,9 +461,9 @@ export default function AllFoodsRegister() {
                             </div>
                             )}
 
-                            {meals.length > 0 && meals.map(comida => (
-                                <div className="mb-6" key={comida.tipoComida.idTipocomida}>
-                                    <div className="flex items-center">
+                            {foods.length > 0 && meals.map(comida => (
+                                <div className="mb-6 mx-4" key={comida.tipoComida.idTipocomida}>
+                                    <div className="">
                                         <h3 className="text-xl font-semibold cursor-pointer hover:underline" onClick={() =>handleBotonMealType(comida.tipoComida.idTipocomida)}>{comida.tipoComida.meal} - {comida.hour}</h3>
                                         {IDmealtype === comida.tipoComida.idTipocomida && (
                                             <div className="flex" data-aos="fade-left" data-aos-duration="250">
