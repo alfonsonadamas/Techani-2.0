@@ -84,34 +84,30 @@ export default function Expediente() {
         .from("informacionPersonal")
         .select("*")
         .eq("uid", user.id);
-      console.log("Datos ", data[0]);
+setPersonalInformation({
+        fullName: data[0].fullName || '',
+        birthdate: data[0].birthdate || '',
+          placeOfBirth:data[0].placeOfBirth || '',
+         weightAtBirth:data[0].weightAtBirth || '',
+        typeOfDelivery:data[0].typeOfDelivery || 'disabled',
+             bloodType:data[0].bloodType || '',
 
-      if (error) throw error;
+                email:data[0].email || '',
+        maritalStatus:data[0].maritalStatus || '',
+         stateOfBirth:data[0].stateOfBirth || '',
+          sizeAtBirth:data[0].sizeAtBirth || '',
+     gestationalWeeks:data[0].gestationalWeeks || '',
+        biologicalSex:data[0].biologicalSex || 'disabled',
+            ocupation:data[0].ocupation || '',
+          actualState:data[0].actualState || '',
+          apgarScore: data[0].apgarScore || '',          
+        complicationsInPregnancy:data[0].complicationsInPregnancy || 'disabled',
+        specificPregnancyProblem:data[0].specificPregnancyProblem || '',
+
+      });
       if (data[0] !== undefined) {
-        setPersonalInformation(data[0]);
         setUpdateInformacionPersonal(true);
       } else {
-        setPersonalInformation({
-          fullName: '',
-          birthdate: '',
-          placeOfBirth: '',
-          weightAtBirth: '',
-          typeOfDelivery: '',
-          bloodType: '',
-
-          email: '',
-          maritalStatus: '',
-          stateOfBirth: '',
-          sizeAtBirth: '',
-          gestationalWeeks: '',
-
-          biologicalSex: '',
-          ocupation: '',
-          actualState: '',
-          apgarScore: '',
-          complicationsInPregnancy: '',
-          specificPregnancyProblem: '',
-        });
         setUpdateInformacionPersonal(false);
       }
       console.log("Es upgrade? :", updateInformacionPersonal)
@@ -121,15 +117,20 @@ export default function Expediente() {
       console.log(error);
     }
   };
-
+  const initialValue = (value) =>{
+    console.log("Hola",value)
+    if(value === null || value === ""){
+      return "disabled";
+    }
+    else return value;
+  };
 
   useEffect(() => {
-
+    setTimeout(() => {
     if (user) {
       initialPersonalInformation();
-      console.log("Personal informacion", personalInformation);
-      console.log(personalInformation.fullName);
-    }
+      }
+    }, 2000);
   }, [user]);
   /*{
                           isDisabled === false
@@ -143,29 +144,9 @@ export default function Expediente() {
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
         <ToastContainer />
         <Formik
-          initialValues={{
-            fullName: personalInformation.fullName,
-            birthdate: personalInformation.birthdate,
-            placeOfBirth: personalInformation.placeOfBirth,
-            weightAtBirth: personalInformation.weightAtBirth,
-            typeOfDelivery: personalInformation.typeOfDelivery,
-            bloodType: personalInformation.bloodType,
-
-            email: personalInformation.email,
-            maritalStatus: personalInformation.maritalStatus,
-            stateOfBirth: personalInformation.stateOfBirth,
-            sizeAtBirth: personalInformation.sizeAtBirth,
-            gestationalWeeks: personalInformation.gestationalWeeks,
-
-            biologicalSex: personalInformation.biologicalSex,
-            ocupation: personalInformation.ocupation,
-            actualState: personalInformation.actualState,
-            apgarScore: personalInformation.apgarScore,
-            complicationsInPregnancy:
-              personalInformation.complicationsInPregnancy,
-            specificPregnancyProblem:
-              personalInformation.specificPregnancyProblem,
-          }}
+          initialValues={
+            personalInformation
+          }
           onSubmit={submitPersonalInformation}
         >
           {({ handleSubmit, handleChange, values, errors, touched }) => (
@@ -189,7 +170,7 @@ export default function Expediente() {
                   <input
                     name="fullName"
                     type="text"
-                    defaultValue={personalInformation.fullName}
+                    value={values.fullName}
                     onChange={handleChange}
                     className={inputStyle}
                   />
@@ -205,7 +186,7 @@ export default function Expediente() {
                       name="birthdate"
                       type="date"
                       onChange={handleChange}
-                      defaultValue={personalInformation.birthdate}
+                      value={values.birthdate}
                       className={inputStyle}
                     />
 
@@ -222,7 +203,7 @@ export default function Expediente() {
                       name="placeOfBirth"
                       type="text"
                       onChange={handleChange}
-                      defaultValue={personalInformation.placeOfBirth}
+                      defaultValue={values.placeOfBirth}
                       className={inputStyle}
                     />
 
@@ -252,9 +233,9 @@ export default function Expediente() {
                   <p className="font-semibold">Tipo de parto</p>
                   <select
                     name="typeOfDelivery"
-                    defaultValue={personalInformation.typeOfDelivery !== null ? personalInformation.typeOfDelivery : "disabled"} onChange={handleChange} className={inputStyle}
+                    defaultChecked={personalInformation.typeOfDelivery !== null ? personalInformation.typeOfDelivery : "disabled"} onChange={handleChange} className={inputStyle}
                   >
-                    <option value="disabled">--Selecciona una opción--</option>
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
                     <option value="parto natural">Parto Natural</option>
                     <option value="cesarea">Cesarea</option>
                   </select>
@@ -272,9 +253,9 @@ export default function Expediente() {
                     type="text"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.bloodType}
+                    defaultValue={values.bloodType}
                   >
-                    <option value="disabled">--Selecciona una opción--</option>
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
                     <option value="A+">A+</option>
@@ -292,7 +273,7 @@ export default function Expediente() {
                     name="email"
                     type="email"
                     onChange={handleChange}
-                    defaultValue={personalInformation.email}
+                    value={values.email}
                     className={inputStyle}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
@@ -305,9 +286,9 @@ export default function Expediente() {
                     name="maritalStatus"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.maritalStatus}
+                    value={values.maritalStatus}
                   >
-                    <option value="disabled">--Selecciona una opción--</option>
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
                     <option value="soltero">Soltero</option>
                     <option value="casado">Casado</option>
                     <option value="viudo">Viudo</option>
@@ -325,7 +306,7 @@ export default function Expediente() {
                     type="text"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.stateOfBirth}
+                    value={personalInformation.stateOfBirth}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.stateOfBirth && touched.stateOfBirth}
@@ -338,7 +319,7 @@ export default function Expediente() {
                     type="number"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.sizeAtBirth}
+                    value={values.sizeAtBirth}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.sizeAtBirth && touched.sizeAtBirth}
@@ -364,11 +345,12 @@ export default function Expediente() {
                   <p className="font-semibold">Sexo biologico</p>
                   <select
                     name="biologicalSex"
-                    onChange={handleChange}
+                    onChange={ (e) =>{setPersonalInformation(personalInformation.biologicalSex = e.target.value)
+                    }}
                     className={inputStyle}
-                    defaultValue={personalInformation.maritalStatus}
+                    value={personalInformation.biologicalSex}
                   >
-                    <option value="disabled">--Selecciona una opción--</option>
+                    <option value="disabled" disabled selected>--Selecciona una opción--</option>
                     <option value="femenino">Femenino</option>
                     <option value="masculino">Masculino</option>
                   </select>
@@ -411,7 +393,7 @@ export default function Expediente() {
                     type="number"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.apgarScore}
+                    value={values.apgarScore}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.apgarScore &&
@@ -433,9 +415,9 @@ export default function Expediente() {
                         <select name="complicationsInPregnancy"
                           onChange={handleChange}
                           className={inputStyle}
-                          defaultValue={personalInformation.complicationsInPregnancy}
+                          value={personalInformation.complicationsInPregnancy}
                         >
-                          <option value="disabled">--Seleciona una opciópn--</option>
+                          <option value="disabled" disabled>--Seleciona una opciópn--</option>
                           <option value="si">Si</option>
                           <option value="no">No</option>
                         </select>
@@ -450,7 +432,7 @@ export default function Expediente() {
                           onChange={handleChange}
                           placeholder="¿Cuál?"
                           defaultValue={personalInformation.specificPregnancyProblem}
-                          disabled={values.complicationsInPregnancy === "no"}
+                          disabled={values.complicationsInPregnancy}
                           className={inputStyle}
                         />
                       </div>
@@ -478,6 +460,7 @@ export default function Expediente() {
             </form>
           )}
         </Formik>
+        {/*Formulario 2 */}
         <Formik
           initialValues={{}}
           onSubmit={(values) => {
