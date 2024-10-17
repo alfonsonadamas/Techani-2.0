@@ -2283,6 +2283,10 @@ input:checked + .toggle-bg{
   gap: 1rem;
 }
 
+.gap-x-1{
+  column-gap: 0.25rem;
+}
+
 .-space-x-4 > :not([hidden]) ~ :not([hidden]){
   --tw-space-x-reverse: 0;
   margin-right: calc(-1rem * var(--tw-space-x-reverse));
@@ -6723,6 +6727,10 @@ input:checked + .toggle-bg{
 
   .md\:flex-row{
     flex-direction: row;
+  }
+
+  .md\:flex-col{
+    flex-direction: column;
   }
 
   .md\:items-center{

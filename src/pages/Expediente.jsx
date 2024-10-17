@@ -9,65 +9,133 @@ import { useUserContext } from "../context/UserContext";
 
 export default function Expediente() {
   const { user } = useUserContext();
-  const [personalInformation, setPersonalInformation] = useState([]);
-  const [val, setVal] = useState({});
-  const [isDisabled, setIsDisabled] = useState(false);
-
+  const [personalInformation, setPersonalInformation] = useState([{}]);
+  const [updateInformacionPersonal, setUpdateInformacionPersonal] = useState(false);
+ const inputStyle = `border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+          dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+          dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`
   const submitPersonalInformation = async (
     values,
     { setErrors, resetForm }
   ) => {
-    const { data, error } = await supabase.from("informacionPersonal").insert({
-      uid: user.id,
-      fullName: values.fullName,
-      birthdate: values.birthdate,
-      placeOfBirth: values.placeOfBirth,
-      weightAtBirth: values.weightAtBirth,
-      typeOfDelivery: values.typeOfDelivery,
-      bloodType: values.bloodType,
 
-      email: values.email,
-      maritalStatus: values.maritalStatus,
-      stateOfBirth: values.stateOfBirth,
-      sizeAtBirth: values.sizeAtBirth,
-      gestationalWeeks: values.gestationalWeeks,
+    if(updateInformacionPersonal === true){
+        const {data, error} = await supabase
+         .from("informacionPersonal")
+         .update({
+            fullName: values.fullName,
+            birthdate: values.birthdate,
+            placeOfBirth: values.placeOfBirth,
+            weightAtBirth: values.weightAtBirth,
+            typeOfDelivery: values.typeOfDelivery,
+            bloodType: values.bloodType,
+      
+            email: values.email,
+            maritalStatus: values.maritalStatus,
+            stateOfBirth: values.stateOfBirth,
+            sizeAtBirth: values.sizeAtBirth,
+            gestationalWeeks: values.gestationalWeeks,
+      
+            biologicalSex: values.biologicalSex,
+            ocupation: values.ocupation,
+            actualState: values.actualState,
+            apgarScore: values.apgarScore,
+            complicationsInPregnancy: values.complicationsInPregnancy,
+            specificPregnancyProblem: values.specificPregnancyProblem,
+                 })
+         .eq("uid", user.id)
+        if (error) throw error;
+        toast.success("Campos actualizados");
+        console.log(data)
+    }
+    else{
+        const { data, error } = await supabase.from("informacionPersonal").insert({
+            uid: user.id,
+            fullName: values.fullName,
+            birthdate: values.birthdate,
+            placeOfBirth: values.placeOfBirth,
+            weightAtBirth: values.weightAtBirth,
+            typeOfDelivery: values.typeOfDelivery,
+            bloodType: values.bloodType,
+      
+            email: values.email,
+            maritalStatus: values.maritalStatus,
+            stateOfBirth: values.stateOfBirth,
+            sizeAtBirth: values.sizeAtBirth,
+            gestationalWeeks: values.gestationalWeeks,
+      
+            biologicalSex: values.biologicalSex,
+            ocupation: values.ocupation,
+            actualState: values.actualState,
+            apgarScore: values.apgarScore,
+            complicationsInPregnancy: values.complicationsInPregnancy,
+            specificPregnancyProblem: values.specificPregnancyProblem,
+          });
+          if (error) throw error;
+            else console.log(data);
+            toast.success("Datos Guardados");
+    }
+    
+    
+  };
+  const initialPersonalInformation = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("informacionPersonal")
+        .select("*")
+        .eq("uid", user.id);
+      console.log("Datos ", data[0]);
 
-      biologicalSex: values.biologicalSex,
-      ocupation: values.ocupation,
-      actualState: values.actualState,
-      apgarScore: values.apgarScore,
-      complicationsInPregnancy: values.complicationsInPregnancy,
-      specificPregnancyProblem: values.specificPregnancyProblem,
-    });
-    if (error) throw error;
-    toast.success("Datos Guardados");
+      if (error) throw error;
+      if(data[0] !== undefined){
+            setPersonalInformation(data[0]);
+            setUpdateInformacionPersonal(true);
+      } else{
+        setPersonalInformation({
+          fullName:'',
+          birthdate: '',
+          placeOfBirth: '',
+          weightAtBirth: '',
+          typeOfDelivery: '',
+          bloodType: '',
+
+          email: '',
+          maritalStatus: '',
+          stateOfBirth: '',
+          sizeAtBirth: '',
+          gestationalWeeks: '',
+
+          biologicalSex: '',
+          ocupation: '',
+          actualState: '',
+          apgarScore: '',
+          complicationsInPregnancy:'',
+          specificPregnancyProblem:'',});
+        setUpdateInformacionPersonal(false);
+      }
+      console.log("Es upgrade? :", updateInformacionPersonal)
+
+      console.log(data[0]);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
+  
   useEffect(() => {
-    const initialPersonalInformation = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("informacionPersonal")
-          .select("*")
-          .eq("uid", user.id);
-        console.log("Datos ", data);
-
-        if (error) throw error;
-
-        setPersonalInformation(data[0]);
-
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    
     if (user) {
       initialPersonalInformation();
       console.log("Personal informacion", personalInformation);
       console.log(personalInformation.fullName);
     }
   }, [user]);
-
+/*{
+                        isDisabled === false
+                          ? `bg-white border border-black text-gray-900 ${style}`  // Clases si no está deshabilitado.
+                          : `bg-gray-200 border border-gray-400 text-gray-500${style}`
+                        } 
+*/
   return (
     <div>
       <SideBar />
@@ -113,100 +181,115 @@ export default function Expediente() {
 
               <hr className="border-gray-400" />
               {/* grid para formulario 1*/}
-              <div className="grid grid-cols-12 grid-rows-6 justify-items-stretch mt-5 pl-5 gap-1">
+              <div className="grid grid-cols-12 grid-rows-6 justify-items-stretch mt-5 pl-5 gap-x-1">
                 {/*Lado izquierdo del contenedor */}
-                <div className="col-span-4">
-                  <div className="w-11/12">
-                    <label>Nombre Completo</label>
+                <div className="col-span-4 w-11/12">
+                  <p className="font-semibold">Nombre Completo</p>
                     <input
                       name="fullName"
-                      input="text"
-                      question="Nombre Completo"
+                      type="text"
+                      defaultValue={personalInformation.fullName}
                       onChange={handleChange}
-                      value={personalInformation.fullName}
-                      className={`${
-                        isDisabled === false
-                          ? "bg-white border border-black text-gray-900" // Clases si no está deshabilitado.
-                          : "bg-gray-200 border border-gray-400 text-gray-500"
-                      } 
-          border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-          dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-          dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`}
+                      className={inputStyle}
                     />
-
                     <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                       {touched.fullName && errors.fullName}
                     </p>
-                  </div>
+                  
                 </div>
                 <div className="col-span-4 col-start-1 row-start-2">
-                  <InputType
-                    name="birthdate"
-                    input="date"
-                    question="Fecha de Nacimiento"
-                    handleChange={handleChange}
-                  />
+                    <div className="w-11/12">
+                     <label htmlFor="question" className="font-semibold">Fecha de Nacimiento</label>
+                        <input
+                        name="birthdate"
+                        type="date"                    
+                        onChange={handleChange}
+                        defaultValue={personalInformation.birthdate}
+                        className={inputStyle}
+                        />
+
+                        <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                        {touched.birthdate && errors.birthdate}
+                        </p>
+                  </div>
+                  
                 </div>
                 <div className="col-span-4 col-start-1 row-start-3">
-                  <InputType
-                    name="placeOfBirth"
-                    input="text"
-                    question="Lugar de Nacimiento"
-                    handleChange={handleChange}
-                  />
-                  <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                    {errors.placeOfBirth &&
-                      touched.placeOfBirth &&
-                      errors.placeOfBirth}{" "}
-                  </p>
+                    <div className="w-11/12">
+                        <label htmlFor="question" className="font-semibold">Lugar de Nacimiento</label>
+                            <input
+                            name="placeOfBirth"
+                            type="text"                    
+                            onChange={handleChange}
+                            defaultValue={personalInformation.placeOfBirth}
+                            className={inputStyle}
+                            />
+
+                            <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                            {touched.placeOfBirth && errors.placeOfBirth}
+                            </p>
+                    </div>
                 </div>
                 <div className="col-span-4 col-start-1 row-start-4">
-                  <InputType
-                    name="weightAtBirth"
-                    input="number"
-                    question="Peso al nacer"
-                    handleChange={handleChange}
-                  />
-                  <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                    {errors.weightAtBirth &&
-                      touched.weightAtBirth &&
-                      errors.weightAtBirth}{" "}
-                  </p>
+                    <div className="w-11/12">
+                        <label htmlFor="question" className="font-semibold">Peso a nacer</label>
+                            <input
+                            name="weightAtBirth"
+                            type="number"                    
+                            onChange={handleChange}
+                            defaultValue={personalInformation.weightAtBirth}
+                            className={inputStyle}
+                            />
+
+                            <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                            {touched.weightAtBirth && errors.weightAtBirth}
+                            </p>
+                    </div>
+                  
                 </div>
-                <div className="col-span-4 col-start-1 row-start-5">
-                  <InputType
-                    name="typeOfDelivery"
-                    input="select"
-                    question="Tipo de parto"
-                    options={[
-                      { option: "parto natural", value: "Parto Natural" },
-                      { option: "cesarea", value: "Cesárea" },
-                    ]}
-                    handleChange={handleChange}
-                  />
+                <div className="col-span-4 col-start-1 row-start-5 w-11/12">
+                  <p className="font-semibold">Tipo de parto</p>
+                  <select name="typeOfDelivery" defaultValue={personalInformation.typeOfDelivery} onChange={handleChange} className={inputStyle}>
+                    <option value="disabled">--Selecciona una opción--</option>
+                    <option value="parto natural">Parto Natural</option>
+                    <option value="cesarea">Cesarea</option>
+                  </select>
+                  
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.typeOfDelivery &&
                       touched.typeOfDelivery &&
                       errors.typeOfDelivery}{" "}
                   </p>
                 </div>
-                <div className="col-span-4 row-start-6">
-                  <InputType
+                <div className="col-span-4 row-start-6 w-11/12">
+                  <p className="font-semibold">Tipo de sangre</p>
+                  <select
                     name="bloodType"
-                    input="text"
-                    question="Tipo de sangre"
-                    handleChange={handleChange}
-                  />
+                    type="text"
+                    onChange={handleChange}
+                    className={inputStyle}
+                    defaultValue={personalInformation.bloodType}
+                  >
+                    <option value="disabled">--Selecciona una opción--</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                  </select>
                 </div>
                 {/*FIN Lado izquierdo del contenedor */}
 
                 {/* lado medio del contenedor */}
-                <div className="col-span-4 col-start-5 row-start-1">
-                  <InputType
+                <div className="col-span-4 col-start-5 row-start-1 w-11/12">
+                  <p className="font-semibold">Correo electrónico</p>
+                  <input
                     name="email"
-                    input="email"
-                    question="Correo electrónico"
-                    handleChange={handleChange}
+                    type="email"
+                    onChange={handleChange}
+                    defaultValue={personalInformation.email}
+                    className={inputStyle}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.birthdate && touched.birthdate && errors.birthdate}{" "}
@@ -281,6 +364,7 @@ export default function Expediente() {
                     name="biologicalSex"
                     input="select"
                     question="Sexo biologico"
+                    value={personalInformation.biologicalSex}
                     options={[
                       { option: "femenino", value: "Femenino" },
                       { option: "masculino", value: "Masculino" },
@@ -339,32 +423,27 @@ export default function Expediente() {
                   </div>
                   <div className="col-span-4 col-start-1 row-start-2 grid-cols-4 flex flex-row items-start">
                     <div className=" w-1/3">
-                      <InputType
-                        name="complicationsInPregnancy"
-                        input="select"
-                        question=""
-                        options={[
-                          { option: "si", value: "Si" },
-                          { option: "no", value: "No" },
-                        ]}
-                        handleChange={handleChange}
-                      />
+                    <select name="complicationsInPregnancy" onChange={(e) => console.log(e.target.value)} className={inputStyle} value={personalInformation.complicationsInPregnancy}>
+                      <option value="disabled">--Seleciona una opciópn--</option>
+                      <option value="si">Si</option>
+                      <option value="no">No</option>
+                    </select>
                       <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                        {errors.complicationsInPregnancy &&
-                          touched.complicationsInPregnancy &&
-                          errors.complicationsInPregnancy}{" "}
+                        {errors.complicationsInPregnancy && touched.complicationsInPregnancy}
                       </p>
                     </div>
                     <div className=" w-2/3 mr-3">
-                      <InputType
-                        name="specificPregnancyProblem"
-                        input="text"
-                        question=""
-                        handleChange={handleChange}
+                      <input 
+                        type="text" 
+                        name="specificPregnancyProblem" 
+                        onChange={handleChange} 
                         placeholder="¿Cuál?"
-                        disabled={values.complicationsInPregnancy}
+                        defaultValue={personalInformation.specificPregnancyProblem}
+                        disabled={values.complicationsInPregnancy === "no"? true : false} 
+                        className={inputStyle + 'w-11/12'}  
                       />
                     </div>
+                    
                     <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                       {errors.specificPregnancyProblem &&
                         touched.specificPregnancyProblem &&

@@ -11,7 +11,8 @@ export default function InputType({
   value,
 }) {
   const [isDisabled, setIsDisabled] = useState(false);
-
+  const [init, setInit] = useState(null)
+  
   const verifyIsDisabled = () => {
     if (disabled === undefined || disabled === "si") {
       setIsDisabled(false);
@@ -20,6 +21,7 @@ export default function InputType({
 
   useEffect(() => {
     verifyIsDisabled();
+    setInit(value)
   }, [disabled]);
 
   return (
@@ -30,7 +32,7 @@ export default function InputType({
           <select
             id={name}
             name={name}
-            defaultValue="disabled"
+            value={init !== undefined ? value : "disabled" }
             className={
               "bg-white border border-black text-gray-900 border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md"
             }
