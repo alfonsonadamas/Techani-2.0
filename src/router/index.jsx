@@ -6,7 +6,6 @@ import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
 import GlucoseRegister from "../pages/GlucoseRegister";
-import AllGlucoseRegister from "../pages/AllGlucoseRegister";
 import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
