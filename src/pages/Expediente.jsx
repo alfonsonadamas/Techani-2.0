@@ -9,8 +9,9 @@ import { useUserContext } from "../context/UserContext";
 
 export default function Expediente() {
   const { user } = useUserContext();
-  const [personalInformation, setPersonalInformation] = useState([{}]);
+  const [personalInformation, setPersonalInformation] = useState({});
   const [updateInformacionPersonal, setUpdateInformacionPersonal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const inputStyle = `border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
           dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`
@@ -18,7 +19,6 @@ export default function Expediente() {
     values,
     { setErrors, resetForm }
   ) => {
-
     if (updateInformacionPersonal === true) {
       const { data, error } = await supabase
         .from("informacionPersonal")
@@ -78,64 +78,56 @@ export default function Expediente() {
 
 
   };
-  const initialPersonalInformation = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("informacionPersonal")
-        .select("*")
-        .eq("uid", user.id);
-setPersonalInformation({
-        fullName: data[0].fullName || '',
-        birthdate: data[0].birthdate || '',
-          placeOfBirth:data[0].placeOfBirth || '',
-         weightAtBirth:data[0].weightAtBirth || '',
-        typeOfDelivery:data[0].typeOfDelivery || 'disabled',
-             bloodType:data[0].bloodType || '',
 
-                email:data[0].email || '',
-        maritalStatus:data[0].maritalStatus || '',
-         stateOfBirth:data[0].stateOfBirth || '',
-          sizeAtBirth:data[0].sizeAtBirth || '',
-     gestationalWeeks:data[0].gestationalWeeks || '',
-        biologicalSex:data[0].biologicalSex || 'disabled',
-            ocupation:data[0].ocupation || '',
-          actualState:data[0].actualState || '',
-          apgarScore: data[0].apgarScore || '',          
-        complicationsInPregnancy:data[0].complicationsInPregnancy || 'disabled',
-        specificPregnancyProblem:data[0].specificPregnancyProblem || '',
+  
 
-      });
-      if (data[0] !== undefined) {
-        setUpdateInformacionPersonal(true);
-      } else {
-        setUpdateInformacionPersonal(false);
-      }
-      console.log("Es upgrade? :", updateInformacionPersonal)
-
-      console.log(data[0]);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const initialValue = (value) =>{
-    console.log("Hola",value)
-    if(value === null || value === ""){
-      return "disabled";
-    }
-    else return value;
-  };
 
   useEffect(() => {
-    setTimeout(() => {
+
     if (user) {
+      const initialPersonalInformation = async () => {
+        try {
+          const { data, error } = await supabase
+            .from("informacionPersonal")
+            .select("*")
+            .eq("uid", user.id);
+          if (error) throw error;
+          setPersonalInformation({
+            fullName: data[0]?.fullName || '',
+            birthdate: data[0]?.birthdate || '',
+            placeOfBirth: data[0]?.placeOfBirth || '',
+            weightAtBirth: data[0]?.weightAtBirth || '',
+            typeOfDelivery: data[0]?.typeOfDelivery || 'disabled',
+            bloodType: data[0]?.bloodType || 'disabled',
+            email: data[0]?.email || '',
+            maritalStatus: data[0]?.maritalStatus || '',
+            stateOfBirth: data[0]?.stateOfBirth || '',
+            sizeAtBirth: data[0]?.sizeAtBirth || '',
+            gestationalWeeks: data[0]?.gestationalWeeks || '',
+            biologicalSex: data[0]?.biologicalSex || 'disabled',
+            ocupation: data[0]?.ocupation || '',
+            actualState: data[0]?.actualState || '',
+            apgarScore: data[0]?.apgarScore || '',
+            complicationsInPregnancy: data[0]?.complicationsInPregnancy || 'disabled',
+            specificPregnancyProblem: data[0]?.specificPregnancyProblem || '',
+
+          });
+          if (data[0] !== undefined) {
+            setUpdateInformacionPersonal(true);
+          } else {
+            setUpdateInformacionPersonal(false);
+          }
+          setIsLoading(false);
+
+        } catch (error) {
+          console.log(error);
+        }
+      };
       initialPersonalInformation();
-      }
-    }, 2000);
+    }
   }, [user]);
   /*{
-                          isDisabled === false
-                            ? `bg-white border border-black text-gray-900 ${style}`  // Clases si no está deshabilitado.
-                            : `bg-gray-200 border border-gray-400 text-gray-500${style}`
+                         
                           } 
   */
   return (
@@ -143,26 +135,26 @@ setPersonalInformation({
       <SideBar />
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
         <ToastContainer />
+        <div className="flex flex-row items-center">
+          <h2 className="text-2xl font-semibold mb-1 mt-4">
+            Información personal
+          </h2>
+          <p className="text-sm mt-10 mb-6 ml-10">
+            ⚠️En caso de ser menor, llama a un padre o tutor para que te
+            ayude a llenar el registro
+          </p>
+        </div>
+        <hr className="border-gray-400" />
+        {isLoading ? (<div>Cargando registros...</div>):(
         <Formik
           initialValues={
             personalInformation
           }
+          enableReinitialize
           onSubmit={submitPersonalInformation}
         >
-          {({ handleSubmit, handleChange, values, errors, touched }) => (
+          {({ values, errors, touched, handleSubmit, handleChange}) => (
             <form onSubmit={handleSubmit}>
-              <div className="flex flex-row items-center">
-                <h2 className="text-2xl font-semibold mb-1 mt-4">
-                  Información personal
-                </h2>
-                <p className="text-sm mt-10 mb-6 ml-10">
-                  ⚠️En caso de ser menor, llama a un padre o tutor para que te
-                  ayude a llenar el registro
-                </p>
-              </div>
-
-              <hr className="border-gray-400" />
-              {/* grid para formulario 1*/}
               <div className="grid grid-cols-12 grid-rows-6 justify-items-stretch mt-5 pl-5 gap-x-1">
                 {/*Lado izquierdo del contenedor */}
                 <div className="col-span-4 w-11/12">
@@ -203,7 +195,7 @@ setPersonalInformation({
                       name="placeOfBirth"
                       type="text"
                       onChange={handleChange}
-                      defaultValue={values.placeOfBirth}
+                      value={values.placeOfBirth}
                       className={inputStyle}
                     />
 
@@ -219,7 +211,7 @@ setPersonalInformation({
                       name="weightAtBirth"
                       type="number"
                       onChange={handleChange}
-                      defaultValue={personalInformation.weightAtBirth}
+                      value={values.weightAtBirth}
                       className={inputStyle}
                     />
 
@@ -233,7 +225,8 @@ setPersonalInformation({
                   <p className="font-semibold">Tipo de parto</p>
                   <select
                     name="typeOfDelivery"
-                    defaultChecked={personalInformation.typeOfDelivery !== null ? personalInformation.typeOfDelivery : "disabled"} onChange={handleChange} className={inputStyle}
+                    value={values.typeOfDelivery}
+                    onChange={handleChange} className={inputStyle}
                   >
                     <option value="disabled" disabled>--Selecciona una opción--</option>
                     <option value="parto natural">Parto Natural</option>
@@ -253,15 +246,18 @@ setPersonalInformation({
                     type="text"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={values.bloodType}
+                    value={values.bloodType}
                   >
-                    <option value="disabled" disabled>--Selecciona una opción--</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
+                    <option value="disabled" disabled >--Selecciona una opción--</option>
                     <option value="A+">A+</option>
                     <option value="A-">A-</option>
                     <option value="B+">B+</option>
                     <option value="B-">B-</option>
+                    <option value="AB+">B+</option>
+                    <option value="AB-">B-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+
                   </select>
                 </div>
                 {/*FIN Lado izquierdo del contenedor */}
@@ -306,7 +302,7 @@ setPersonalInformation({
                     type="text"
                     onChange={handleChange}
                     className={inputStyle}
-                    value={personalInformation.stateOfBirth}
+                    value={values.stateOfBirth}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.stateOfBirth && touched.stateOfBirth}
@@ -332,7 +328,7 @@ setPersonalInformation({
                     type="number"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.gestationalWeeks}
+                    value={values.gestationalWeeks}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.gestationalWeeks && touched.gestationalWeeks}
@@ -345,12 +341,11 @@ setPersonalInformation({
                   <p className="font-semibold">Sexo biologico</p>
                   <select
                     name="biologicalSex"
-                    onChange={ (e) =>{setPersonalInformation(personalInformation.biologicalSex = e.target.value)
-                    }}
+                    onChange={handleChange}
                     className={inputStyle}
-                    value={personalInformation.biologicalSex}
+                    value={values.biologicalSex}
                   >
-                    <option value="disabled" disabled selected>--Selecciona una opción--</option>
+                    <option value="disabled" disabled >--Selecciona una opción--</option>
                     <option value="femenino">Femenino</option>
                     <option value="masculino">Masculino</option>
                   </select>
@@ -365,7 +360,7 @@ setPersonalInformation({
                     type="text"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.ocupation}
+                    value={values.ocupation}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.ocupation && touched.ocupation && errors.ocupation}{" "}
@@ -378,7 +373,7 @@ setPersonalInformation({
                     type="text"
                     onChange={handleChange}
                     className={inputStyle}
-                    defaultValue={personalInformation.actualState}
+                    value={values.actualState}
                   />
                   <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
                     {errors.actualState &&
@@ -403,19 +398,19 @@ setPersonalInformation({
                 </div>
                 {/*contenedor con  inputs en la misma linea */}
                 <div className="col-span-4 col-start-9 row-start-5 h-6 flex flex-col items-start">
-                  
-                    <div className="flex flex-auto">
-                      <p className="font-semibold mb-0">
-                        ¿Hubo complicaciones en el embarazo?
-                      </p>
-                    </div>
-                    <div className="w-11/12">
+
+                  <div className="flex flex-auto">
+                    <p className="font-semibold mb-0">
+                      ¿Hubo complicaciones en el embarazo?
+                    </p>
+                  </div>
+                  <div className="w-11/12">
                     <div className="col-span-4 col-start-1 row-start-2 grid-cols-4 flex flex-row items-start gap-1">
                       <div className="w-1/3">
                         <select name="complicationsInPregnancy"
                           onChange={handleChange}
                           className={inputStyle}
-                          value={personalInformation.complicationsInPregnancy}
+                          value={values.complicationsInPregnancy}
                         >
                           <option value="disabled" disabled>--Seleciona una opciópn--</option>
                           <option value="si">Si</option>
@@ -431,9 +426,11 @@ setPersonalInformation({
                           name="specificPregnancyProblem"
                           onChange={handleChange}
                           placeholder="¿Cuál?"
-                          defaultValue={personalInformation.specificPregnancyProblem}
-                          disabled={values.complicationsInPregnancy}
-                          className={inputStyle}
+                          value={values.specificPregnancyProblem}
+                          disabled={values.complicationsInPregnancy === "no"}
+                          className={ values.complicationsInPregnancy ==="si"
+                            ? `${inputStyle}bg-white border border-black text-gray-900`  // Clases si no está deshabilitado.
+                            : `${inputStyle}bg-gray-200 border border-gray-300 text-gray-500 shadow-sm cursor-not-allowed `}
                         />
                       </div>
 
@@ -460,13 +457,13 @@ setPersonalInformation({
             </form>
           )}
         </Formik>
+)}
         {/*Formulario 2 */}
         <Formik
           initialValues={{}}
           onSubmit={(values) => {
             console.log(values);
           }}
-          validationSchema={console.log("validationSchema3")}
         >
           {({ handleSubmit, handleChange, values, errors, touched }) => (
             <form onSubmit={handleSubmit}>
