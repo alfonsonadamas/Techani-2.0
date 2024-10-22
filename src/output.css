@@ -762,7 +762,7 @@ select:not([size]){
   outline: 1px auto inherit;
 }
 
-input[type=file]::-webkit-file-upload-button{
+input[type="file"]::-webkit-file-upload-button {
   color: white;
   background: #1F2937;
   border: 0;
@@ -777,9 +777,9 @@ input[type=file]::-webkit-file-upload-button{
   margin-inline-end: 1rem;
 }
 
-input[type=file]::file-selector-button{
+input[type="file"]::file-selector-button {
   color: white;
-  background: #1F2937;
+  background: #1f2937;
   border: 0;
   font-weight: 500;
   font-size: 0.875rem;
@@ -792,40 +792,40 @@ input[type=file]::file-selector-button{
   margin-inline-end: 1rem;
 }
 
-input[type=file]::-webkit-file-upload-button:hover{
+input[type="file"]::-webkit-file-upload-button:hover {
   background: #374151;
 }
 
-input[type=file]::file-selector-button:hover{
+input[type="file"]::file-selector-button:hover {
   background: #374151;
 }
 
-:is([dir=rtl]) input[type=file]::-webkit-file-upload-button{
+:is([dir="rtl"]) input[type="file"]::-webkit-file-upload-button {
   padding-right: 2rem;
   padding-left: 1rem;
 }
 
-:is([dir=rtl]) input[type=file]::file-selector-button{
+:is([dir="rtl"]) input[type="file"]::file-selector-button {
   padding-right: 2rem;
   padding-left: 1rem;
 }
 
-.dark input[type=file]::-webkit-file-upload-button{
+.dark input[type="file"]::-webkit-file-upload-button {
   color: white;
-  background: #4B5563;
+  background: #4b5563;
 }
 
-.dark input[type=file]::file-selector-button{
+.dark input[type="file"]::file-selector-button {
   color: white;
-  background: #4B5563;
+  background: #4b5563;
 }
 
-.dark input[type=file]::-webkit-file-upload-button:hover{
-  background: #6B7280;
+.dark input[type="file"]::-webkit-file-upload-button:hover {
+  background: #6b7280;
 }
 
-.dark input[type=file]::file-selector-button:hover{
-  background: #6B7280;
+.dark input[type="file"]::file-selector-button:hover {
+  background: #6b7280;
 }
 
 input[type="range"]::-webkit-slider-thumb{
@@ -1399,7 +1399,7 @@ input:checked + .toggle-bg{
   margin-bottom: 2.5rem;
 }
 
-.mb-2{
+.mb-2 {
   margin-bottom: 0.5rem;
 }
 
@@ -1739,7 +1739,7 @@ input:checked + .toggle-bg{
   height: auto;
 }
 
-.h-fit{
+.h-fit {
   height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
@@ -1925,7 +1925,7 @@ input:checked + .toggle-bg{
   width: auto;
 }
 
-.w-fit{
+.w-fit {
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
@@ -2267,8 +2267,8 @@ input:checked + .toggle-bg{
   gap: 1rem;
 }
 
-.gap-x-1{
-  column-gap: 0.25rem;
+.gap-x-28{
+  column-gap: 7rem;
 }
 
 .gap-x-28{

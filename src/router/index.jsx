@@ -6,7 +6,6 @@ import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
 import GlucoseRegister from "../pages/GlucoseRegister";
-import AllGlucoseRegister from "../pages/AllGlucoseRegister";
 import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
@@ -33,6 +32,7 @@ import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
 import SleepHours from "../pages/SleepHours";
 import MyGlucoseRegister from "../pages/MyGlucoseRegister";
+import EditRecords from "../pages/EditRecords";
 import Expediente from "../pages/Expediente";
 
 export const router = createBrowserRouter([
@@ -71,6 +71,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <GlucoseRegister />,
+          },
+        ],
+      },
+      {
+        path: "/editRecords",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <EditRecords />,
           },
         ],
       },

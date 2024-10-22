@@ -235,81 +235,6 @@ export default function MyGlucoseRegister() {
     return data;
   };
 
-  const deleteRecord = async (record) => {
-    console.log(record);
-
-    // Eliminar registros de glucosa
-    await record.glucose.reduce((promise, item) => {
-      return promise.then(async () => {
-        try {
-          const { error } = await supabase
-            .from("registroGlucosa")
-            .delete()
-            .eq("id", item.idGlucose);
-          if (error) throw error;
-          console.log("Registro eliminado de glucosa");
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    }, Promise.resolve());
-
-    // Eliminar registros de insulina
-    await record.insuline.reduce((promise, item) => {
-      return promise.then(async () => {
-        try {
-          const { error } = await supabase
-            .from("registroInsulina")
-            .delete()
-            .eq("id", item.id);
-          if (error) throw error;
-          console.log("Registro eliminado de insulina");
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    }, Promise.resolve());
-
-    // Eliminar registros de agua
-    await record.water.reduce((promise, item) => {
-      return promise.then(async () => {
-        try {
-          const { error } = await supabase
-            .from("registroAgua")
-            .delete()
-            .eq("id", item.id);
-          if (error) throw error;
-          console.log("Registro eliminado de agua");
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    }, Promise.resolve());
-
-    // Eliminar registros de días atípicos
-    await record.atipicDay.reduce((promise, item) => {
-      return promise.then(async () => {
-        try {
-          const { error } = await supabase
-            .from("registroDiaAtipico")
-            .delete()
-            .eq("id", item.id);
-          if (error) throw error;
-          console.log("Registro eliminado de día atípico");
-        } catch (error) {
-          console.log(error);
-        }
-      });
-    }, Promise.resolve());
-
-    setTimeout(() => {
-      getGlucosa();
-      getInsuline();
-      getWater();
-      getAtipicDay();
-    }, 2000);
-  };
-
   useEffect(() => {
     if (user) {
       getGlucosa();
@@ -324,7 +249,7 @@ export default function MyGlucoseRegister() {
       <SideBar />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <div>
-          <h1>Registros de Glucosa</h1>
+          <h1 className="font-semibold text-xl mt-5">Registros de Glucosa</h1>
           <div className="mt-5 mb-24">
             <span>Fecha inicio:</span>
             <input
@@ -425,14 +350,6 @@ export default function MyGlucoseRegister() {
                       );
                     }}
                   </PDFDownloadLink>
-                  <button
-                    onClick={() => {
-                      deleteRecord(record);
-                    }}
-                    className="bg-[#AB1A1A] p-1 rounded-md px-2 ml-5"
-                  >
-                    <img src={trash} alt="trash" className="w-5 h-5" />
-                  </button>
                 </div>
               </div>
             );
