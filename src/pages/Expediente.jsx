@@ -183,7 +183,7 @@ export default function Expediente() {
             setUpdateInformacionPersonal(false);
           }
           setIsLoading(false);
-
+          console.log(data[0]);
         } catch (error) {
           console.log(error);
         }
