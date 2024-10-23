@@ -10,6 +10,7 @@ import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 import ModalGlucosa from "../components/ModalGlucosa";
 import { toast, ToastContainer } from "react-toastify";
+import { Formik } from "formik";
 
 export default function EditRecords() {
   const [date, setDate] = useState("");
@@ -91,22 +92,13 @@ export default function EditRecords() {
 
   const getWater = async () => {
     try {
-      var totalWater = 0;
       const { data, error } = await supabase
         .from("registroAgua")
-        .select("*")
+        .select("id, created_at, agua")
         .eq("uid", user.id);
       if (error) throw error;
-      const newData = data.map((record) => {
-        totalWater += record.agua;
-        const object = {
-          id: record.id,
-          created_at: record.created_at,
-          water: totalWater,
-        };
-        return object;
-      });
-      setWater(newData);
+      setWater(data);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -141,7 +133,7 @@ export default function EditRecords() {
     }`;
   };
 
-  const filterData = (dataGlucose) => {
+  const filterData = (dataGlucose, dataWater) => {
     if (date) {
       setNewDataGlucosa([]);
       const filteredData = dataGlucose.filter((record) => {
@@ -156,7 +148,7 @@ export default function EditRecords() {
       setNewDataInsuline(filteredDataInsuline);
 
       setNewDataWater([]);
-      const filteredDataWater = water.filter((record) => {
+      const filteredDataWater = dataWater.filter((record) => {
         return formatDate(record.created_at) === date;
       });
       setNewDataWater(filteredDataWater);
@@ -189,29 +181,120 @@ export default function EditRecords() {
   };
 
   const updateDataGlucose = async (data, id) => {
+    var duplicate = false;
     try {
+      if (glucosa.length > 0) {
+        glucosa.forEach((record) => {
+          if (record.medition === parseInt(data.idMedicion)) {
+            duplicate = true;
+          }
+        });
+      }
+
+      if (!duplicate) {
+        const { error } = await supabase
+          .from("registroGlucosa")
+          .update(data)
+          .eq("id", id);
+        if (error) throw error;
+
+        setGlucosa((prev) => {
+          const updatedData = prev.map((record) => {
+            if (record.idGlucose === id) {
+              return {
+                ...record,
+                glucose: data.glucosa,
+                medition: data.idMedicion,
+              };
+            }
+            return record;
+          });
+          return updatedData;
+        });
+        filterData(glucosa);
+
+        toast.success("Registro actualizado");
+      } else {
+        const { error } = await supabase
+          .from("registroGlucosa")
+          .update({
+            glucosa: data.glucosa,
+          })
+          .eq("id", id);
+        if (error) throw error;
+
+        setGlucosa((prev) => {
+          const updatedData = prev.map((record) => {
+            if (record.idGlucose === id) {
+              return {
+                ...record,
+                glucose: data.glucosa,
+                idMedicion: data.idMedicion,
+              };
+            }
+            return record;
+          });
+          return updatedData;
+        });
+        filterData(glucosa);
+        toast.warning(
+          "Ya existe un registro con este tipo de medición se actualizará solo el registro de glucosa"
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateDataWater = async (data, id) => {
+    try {
+      console.log(data);
       const { error } = await supabase
-        .from("registroGlucosa")
+        .from("registroAgua")
         .update(data)
         .eq("id", id);
-      if (error) throw error;
-
-      setGlucosa((prev) => {
-        const updatedData = prev.map((record) => {
-          if (record.idGlucose === id) {
-            return {
-              ...record,
-              glucose: data.glucosa,
-              idMedicion: data.idMedicion,
-            };
-          }
-          return record;
-        });
-        return updatedData;
+      const updatedWater = water.map((record) => {
+        if (record.id === id) {
+          return {
+            ...record,
+            agua: data.water,
+          };
+        }
+        return record;
       });
-      filterData(glucosa);
-
+      console.log(error);
+      setWater(updatedWater);
+      filterData(glucosa, water);
       toast.success("Registro actualizado");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const formatDateSeconds = (dateFormat) => {
+    const newDate = new Date(dateFormat);
+    return `${newDate.getFullYear()}-${newDate.getMonth() + 1}-${
+      newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate()
+    } ${
+      newDate.getHours() < 10 ? `0${newDate.getHours()}` : newDate.getHours()
+    }:${
+      newDate.getMinutes() < 10
+        ? `0${newDate.getMinutes()}`
+        : `${newDate.getMinutes()}`
+    }:${newDate.getSeconds()}`;
+  };
+
+  const deleteDataWater = async (ids) => {
+    try {
+      const { error } = await supabase
+        .from("registroAgua")
+        .delete()
+        .in("id", ids);
+      if (error) throw error;
+      const updatedWater = water.filter((record) => !ids.includes(record.id));
+      setWater(updatedWater);
+      filterData(glucosa, updatedWater);
+      setOpenWater(false);
     } catch (error) {
       console.log(error);
     }
@@ -242,68 +325,77 @@ export default function EditRecords() {
                 </h1>
                 <p>Ingrese los nuevos datos</p>
               </div>
-              <div className="flex mt-2 mb-2">
+              <div className="flex mt-5 mb-2">
                 {newDataGlucosa &&
                   newDataGlucosa.map((record) => {
                     return (
-                      <div key={record.idGlucose} className=" flex flex-col">
-                        <span>Glucosa:</span>
-                        <input
-                          type="number"
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.glucose}
-                          onChange={(e) => {
-                            record.glucose = e.target.value;
-                            setEditRecordData({
-                              ...editRecordData,
-                              glucosa: record.glucose,
-                            });
-                          }}
-                        ></input>
-                        <span className="mt-5">Medicion:</span>
-                        <select
-                          name=""
-                          id=""
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.medition}
-                          onChange={(e) => {
-                            setEditRecordData({
-                              ...editRecordData,
-                              idMedicion: e.target.value,
-                            });
-                            console.log(editRecordData);
-                          }}
-                        >
-                          {meditionGlucose.map((medition) => {
-                            return (
-                              <option value={medition.idMedicion}>
-                                {medition.measurement}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <div className="flex justify-between mt-5">
-                          <button
-                            onClick={() => {
-                              updateDataGlucose(
-                                editRecordData,
-                                record.idGlucose
-                              );
-                            }}
-                            className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
+                      <Formik
+                        initialValues={{
+                          glucosa: record.glucose,
+                          medition: record.medition,
+                        }}
+                      >
+                        {({
+                          handleChange,
+                          handleBlur,
+                          handleSubmit,
+                          values,
+                        }) => (
+                          <div
+                            key={record.idGlucose}
+                            className=" flex flex-col border-2 border-gray-900 shadow-xl shadow-gray-400 p-5 rounded-lg mx-5"
                           >
-                            Guardar
-                          </button>
-                          <button
-                            onClick={() => {
-                              deleteDataGlucose([record.idGlucose]);
-                            }}
-                            className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </div>
+                            <span>Glucosa:</span>
+                            <input
+                              type="number"
+                              name="glucosa"
+                              className="mx-3 w-48  border-gray-400 rounded-xl"
+                              defaultValue={values.glucosa}
+                              onChange={handleChange}
+                            ></input>
+                            <span className="mt-5">Medicion:</span>
+                            <select
+                              name="medition"
+                              id=""
+                              className="mx-3 w-48  border-gray-400 rounded-xl"
+                              defaultValue={values.medition}
+                              onChange={handleChange}
+                            >
+                              {meditionGlucose.map((medition) => {
+                                return (
+                                  <option value={medition.idMedicion}>
+                                    {medition.measurement}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            <div className="flex justify-between mt-5">
+                              <button
+                                onClick={() => {
+                                  updateDataGlucose(
+                                    {
+                                      glucosa: values.glucosa,
+                                      idMedicion: values.medition,
+                                    },
+                                    record.idGlucose
+                                  );
+                                }}
+                                className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
+                              >
+                                Guardar
+                              </button>
+                              <button
+                                onClick={() => {
+                                  deleteDataGlucose([record.idGlucose]);
+                                }}
+                                className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Formik>
                     );
                   })}
               </div>
@@ -353,17 +445,17 @@ export default function EditRecords() {
                 <p>Ingrese los nuevos datos</p>
               </div>
               <div className="flex mt-2 mb-2">
-                {newDataGlucosa &&
-                  newDataGlucosa.map((record) => {
+                {newDataInsuline &&
+                  newDataInsuline.map((record) => {
                     return (
-                      <div key={record.idGlucose} className=" flex flex-col">
-                        <span>Glucosa:</span>
+                      <div key={record.id} className=" flex flex-col">
+                        <span>Dosis de insulina:</span>
                         <input
                           type="number"
                           className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.glucose}
+                          defaultValue={record.dosis}
                           onChange={(e) => {
-                            record.glucose = e.target.value;
+                            record.dosis = e.target.value;
                             setEditRecordData({
                               ...editRecordData,
                               glucosa: record.glucose,
@@ -448,74 +540,65 @@ export default function EditRecords() {
         {optionEdit ? (
           <div className="flex justify-center">
             <div className="overflow-x-auto flex flex-col">
-              <div className="flex justify-center flex-col items-center">
+              <div className="w-full flex justify-center flex-col items-center">
                 <h1 className="font-semibold text-lg">
-                  Editar registro de glucosa
+                  Editar registro de agua consumida
                 </h1>
                 <p>Ingrese los nuevos datos</p>
               </div>
               <div className="flex mt-2 mb-2">
-                {newDataGlucosa &&
-                  newDataGlucosa.map((record) => {
-                    return (
-                      <div key={record.idGlucose} className=" flex flex-col">
-                        <span>Glucosa:</span>
-                        <input
-                          type="number"
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.glucose}
-                          onChange={(e) => {
-                            record.glucose = e.target.value;
-                            setEditRecordData({
-                              ...editRecordData,
-                              glucosa: record.glucose,
-                            });
-                          }}
-                        ></input>
-                        <span className="mt-5">Medicion:</span>
-                        <select
-                          name=""
-                          id=""
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.medition}
-                          onChange={(e) => {
-                            setEditRecordData({
-                              ...editRecordData,
-                              medition: e.target.value,
-                            });
-                            console.log(editRecordData);
-                          }}
-                        >
-                          {meditionGlucose.map((medition) => {
-                            return (
-                              <option value={medition.idMedicion}>
-                                {medition.measurement}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <div className="flex justify-between mt-5">
-                          <button className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center">
-                            Guardar
-                          </button>
-                          <button
-                            onClick={() => {
-                              deleteDataGlucose([record.idGlucose]);
-                            }}
-                            className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
-                          >
-                            Eliminar
-                          </button>
+                {newDataWater.map((record) => {
+                  return (
+                    <Formik
+                      initialValues={{
+                        agua: record.agua,
+                        created_at: record.created_at,
+                      }}
+                      key={record.id}
+                    >
+                      {({ values, handleChange }) => (
+                        <div className=" flex flex-col border-2 border-gray-900 shadow-xl shadow-gray-400 p-5 rounded-lg mx-5">
+                          <span>
+                            Fecha: {formatDateSeconds(values.created_at)}
+                          </span>
+                          <span>Agua consumida en vasos de 250ml:</span>
+                          <input
+                            type="number"
+                            name="agua"
+                            className="mx-3 w-48  border-gray-400 rounded-xl"
+                            defaultValue={values.agua}
+                            onChange={handleChange}
+                          ></input>
+
+                          <div className="flex justify-between mt-5">
+                            <button
+                              onClick={() => {
+                                updateDataWater(values, record.id);
+                              }}
+                              className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
+                            >
+                              Guardar
+                            </button>
+                            <button
+                              onClick={() => {
+                                deleteDataWater([record.id]);
+                              }}
+                              className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </Formik>
+                  );
+                })}
               </div>
             </div>
           </div>
         ) : (
           <div className="">
-            <h1>Eliminar registro de Insulina</h1>{" "}
+            <h1>Eliminar registro de Agua</h1>{" "}
             <p>
               ¿Estas seguro de eliminar? Se eliminaran TODOS los datos de los
               registros
@@ -531,11 +614,11 @@ export default function EditRecords() {
               </button>
               <button
                 onClick={() => {
-                  const meditionIds = [];
-                  newDataGlucosa.map((medition) => {
-                    return meditionIds.push(medition.idGlucose);
+                  const waterIds = [];
+                  newDataWater.map((water) => {
+                    return waterIds.push(water.id);
                   });
-                  deleteDataGlucose(meditionIds);
+                  deleteDataWater(waterIds);
                 }}
                 className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
               >
@@ -663,7 +746,7 @@ export default function EditRecords() {
 
           <button
             onClick={() => {
-              filterData(glucosa);
+              filterData(glucosa, water);
             }}
             className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
           >

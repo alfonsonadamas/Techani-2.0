@@ -21,7 +21,10 @@ export default function WaterRegister() {
     var year = parts[2];
     var month = parts[1];
     var day = parts[0];
-    var formatDate = `${year}-${month}-${day}`;
+    var hour = new Date().getHours();
+    var minutes = new Date().getMinutes();
+    var seconds = new Date().getSeconds();
+    var formatDate = `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`;
 
     try {
       setSubmitting(true);
