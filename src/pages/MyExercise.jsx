@@ -25,7 +25,7 @@ export default function MyExercise() {
 
   const openModal = (record) => {
     setActivity([]);
-    setWeightOption(getWeightOption(record.weight));
+
     console.log("record seleccionado: ", record);
     const name = getNameActivity(record.idActividades, record.actividadUsuario);
     if (record.idActividades === 12) {

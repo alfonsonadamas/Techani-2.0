@@ -1,13 +1,13 @@
-import React, { useState } from "react";
 import SideBar from "../components/SideBar";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
-
+import React, { useEffect, useState } from "react";
 export default function Estados() {
   const [estados, setEstados] = useState({ idEmocion: null, value: null });
   const [error, setError] = useState("");
   const [SaveSuccessfully, setSaveSuccessfully] = useState(false);
   const { user } = useUserContext();
+  const [meditionType, setMeditionType] = useState([]);
 
   const handleMoodChange = (idEmocion, value) => {
     setEstados({ idEmocion, value });
@@ -20,9 +20,15 @@ export default function Estados() {
   const mostrarValor = (event) => {
     setValor(event.target.value);
   };
-
+  const getMeditionType = async () => {
+    const { data, error } = await supabase.from("medicion").select("*");
+    if (error) throw error;
+    setMeditionType(data);
+  };
   const [timeRegistroEm, setTimeRegistroEm] = useState("");
-
+  useEffect(() => {
+    getMeditionType();
+  });
   const handleTimeChange = (e) => {
     setTimeRegistroEm(e.target.value);
   };
@@ -617,7 +623,7 @@ export default function Estados() {
                 type="range"
                 id="rango"
                 name="rango"
-                min="0"
+                min="1"
                 max="5"
                 step="1"
                 className="form-range w-full mt-2"
@@ -644,11 +650,11 @@ export default function Estados() {
                 <option disabled value="">
                   -- Selecciona una opcion --
                 </option>
-                <option required value="Desayuno">
-                  Desayuno
-                </option>
-                <option value="Comida">Comida</option>
-                <option value="Cena">Cena</option>
+                {meditionType.map((medition) => (
+                  <option key={medition.idMedicion} value={medition.idMedicion}>
+                    {medition.measurement}
+                  </option>
+                ))}
               </select>
             </div>
 
