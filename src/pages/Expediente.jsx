@@ -23,58 +23,41 @@ export default function Expediente() {
     values,
     { setErrors, resetForm }
   ) => {
+    let info = {
+      fullName: values?.fullName || null,
+      birthdate: values?.birthdate || null,
+      placeOfBirth: values?.placeOfBirth || null,
+      weightAtBirth: values?.weightAtBirth || null,
+      typeOfDelivery: values?.typeOfDelivery || null,
+      bloodType: values?.bloodType || null,
+
+      email: values?.email || null,
+      maritalStatus: values?.maritalStatus || null,
+      stateOfBirth: values?.stateOfBirth || null,
+      sizeAtBirth: values?.sizeAtBirth || null,
+      gestationalWeeks: values?.gestationalWeeks || null,
+     
+      biologicalSex: values?.biologicalSex || null,
+      ocupation: values?.ocupation || null,
+      actualState: values?.actualState || null,
+      apgarScore: values?.apgarScore || null,
+      complicationsInPregnancy: values?.complicationsInPregnancy || null,
+      specificPregnancyProblem: values?.specificPregnancyProblem || null,
+    }
     if (updateInformacionPersonal === true) {
       const { data, error } = await supabase
         .from("informacionPersonal")
-        .update({
-          fullName: values.fullName,
-          birthdate: values.birthdate,
-          placeOfBirth: values.placeOfBirth,
-          weightAtBirth: values.weightAtBirth,
-          typeOfDelivery: values.typeOfDelivery,
-          bloodType: values.bloodType,
-
-          email: values.email,
-          maritalStatus: values.maritalStatus,
-          stateOfBirth: values.stateOfBirth,
-          sizeAtBirth: values.sizeAtBirth,
-          gestationalWeeks: values.gestationalWeeks,
-
-          biologicalSex: values.biologicalSex,
-          ocupation: values.ocupation,
-          actualState: values.actualState,
-          apgarScore: values.apgarScore,
-          complicationsInPregnancy: values.complicationsInPregnancy,
-          specificPregnancyProblem: values.specificPregnancyProblem,
-        })
+        .update([
+          info
+        ])
         .eq("uid", user.id);
       if (error) throw error;
       toast.success("Campos actualizados");
       console.log(data)
     }
     else {
-      const { data, error } = await supabase.from("informacionPersonal").insert({
-        uid: user.id,
-        fullName: values.fullName,
-        birthdate: values.birthdate,
-        placeOfBirth: values.placeOfBirth,
-        weightAtBirth: values.weightAtBirth,
-        typeOfDelivery: values.typeOfDelivery,
-        bloodType: values.bloodType,
-
-        email: values.email,
-        maritalStatus: values.maritalStatus,
-        stateOfBirth: values.stateOfBirth,
-        sizeAtBirth: values.sizeAtBirth,
-        gestationalWeeks: values.gestationalWeeks,
-
-        biologicalSex: values.biologicalSex,
-        ocupation: values.ocupation,
-        actualState: values.actualState,
-        apgarScore: values.apgarScore,
-        complicationsInPregnancy: values.complicationsInPregnancy,
-        specificPregnancyProblem: values.specificPregnancyProblem,
-      });
+      let infoWithUser = {...info, uid: user.uid}
+      const { data, error } = await supabase.from("informacionPersonal").insert([infoWithUser]);
       if (error) throw error;
       else console.log(data);
       toast.success("Datos Guardados");
@@ -87,29 +70,29 @@ export default function Expediente() {
     values,
     { setErrors, resetForm }
   ) => {
+    let info = {
+      lastHemoglobin: values?.lastHemoglobin || null,
+      systolicBloodPressure: values?.systolicBloodPressure || null,
+      diastolicBloodPressure: values?.diastolicBloodPressure || null,
+      dateLastHemoglobin: values?.dateLastHemoglobin || null,
+      lastTriglycerides: values?.lastTriglycerides || null,
+      dateLastTriglycerides: values?.dateLastTriglycerides || null,
+      colesterolHDL: values?.colesterolHDL || null,
+      currentWeight: values?.currentWeight || null,
+      currentFastingGlucose: values?.currentFastingGlucose || null,
+      lastUricAcid: values?.lastUricAcid || null,
+      dateLastUricAcid: values?.dateLastUricAcid || null,
+      timeInRange: values?.timeInRange || null,
+      currentSize: values?.currentSize || null,
+      lastCholesterol: values?.lastCholesterol || null,
+      dateLastCholesterol: values?.dateLastCholesterol || null,
+      glucoseGoal: values?.glucoseGoal || null,
+      averageGlucose: values?.averageGlucose || null,}
     try {
       if (updateMedicalEvaluation === true) {
         const { data, error } = await supabase
           .from("evaluacionesMedicas")
-          .update({
-            lastHemoglobin: values.lastHemoglobin,
-            dateLastHemoglobin: values.dateLastHemoglobin,
-            systolicBloodPressure: values.systolicBloodPressure,
-            diastolicBloodPressure: values.diastolicBloodPressure,
-            lastTriglycerides: values.lastTriglycerides,
-            dateLastTriglycerides: values.dateLastTriglycerides,
-            colesterolHDL: values.colesterolHDL,
-            currentWeight: values.currentWeight,
-            currentFastingGlucose: values.currentFastingGlucose,
-            lastUricAcid: values.lastUricAcid,
-            dateLastUricAcid: values.dateLastUricAcid,
-            timeInRange: values.timeInRange,
-            currentSize: values.currentSize,
-            lastCholesterol: values.lastCholesterol,
-            dateLastCholesterol: values.dateLastCholesterol,
-            glucoseGoal: values.glucoseGoal,
-            averageGlucose: values.averageGlucose,
-          })
+          .update([info])
           .eq("uid", user.id);
         if (error) throw error;
         toast.success("Campos actualizados");
@@ -117,29 +100,13 @@ export default function Expediente() {
 
       }
       else {
+        let infoWithUser = {...info,uid:user.id}
         const { data, error } = await supabase
           .from("evaluacionesMedicas")
-          .insert({
-            uid: user.id,
-            lastHemoglobin: values.lastHemoglobin,
-            systolicBloodPressure: values.systolicBloodPressure,
-            diastolicBloodPressure: values.diastolicBloodPressure,
-            dateLastHemoglobin: values.dateLastHemoglobin,
-            lastTriglycerides: values.lastTriglycerides,
-            dateLastTriglycerides: values.dateLastTriglycerides,
-            colesterolHDL: values.colesterolHDL,
-            currentWeight: values.currentWeight,
-            currentFastingGlucose: values.currentFastingGlucose,
-            lastUricAcid: values.lastUricAcid,
-            dateLastUricAcid: values.dateLastUricAcid,
-            timeInRange: values.timeInRange,
-            currentSize: values.currentSize,
-            lastCholesterol: values.lastCholesterol,
-            dateLastCholesterol: values.dateLastCholesterol,
-            glucoseGoal: values.glucoseGoal,
-            averageGlucose: values.averageGlucose,
-          });
-        if (error) throw error;
+          .insert([
+            infoWithUser  
+          ]);
+        if (error) console.log( error.message);
         else console.log(data);
         toast.success("Datos Guardados");
 
@@ -170,23 +137,23 @@ export default function Expediente() {
     specificPregnancyProblem: Yup.string().max(255,"Describa de una manera más corta"),
   });
   const validationSchema2 = Yup.object({
-    lastHemoglobin: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    lastHemoglobin: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     dateLastHemoglobin: Yup.date(),
-    systolicBloodPressure: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    diastolicBloodPressure: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    lastTriglycerides: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    systolicBloodPressure: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    diastolicBloodPressure: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    lastTriglycerides: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     dateLastTriglycerides: Yup.date(),
-    colesterolHDL: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    currentWeight: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    currentFastingGlucose: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    lastUricAcid: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    colesterolHDL: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    currentWeight: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    currentFastingGlucose: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    lastUricAcid: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     dateLastUricAcid: Yup.date(),
-    timeInRange: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    currentSize: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    lastCholesterol: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    timeInRange: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    currentSize: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    lastCholesterol: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     dateLastCholesterol: Yup.date(),
-    glucoseGoal: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
-    averageGlucose: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    glucoseGoal: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
+    averageGlucose: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
   });
   useEffect(() => {
     if (user) {
@@ -260,6 +227,7 @@ export default function Expediente() {
             setUpdateMedicalEvaluation(false);
           }
           setIsLoading(false);
+          console.log(updateMedicalEvaluation)
           console.log(medicalEvaluation)
         } catch (error) {
           console.log(error);
