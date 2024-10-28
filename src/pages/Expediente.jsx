@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SideBar from "../components/SideBar";
 import { Formik } from "formik";
+import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "../config/supabase";
@@ -17,6 +18,7 @@ export default function Expediente() {
   const inputStyle = `border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
           dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`
+
   const submitPersonalInformation = async (
     values,
     { setErrors, resetForm }
@@ -77,7 +79,7 @@ export default function Expediente() {
       else console.log(data);
       toast.success("Datos Guardados");
     }
-    
+
 
 
   };
@@ -95,9 +97,10 @@ export default function Expediente() {
             systolicBloodPressure: values.systolicBloodPressure,
             diastolicBloodPressure: values.diastolicBloodPressure,
             lastTriglycerides: values.lastTriglycerides,
+            dateLastTriglycerides: values.dateLastTriglycerides,
             colesterolHDL: values.colesterolHDL,
             currentWeight: values.currentWeight,
-            currentGlucose: values.currentGlucose,
+            currentFastingGlucose: values.currentFastingGlucose,
             lastUricAcid: values.lastUricAcid,
             dateLastUricAcid: values.dateLastUricAcid,
             timeInRange: values.timeInRange,
@@ -111,44 +114,81 @@ export default function Expediente() {
         if (error) throw error;
         toast.success("Campos actualizados");
         console.log(data);
-        
+
       }
       else {
         const { data, error } = await supabase
-        .from("evaluacionesMedicas")
-        .insert({uid: user.id,
-          lastHemoglobin: values.lastHemoglobin,
-          systolicBloodPressure: values.systolicBloodPressure,
-          diastolicBloodPressure: values.diastolicBloodPressure,
-          dateLastHemoglobin: values.dateLastHemoglobin,
-          lastTriglycerides: values.lastTriglycerides,
-          colesterolHDL: values.colesterolHDL,
-          currentWeight: values.currentWeight,
-          currentGlucose: values.currentGlucose,
-          lastUricAcid: values.lastUricAcid,
-          dateLastUricAcid: values.dateLastUricAcid,
-          timeInRange: values.timeInRange,
-          currentSize: values.currentSize,
-          lastCholesterol: values.lastCholesterol,
-          dateLastCholesterol: values.dateLastCholesterol,
-          glucoseGoal: values.glucoseGoal,
-          averageGlucose: values.averageGlucose,
-        });
+          .from("evaluacionesMedicas")
+          .insert({
+            uid: user.id,
+            lastHemoglobin: values.lastHemoglobin,
+            systolicBloodPressure: values.systolicBloodPressure,
+            diastolicBloodPressure: values.diastolicBloodPressure,
+            dateLastHemoglobin: values.dateLastHemoglobin,
+            lastTriglycerides: values.lastTriglycerides,
+            dateLastTriglycerides: values.dateLastTriglycerides,
+            colesterolHDL: values.colesterolHDL,
+            currentWeight: values.currentWeight,
+            currentFastingGlucose: values.currentFastingGlucose,
+            lastUricAcid: values.lastUricAcid,
+            dateLastUricAcid: values.dateLastUricAcid,
+            timeInRange: values.timeInRange,
+            currentSize: values.currentSize,
+            lastCholesterol: values.lastCholesterol,
+            dateLastCholesterol: values.dateLastCholesterol,
+            glucoseGoal: values.glucoseGoal,
+            averageGlucose: values.averageGlucose,
+          });
         if (error) throw error;
         else console.log(data);
         toast.success("Datos Guardados");
-        
+
       }
-  } catch (error) {
+    } catch (error) {
       console.log(error);
-  } finally{
-    resetForm();
+    } finally {
+      resetForm();
+    }
   }
-
-
-  };
+  const validationSchema1 = Yup.object({
+    fullName: Yup.string().matches(/^[^\d]+$/, "El campo debe ser texto"),
+    birthdate: Yup.date().min(new Date(), 'La fecha no puede ser mayor a hoy'),
+    placeOfBirth: Yup.string().matches(/^[^\d]+$/, "El campo debe ser texto"),
+    weightAtBirth:  Yup.number("El campo debe ser un numero").positive("El peso debe ser positivo"),
+    typeOfDelivery: Yup.string(),
+    bloodType: Yup.string(),
+    email: Yup.string().email("Ingresa una dirección de correo válida"),
+    maritalStatus: Yup.string(),
+    stateOfBirth: Yup.string().matches(/^[^\d]+$/, "El campo de ser texto"),
+    sizeAtBirth: Yup.number("El campo debe ser un numero").positive("La talla debe ser positivo"),
+    gestationalWeeks: Yup.number("El campo debe ser un numero").positive("Las semanas deben ser positivas"),
+    biologicalSex: Yup.string(),
+    ocupation: Yup.string().matches(/^[^\d]+$/, "El campo de ser sólo texto"),
+    actualState: Yup.string().matches(/^[^\d]+$/, "El campo de ser texto"),
+    apgarScore: Yup.number().max(10,"La calificación mayor es 10").min(0,"La calificación mínima es 0"),
+    complicationsInPregnancy: Yup.string(),
+    specificPregnancyProblem: Yup.string().max(255,"Describa de una manera más corta"),
+  });
+  const validationSchema2 = Yup.object({
+    lastHemoglobin: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    dateLastHemoglobin: Yup.date(),
+    systolicBloodPressure: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    diastolicBloodPressure: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    lastTriglycerides: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    dateLastTriglycerides: Yup.date(),
+    colesterolHDL: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    currentWeight: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    currentFastingGlucose: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    lastUricAcid: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    dateLastUricAcid: Yup.date(),
+    timeInRange: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    currentSize: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    lastCholesterol: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    dateLastCholesterol: Yup.date(),
+    glucoseGoal: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+    averageGlucose: Yup.number("El campo debe ser positivo").positive("El campo debe ser un número positivo"),
+  });
   useEffect(() => {
-
     if (user) {
       const initialPersonalInformation = async () => {
         try {
@@ -201,9 +241,10 @@ export default function Expediente() {
             systolicBloodPressure: data[0]?.systolicBloodPressure || '',
             diastolicBloodPressure: data[0]?.diastolicBloodPressure || '',
             lastTriglycerides: data[0]?.lastTriglycerides || '',
+            dateLastTriglycerides: data[0]?.dateLastTriglycerides || '',
             colesterolHDL: data[0]?.colesterolHDL || '',
             currentWeight: data[0]?.currentWeight || '',
-            currentGlucose: data[0]?.currentGlucose || '',
+            currentFastingGlucose: data[0]?.currentFastingGlucose || '',
             lastUricAcid: data[0]?.lastUricAcid || '',
             dateLastUricAcid: data[0]?.dateLastUricAcid || '',
             timeInRange: data[0]?.timeInRange || '',
@@ -254,10 +295,11 @@ export default function Expediente() {
             }
             enableReinitialize
             onSubmit={submitPersonalInformation}
+            validationSchema={validationSchema1}
           >
             {({ values, errors, touched, handleSubmit, handleChange }) => (
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-12 grid-rows-6 justify-items-stretch mt-5 pl-5 gap-x-1">
+                <div className="grid grid-cols-12 grid-rows-6 justify-items-stretch mt-5 pl-5 gap-x-1 gap-y-2">
                   {/*Lado izquierdo del contenedor */}
                   <div className="col-span-4 w-11/12">
                     <p className="font-semibold">Nombre Completo</p>
@@ -268,7 +310,7 @@ export default function Expediente() {
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {touched.fullName && errors.fullName}
                     </p>
 
@@ -284,7 +326,7 @@ export default function Expediente() {
                         className={inputStyle}
                       />
 
-                      <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                      <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                         {touched.birthdate && errors.birthdate}
                       </p>
                     </div>
@@ -301,7 +343,7 @@ export default function Expediente() {
                         className={inputStyle}
                       />
 
-                      <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                      <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                         {touched.placeOfBirth && errors.placeOfBirth}
                       </p>
                     </div>
@@ -317,7 +359,7 @@ export default function Expediente() {
                         className={inputStyle}
                       />
 
-                      <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+<p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                         {touched.weightAtBirth && errors.weightAtBirth}
                       </p>
                     </div>
@@ -335,7 +377,7 @@ export default function Expediente() {
                       <option value="cesarea">Cesarea</option>
                     </select>
 
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.typeOfDelivery &&
                         touched.typeOfDelivery &&
                         errors.typeOfDelivery}{" "}
@@ -374,7 +416,7 @@ export default function Expediente() {
                       value={values.email}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.email && touched.email && errors.email}{" "}
                     </p>
                   </div>
@@ -391,7 +433,7 @@ export default function Expediente() {
                       <option value="casado">Casado</option>
                       <option value="viudo">Viudo</option>
                     </select>
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.maritalStatus &&
                         touched.maritalStatus &&
                         errors.maritalStatus}{" "}
@@ -406,7 +448,7 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.stateOfBirth}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.stateOfBirth && touched.stateOfBirth}
                     </p>
                   </div>
@@ -419,7 +461,7 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.sizeAtBirth}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.sizeAtBirth && touched.sizeAtBirth}
                     </p>
                   </div>
@@ -432,7 +474,7 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.gestationalWeeks}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.gestationalWeeks && touched.gestationalWeeks}
                     </p>
                   </div>
@@ -451,7 +493,7 @@ export default function Expediente() {
                       <option value="femenino">Femenino</option>
                       <option value="masculino">Masculino</option>
                     </select>
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.biologicalSex && touched.biologicalSex}
                     </p>
                   </div>
@@ -464,7 +506,7 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.ocupation}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.ocupation && touched.ocupation && errors.ocupation}{" "}
                     </p>
                   </div>
@@ -477,7 +519,7 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.actualState}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.actualState &&
                         touched.actualState &&
                         errors.actualState}{" "}
@@ -492,7 +534,7 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.apgarScore}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.apgarScore &&
                         touched.apgarScore &&
                         errors.apgarScore}{" "}
@@ -516,7 +558,7 @@ export default function Expediente() {
                           <option value="si">Si</option>
                           <option value="no">No</option>
                         </select>
-                        <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                        <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                           {errors.complicationsInPregnancy && touched.complicationsInPregnancy}
                         </p>
                       </div>
@@ -532,13 +574,14 @@ export default function Expediente() {
                             ? `${inputStyle}bg-white  text-gray-900 shadow-md`  // Clases si no está deshabilitado.
                             : `${inputStyle}bg-gray-200 border border-gray-300 text-gray-500 shadow-sm cursor-not-allowed `}
                         />
-                      </div>
-
-                      <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                        <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                         {errors.specificPregnancyProblem &&
                           touched.specificPregnancyProblem &&
                           errors.specificPregnancyProblem}{" "}
-                      </p>
+                        </p>
+                      </div>
+
+                      
                     </div>
                   </div>
                   {/* fin contenedor con  inputs en la misma linea */}
@@ -571,6 +614,7 @@ export default function Expediente() {
             initialValues={medicalEvaluation}
             enableReinitialize
             onSubmit={sumbitMedicalEvaluation}
+            validationSchema={validationSchema2}
           >
             {({ handleSubmit, handleChange, values, errors, touched }) => (
               <form onSubmit={handleSubmit}>
@@ -591,17 +635,26 @@ export default function Expediente() {
                           <input
                             name="lastHemoglobin"
                             type="number"
+                            value={values.lastHemoglobin}
                             onChange={handleChange}
                             className={inputStyle}
                           />
+                          <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
+                            {errors.lastHemoglobin && touched.lastHemoglobin}{""}
+                          </p>
+
                         </div>
                         <div className=" w-2/3 ">
                           <input
                             name="dateLastHemoglobin"
                             type="date"
+                            value={values.dateLastHemoglobin}
                             onChange={handleChange}
                             className={inputStyle}
                           />
+                          <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
+                            {errors.dateLastHemoglobin && touched.dateLastHemoglobin}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -609,35 +662,37 @@ export default function Expediente() {
                   </div>
                   <div className="col-span-4 col-start-1 row-start-2 w-11/12 flex-col">
                     <p className="font-semibold mb-0 flex ">
-                     Presión arterial actual
+                      Presión arterial actual
                     </p>
                     <div className=" flex flex-row gap-1">
-                    <div className="w-1/2">
-                      <input
-                        name="systolicBloodPressure"
-                        type="number"
-                        onChange={handleChange}
-                        className={inputStyle}
-                        placeholder="Sistólica"
-                      />
-                      <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                        {errors.systolicBloodPressure &&
-                          touched.systolicBloodPressure}{" "}
-                      </p>
-                    </div>
-                    <div className="w-1/2">
-                      <input
-                        name="diastolicBloodPressure"
-                        type="number"
-                        onChange={handleChange}
-                        className={inputStyle}
-                        placeholder="Diastólica"
-                      />
-                      <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                        {errors.diastolicBloodPressure &&
-                          touched.diastolicBloodPressure}{" "}
-                      </p>
-                    </div>
+                      <div className="w-1/2">
+                        <input
+                          name="systolicBloodPressure"
+                          type="number"
+                          value={values.systolicBloodPressure}
+                          onChange={handleChange}
+                          className={inputStyle}
+                          placeholder="Sistólica"
+                        />
+                        <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1 col-start-1 row-span-4">
+                          {errors.systolicBloodPressure &&
+                            touched.systolicBloodPressure}{" "}
+                        </p>
+                      </div>
+                      <div className="w-1/2">
+                        <input
+                          name="diastolicBloodPressure"
+                          type="number"
+                          value={values.diastolicBloodPressure}
+                          onChange={handleChange}
+                          className={inputStyle}
+                          placeholder="Diastólica"
+                        />
+                        <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1 col-start-1 row-span-4">
+                          {errors.diastolicBloodPressure &&
+                            touched.diastolicBloodPressure}{" "}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <div className="col-span-4 col-start-1 row-start-3 w-11/12">
@@ -653,14 +708,21 @@ export default function Expediente() {
                           <input
                             name="lastTriglycerides"
                             type="number"
+                            value={values.lastTriglycerides}
                             onChange={handleChange}
                             className={inputStyle}
                           />
+                          <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1 col-start-1 row-span-4">
+                          {errors.lastTriglycerides &&
+                            touched.lastTriglycerides}{" "}
+                        </p>
                         </div>
+                        
                         <div className=" w-2/3 ">
                           <input
                             name="dateLastTriglycerides"
                             type="date"
+                            value={values.dateLastTriglycerides}
                             onChange={handleChange}
                             className={inputStyle}
                           />
@@ -676,10 +738,11 @@ export default function Expediente() {
                     <input
                       name="colesterolHDL"
                       type="number"
+                      value={values.colesterolHDL}
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.colesterolHDL &&
                         touched.colesterolHDL &&
                         errors.colesterolHDL}{" "}
@@ -695,10 +758,11 @@ export default function Expediente() {
                     <input
                       name="currentWeight"
                       type="number"
+                      value={values.currentWeight}
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.currentWeight &&
                         touched.currentWeight &&
                         errors.currentWeight}{" "}
@@ -709,15 +773,16 @@ export default function Expediente() {
                       Glucosa en ayunas actual
                     </p>
                     <input
-                      name="currentGlucose"
+                      name="currentFastingGlucose"
                       type="number"
+                      value={values.currentFastingGlucose}
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                      {errors.currentGlucose &&
-                        touched.currentGlucose &&
-                        errors.currentGlucose}{" "}
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
+                      {errors.currentFastingGlucose &&
+                        touched.currentFastingGlucose &&
+                        errors.currentFastingGlucose}{" "}
                     </p>
                   </div>
                   <div className="col-span-4 col-start-5 row-start-3 w-11/12">
@@ -733,14 +798,21 @@ export default function Expediente() {
                           <input
                             name="lastUricAcid"
                             type="number"
+                            value={values.lastUricAcid}
                             onChange={handleChange}
                             className={inputStyle}
                           />
+                          <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1 col-span-4 col-start-1">
+                      {errors.lastUricAcid &&
+                        touched.lastUricAcid &&
+                        errors.lastUricAcid}{" "}
+                    </p>
                         </div>
                         <div className=" w-2/3 ">
                           <input
                             name="dateLastUricAcid"
                             type="date"
+                            value={values.dateLastUricAcid}
                             onChange={handleChange}
                             className={inputStyle}
                           />
@@ -756,11 +828,12 @@ export default function Expediente() {
                     <input
                       name="timeInRange"
                       type="number"
+                      value={values.timeInRange}
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                      {errors.timeInRangetimeInRange &&
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
+                      {errors.timeInRange &&
                         touched.timeInRange &&
                         errors.timeInRange}{" "}
                     </p>
@@ -775,10 +848,11 @@ export default function Expediente() {
                     <input
                       name="currentSize"
                       type="number"
+                      value={values.currentSize}
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {errors.currentSize &&
                         touched.currentSize &&
                         errors.currentSize}{" "}
@@ -796,14 +870,21 @@ export default function Expediente() {
                         <input
                           name="lastCholesterol"
                           type="number"
+                          value={values.lastCholesterol}
                           onChange={handleChange}
                           className={inputStyle}
                         />
+                        <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1 col-span-4 col-start-1">
+                      {errors.lastCholesterol &&
+                        touched.lastCholesterol &&
+                        errors.lastCholesterol}{" "}
+                    </p>
                       </div>
                       <div className=" w-2/3 ">
                         <input
                           name="dateLastCholesterol"
                           type="date"
+                          value={values.dateLastCholesterol}
                           onChange={handleChange}
                           className={inputStyle}
                         />
@@ -818,22 +899,29 @@ export default function Expediente() {
                     <input
                       name="glucoseGoal"
                       type="number"
+                      value={values.glucoseGoal}
                       onChange={handleChange}
                       className={inputStyle}
                     />
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
+                      {errors.glucoseGoal &&
+                        touched.glucoseGoal &&
+                        errors.glucoseGoal}{" "}
+                    </p>
                   </div>
                   <div className="col-span-4 col-start-9 row-start-4 w-11/12">
                     <p className="font-semibold mb-0">Glucosa promedio</p>
                     <input
                       name="averageGlucose"
                       type="number"
+                      value={values.averageGlucose}
                       onChange={handleChange}
                       className={inputStyle}
                     />
-                    <p className="mb-2 text-sm text-red-500 dark:text-white w-1">
-                      {errors.apgarScore &&
-                        touched.apgarScore &&
-                        errors.apgarScore}{" "}
+                    <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
+                      {errors.averageGlucose &&
+                        touched.averageGlucose &&
+                        errors.averageGlucose}{" "}
                     </p>
                   </div>
                   {/*FIN DEL LADO DERECHO */}
@@ -855,3 +943,4 @@ export default function Expediente() {
     </div>
   );
 }
+
