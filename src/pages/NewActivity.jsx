@@ -4,6 +4,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Activities() {
   const { user } = useUserContext();
@@ -39,6 +40,7 @@ export default function Activities() {
       console.log(error.message);
     } finally {
       setSubmitting(false);
+      toast.success("Nuevo ejercicio registrado");
       resetForm();
     }
   };
@@ -49,20 +51,8 @@ export default function Activities() {
   return (
     <div>
       <SideBar />
-
+      <ToastContainer />
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
-        {submitted && (
-          <div
-            class="flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
-            role="alert"
-          >
-            <span className="sr-only">Info</span>
-            <div className="text-green-400">
-              <span class="font-medium ">Felicidades! </span>
-              <span>Actividad Registrada con éxito</span>
-            </div>
-          </div>
-        )}
         {activitieDuplicated && (
           <div
             class="flex items-center p-4 mb-4 text-sm text-red-600 border border-red-300 rounded-lg bg-red-300 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"

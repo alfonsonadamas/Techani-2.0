@@ -7,6 +7,8 @@ import edit from "../assets/img/edit.png";
 import delate from "../assets/img/delate.png";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { toast, ToastContainer } from "react-toastify";
+import { Toast } from "flowbite-react";
 
 export default function ViewActivity() {
   const { user } = useUserContext();
@@ -55,6 +57,7 @@ export default function ViewActivity() {
       console.log(error);
     } finally {
       setLoading(false);
+      toast.success("Se a eliminado ejercio");
       getRecords(); //actualiza
     }
   };
@@ -79,6 +82,7 @@ export default function ViewActivity() {
       console.log(error);
     } finally {
       setSubmitting(false);
+      toast.success("Se a modificado el ejercicio");
       getRecords(); //actualiza
     }
   };
@@ -96,6 +100,7 @@ export default function ViewActivity() {
   return (
     <div>
       <SideBar />
+      <ToastContainer />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <h2 className="text-2xl font-semibold mb-4">Tus Ejercicios</h2>
         <div className="w-full h-full">
