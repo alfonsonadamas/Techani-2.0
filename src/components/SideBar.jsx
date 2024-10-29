@@ -4,6 +4,9 @@ import Logo from "../assets/img/Techani (1).png";
 import { useUserContext } from "../context/UserContext";
 import act1 from "../assets/img/yoga.png";
 import act2 from "../assets/img/ejercicio.png";
+import sleep from "../assets/img/sleep.png";
+import sleeping from "../assets/img/sleeping.png";
+import carpeta from "../assets/img/carpeta-abierta.png";
 
 export default function SideBar() {
   const { user } = useUserContext();
@@ -14,6 +17,7 @@ export default function SideBar() {
   const [isHidden5, setIsHidden5] = useState(true);
   const [isHidden6, setIsHidden6] = useState(true);
   const [isHidden7, setIsHidden7] = useState(true);
+  const [isHidden8, setIsHidden8] = useState(true);
   const [name, setName] = useState("");
   const [picture, setPicture] = useState("");
 
@@ -43,6 +47,10 @@ export default function SideBar() {
 
   const dropDown7 = () => {
     setIsHidden7(!isHidden7);
+  };
+
+  const dropDown8 = () => {
+    setIsHidden8(!isHidden8);
   };
 
   useEffect(() => {
@@ -269,6 +277,26 @@ export default function SideBar() {
                   </svg>
 
                   <span className="ml-3">Mis Registros</span>
+                </Link>
+              </div>
+              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link to={"/editRecords"} className="flex cursor-pointer p-2 ">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 h-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
+                    />
+                  </svg>
+
+                  <span className="ml-3">Editar Registros</span>
                 </Link>
               </div>
             </div>
@@ -801,6 +829,91 @@ export default function SideBar() {
                 </Link>
               </div>
             </div>
+            <div className="p-2.5 mt-3 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-gray-100">
+              <img
+                className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                alt="sleep"
+                src={sleep}
+              />
+
+              <div
+                className="flex justify-between w-full items-center"
+                onClick={dropDown8}
+              >
+                <span className="text-[15px] ml-2 font-semibold">Sueño</span>
+                <span
+                  className={
+                    isHidden8
+                      ? "text-sm duration-300"
+                      : "text-sm rotate-180 duration-300 "
+                  }
+                >
+                  <svg
+                    class="w-3 h-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m1 1 4 4 4-4"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+
+            <div
+              className={
+                isHidden8
+                  ? "hidden text-left text-sm  mt-2 w-4/5 mx-auto"
+                  : " text-left text-sm  mt-2 w-4/5 mx-auto"
+              }
+            >
+              <div className="w-full hover:bg-gray-200 duration-300 rounded-md mt-1 ">
+                <Link
+                  to={"/sleep"}
+                  className="flex items-center cursor-pointer p-2 "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+
+                  <span className="ml-3">Nuevo registro</span>
+                </Link>
+              </div>
+            </div>
+            
+            <div className=" font-semibold w-full hover:bg-gray-200 duration-300 rounded-md mt-1 pl-2">
+                <Link
+                  to={"/myRecord"}
+                  className="flex items-center cursor-pointer p-2 "
+                >
+                  <img
+                    className="h-5 w-5"
+                    alt="folder"
+                    src={carpeta}
+                  />
+
+                  <span className="ml-3">Expediente</span>
+                </Link>
+              </div>
+            
 
             {/* Aqui acaba */}
           </div>

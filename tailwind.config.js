@@ -34,9 +34,12 @@ module.exports = {
     "./src/pages/Main.jsx",
     "./src/pages/Index.jsx",
     "./src/components/NavRegistro.jsx",
+    "./src/components/Paginacion.jsx",
     "./src/components/Modal.jsx",
     "./src/components/ModalGlucosa.jsx",
     "./src/pages/Profile.jsx",
+    "./src/pages/SleepHours.jsx",
+    "./src/pages/MyGlucoseRegister.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {

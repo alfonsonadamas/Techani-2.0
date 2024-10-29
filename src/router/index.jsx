@@ -6,7 +6,6 @@ import Login from "../pages/Login";
 import Main from "../pages/Main";
 import Index from "../pages/Index";
 import GlucoseRegister from "../pages/GlucoseRegister";
-import AllGlucoseRegister from "../pages/AllGlucoseRegister";
 import SignUp from "../pages/SignUp";
 import Profile from "../pages/Profile";
 import Food from "../pages/Food";
@@ -31,6 +30,10 @@ import Grapics from "../pages/Graphics";
 import MyExercise from "../pages/MyExercise";
 import MyFiles from "../pages/MyFiles";
 import Pagina1Registro from "../pages/Pagina1Registro";
+import SleepHours from "../pages/SleepHours";
+import MyGlucoseRegister from "../pages/MyGlucoseRegister";
+import EditRecords from "../pages/EditRecords";
+import Expediente from "../pages/Expediente";
 
 export const router = createBrowserRouter([
   {
@@ -72,6 +75,16 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "/editRecords",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <EditRecords />,
+          },
+        ],
+      },
+      {
         path: "/viewEstados",
         element: <LayoutPrivate />,
         children: [
@@ -87,7 +100,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllGlucoseRegister />,
+            element: <MyGlucoseRegister />,
           },
         ],
       },
@@ -214,6 +227,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/newActivitie",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -223,6 +237,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dailyRecord",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -232,6 +247,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/insulineRegister",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -241,6 +257,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/waterRegister",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -250,6 +267,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/atipicDayRegister",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -259,6 +277,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/files",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -268,6 +287,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/myFiles",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -277,6 +297,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/exercise",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -286,6 +307,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/graphics",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
@@ -295,10 +317,31 @@ export const router = createBrowserRouter([
       },
       {
         path: "/registroTemp",
+        element: <LayoutPrivate />,
         children: [
           {
             index: true,
             element: <Pagina1Registro />,
+          },
+        ],
+      },
+      {
+        path: "/sleep",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <SleepHours />,
+          },
+        ],
+      },
+      {
+        path: "/myRecord",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <Expediente />,
           },
         ],
       },

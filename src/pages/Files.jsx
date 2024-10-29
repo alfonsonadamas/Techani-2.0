@@ -63,7 +63,7 @@ export default function Files() {
   const validationFile = (e) => {
     const selectedFile = e.target.files[0];
     const typeOfFile = selectedFile.name.split(".").slice(-1)[0].toLowerCase();
-    const extensions = ["jpg", "png", "jpeg","pdf"];
+    const extensions = ["jpg", "png", "jpeg", "pdf"];
     console.log(typeOfFile);
     if (extensions.includes(typeOfFile)) {
       if (selectedFile.size <= 300000) {
@@ -82,11 +82,9 @@ export default function Files() {
   };
 
   const validationSchema = Yup.object().shape({
-    filename: Yup.string()
-      .required("Ingresa el Tipo de Analisis"),
+    filename: Yup.string().required("Ingresa el Tipo de Analisis"),
 
-    date: Yup.string()
-    .required("La Fecha es requerida"),
+    date: Yup.string().required("La Fecha es requerida"),
   });
 
   return (
@@ -125,17 +123,15 @@ export default function Files() {
                     onBlur={handleBlur}
                     aria-describedby="helper-text-explanation"
                     className={
-                      errors.glucose
+                      errors.filename
                         ? "bg-gray-50 mb-2 border border-red-500 text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         : "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     }
                     placeholder="Ingresa el nombre del Análisis"
                   />
                   <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                        {errors.filename &&
-                          touched.filename &&
-                          errors.filename}
-                      </p>
+                    {errors.filename && touched.filename && errors.filename}
+                  </p>
                 </div>
                 <div className="flex-1 ml-2">
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -158,10 +154,8 @@ export default function Files() {
                     placeholder="Fecha del Análisis"
                   />
                   <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                        {errors.date &&
-                          touched.date &&
-                          errors.date}
-                      </p>
+                    {errors.date && touched.date && errors.date}
+                  </p>
                 </div>
               </div>
               <div>

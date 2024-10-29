@@ -4,6 +4,7 @@ import { Formik } from "formik";
 import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import * as Yup from "yup";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function WaterRegister() {
   const { user } = useUserContext();
@@ -33,7 +34,7 @@ export default function WaterRegister() {
       ]);
 
       if (error) throw error;
-      setSubmited(true);
+      toast.success("Registro de agua guardado");
     } catch (error) {
       console.log(error);
     } finally {
@@ -53,6 +54,7 @@ export default function WaterRegister() {
     <div>
       <SideBar />
       <div className="p-16 pt-16  sm:ml-64" data-aos="fade-up">
+        <ToastContainer />
         <div className="w-full h-60 flex justify-center items-center">
           <div className=" w-full">
             {!submited ? (

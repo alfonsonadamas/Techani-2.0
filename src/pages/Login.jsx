@@ -28,6 +28,8 @@ export default function Login() {
         return setErrors({ validate: "Correo Electronico no confirmado" });
       }
 
+      console.log(user);
+
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
