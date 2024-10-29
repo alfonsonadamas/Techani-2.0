@@ -509,13 +509,16 @@ export default function Pagina1Registro() {
                   </div>
                   {/*FIN DEL LADO DERECHO DEL FORMULARIO */}
                 </div>
+
                 <div className="flex justify-between ">
   
   
                 </div>
   
               </div>
+              
             </div>
+            
           </form>
         )}
       </Formik>
