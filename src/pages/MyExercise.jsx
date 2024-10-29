@@ -7,6 +7,8 @@ import edit from "../assets/img/edit.png";
 import delate from "../assets/img/delate.png";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function MyExercise() {
   const { user } = useUserContext();
@@ -88,7 +90,8 @@ export default function MyExercise() {
     try {
       const { data, error } = await supabase
         .from("actividadesUsuario")
-        .select();
+        .select()
+        .eq("uid", user.id);
       if (error) throw error;
       setActivitiesUs(data);
     } catch (error) {
@@ -152,6 +155,7 @@ export default function MyExercise() {
       if (error) throw error;
       else console.log(data);
       closeModal();
+      toast.success("Registro modificado");
       resetForm();
       Ejercicios(); // Actualiza
     } catch (error) {
@@ -194,6 +198,7 @@ export default function MyExercise() {
     } catch (error) {
       console.log(error);
     } finally {
+      toast.success("Registro eliminado");
       setLoading(false);
       Ejercicios(); //actualiza
     }
@@ -225,7 +230,7 @@ export default function MyExercise() {
     Ejercicios();
     getActivities();
     getActivitiesUs();
-  }, []);
+  }, [user]);
 
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
@@ -273,6 +278,7 @@ export default function MyExercise() {
   return (
     <div>
       <SideBar />
+      <ToastContainer></ToastContainer>
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <h2 className="text-2xl font-semibold mt-10">Ejercicios anteriores</h2>
         <p className="mb-5">Filtro por rango de fecha</p>
