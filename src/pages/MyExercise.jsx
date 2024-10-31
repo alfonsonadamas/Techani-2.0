@@ -59,7 +59,7 @@ export default function MyExercise() {
   };
 
   const validationSchema = Yup.object({
-    excersiceName: Yup.string()
+    nameActividad: Yup.string()
       .matches(/^[^\d]+$/, "El campo debe ser texto")
       .required("Este campo es requerido"),
     time: Yup.number()
@@ -109,6 +109,7 @@ export default function MyExercise() {
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
+      console.log(idActividad);
       console.log("idEjercicio", editRecord.idEjercicio);
       setSubmitting(true);
       const weightValue = weightOption === "si" ? weight : null;
@@ -377,13 +378,14 @@ export default function MyExercise() {
                   <Formik
                     initialValues={{
                       idEjercicio: editRecord.idEjercicio,
+                      idActividad: editRecord.idActividades,
                       weight: editRecord.weight,
                       weightOption: weightOption,
-                      actividadUsuario: edit.actividadUsuario,
                       nameActividad: getNameActivity(
                         editRecord.idActividades,
                         editRecord.actividadUsuario
                       ),
+                      time: editRecord.time,
                     }}
                     validationSchema={validationSchema}
                     onSubmit={updateEjercicio}
@@ -414,7 +416,7 @@ export default function MyExercise() {
                               <input
                                 type="search"
                                 id="default-search"
-                                name="idActividades"
+                                name="nameActividad"
                                 autoComplete="off"
                                 defaultValue={values.nameActividad}
                                 onChange={handleSearch}

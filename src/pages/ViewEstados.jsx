@@ -123,6 +123,7 @@ export default function ViewEstados() {
       setEffectRan(true);
     }
     fetchData();
+    emotions();
   }, [user]);
 
   const deleteEmotion = async (id) => {
@@ -313,7 +314,7 @@ export default function ViewEstados() {
             id="idFfin"
             type="date"
             value={datefin}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => setDateFin(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
           />
 
