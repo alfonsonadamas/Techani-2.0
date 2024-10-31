@@ -308,7 +308,7 @@ export default function MyExercise() {
           </button>
         </div>
         {loading ? (
-          <p className="">Cargando registros...</p>
+          <p className="">Cargando nuevos..</p>
         ) : (
           <div>
             <div
