@@ -30,12 +30,45 @@ export default function EditRecords() {
   const [optionEdit, setOptionEdit] = useState(false);
   const [meditionGlucose, setMeditionGlucose] = useState([]);
   const [editRecordData, setEditRecordData] = useState([]);
+  const [atipicDayData, setAtipicDayData] = useState([]);
+  const [insulineType, setInsulineType] = useState([]);
+  const [insulineDose, setInsulineDose] = useState([]);
 
   const getMeditionGlucose = async () => {
     try {
       const { data, error } = await supabase.from("medicion").select("*");
       if (error) throw error;
       setMeditionGlucose(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getAtipicDays = async () => {
+    try {
+      const { data, error } = await supabase.from("diaAtipico").select("*");
+      if (error) throw error;
+      setAtipicDayData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getInsulineType = async () => {
+    try {
+      const { data, error } = await supabase.from("insulina").select("*");
+      if (error) throw error;
+      setInsulineType(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getInsulineDose = async () => {
+    try {
+      const { data, error } = await supabase.from("tipoDosis").select("*");
+      if (error) throw error;
+      setInsulineDose(data);
     } catch (error) {
       console.log(error);
     }
@@ -68,9 +101,7 @@ export default function EditRecords() {
     try {
       const { data, error } = await supabase
         .from("registroInsulina")
-        .select(
-          "id, created_at, dosis, medicion, insulina(insulin), tipoDosis(tipoDosis)"
-        )
+        .select("id, created_at, dosis, medicion, tipoInsulina, tipoDosis")
         .eq("uid", user.id);
       if (error) throw error;
       const newData = data.map((record) => {
@@ -78,8 +109,8 @@ export default function EditRecords() {
           id: record.id,
           dose: record.dosis,
           created_at: record.created_at,
-          insulineType: record.insulina.insulin,
-          doseType: record.tipoDosis.tipoDosis,
+          insulineType: record.tipoInsulina,
+          doseType: record.tipoDosis,
           medition: record.medicion,
         };
         return object;
@@ -108,14 +139,14 @@ export default function EditRecords() {
     try {
       const { data, error } = await supabase
         .from("registroDiaAtipico")
-        .select("id, created_at, diaAtipico(typeDay), otherAtipicDay")
+        .select("id, created_at, diaAtipico, otherAtipicDay")
         .eq("uid", user.id);
       if (error) throw error;
       const newData = data.map((record) => {
         const object = {
           id: record.id,
           created_at: record.created_at,
-          atipicDay: record.diaAtipico.typeDay,
+          atipicDay: record.diaAtipico,
           otherAtipicDay: record.otherAtipicDay,
         };
         return object;
@@ -133,7 +164,7 @@ export default function EditRecords() {
     }`;
   };
 
-  const filterData = (dataGlucose, dataWater) => {
+  const filterData = (dataGlucose, dataWater, atipicDay, insuline) => {
     if (date) {
       setNewDataGlucosa([]);
       const filteredData = dataGlucose.filter((record) => {
@@ -158,25 +189,6 @@ export default function EditRecords() {
         return formatDate(record.created_at) === date;
       });
       setNewDataAtipicDay(filteredDataAtipicDay);
-    }
-  };
-
-  const deleteDataGlucose = async (ids) => {
-    try {
-      const { error } = await supabase
-        .from("registroGlucosa")
-        .delete()
-        .in("id", ids);
-      if (error) throw error;
-      console.log("Registro eliminado");
-      const updatedGlucosa = glucosa.filter(
-        (record) => !ids.includes(record.idGlucose)
-      );
-      setGlucosa(updatedGlucosa);
-      filterData(updatedGlucosa);
-      setOpenGlucose(false);
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -236,9 +248,9 @@ export default function EditRecords() {
           });
           return updatedData;
         });
-        filterData(glucosa);
+        filterData(glucosa, water, atipicDay, insuline);
         toast.warning(
-          "Ya existe un registro con este tipo de medición se actualizará solo el registro de glucosa"
+          "Ya existe un registro con este tipo de medición se actualizaran los campos que no estan repetidos"
         );
       }
     } catch (error) {
@@ -264,8 +276,118 @@ export default function EditRecords() {
       });
       console.log(error);
       setWater(updatedWater);
-      filterData(glucosa, water);
+      filterData(glucosa, water, atipicDay, insuline);
       toast.success("Registro actualizado");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateDataAtipicDay = async (data, id) => {
+    try {
+      console.log(data);
+      if (data.atipicDay === "6" || data.atipicDay === 6) {
+        const { error } = await supabase
+          .from("registroDiaAtipico")
+          .update({
+            diaAtipico: data.atipicDay,
+            otherAtipicDay: data.otherAtipicDay,
+          })
+          .eq("id", id);
+        console.log(error);
+      } else {
+        const { error } = await supabase
+          .from("registroDiaAtipico")
+          .update({
+            diaAtipico: data.atipicDay,
+            otherAtipicDay: null,
+          })
+          .eq("id", id);
+        console.log(error);
+      }
+      const updateDataAtipicDay = atipicDay.map((record) => {
+        if (record.id === id) {
+          return {
+            ...record,
+            diaAtipico: data.atipicDay,
+            otherAtipicDay: data.otherAtipicDay,
+          };
+        }
+        return record;
+      });
+
+      setAtipicDay(updateDataAtipicDay);
+      filterData(glucosa, water, atipicDay, insuline);
+      toast.success("Registro actualizado");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateDataInsuline = async (data, id) => {
+    var duplicate = false;
+    try {
+      if (data.doseType !== 1) {
+        if (insuline.length > 0) {
+          insuline.forEach((record) => {
+            if (record.medicion === parseInt(data.medition)) {
+              duplicate = true;
+            }
+          });
+        }
+
+        if (!duplicate) {
+          const { error } = await supabase
+            .from("registroInsulina")
+            .update({
+              dosis: data.dosis,
+              tipoInsulina: data.insulineType,
+              tipoDosis: data.doseType,
+              medicion: data.medition,
+            })
+            .eq("id", id);
+          if (error) throw error;
+          toast.success("Registro actualizado");
+        } else {
+          const { error } = await supabase
+            .from("registroInsulina")
+            .update({
+              dosis: data.dosis,
+              tipoInsulina: data.insulineType,
+            })
+            .eq("id", id);
+          if (error) throw error;
+          toast.warning(
+            "Ya existe un registro con este tipo de medición se actualizaran los campos que no estan repetidos"
+          );
+        }
+      } else {
+        const { error } = await supabase
+          .from("registroInsulina")
+          .update({
+            dosis: data.dosis,
+            tipoInsulina: data.insulineType,
+            tipoDosis: data.doseType,
+            medicion: data.medition,
+          })
+          .eq("id", id);
+        if (error) throw error;
+        toast.success("Registro actualizado");
+      }
+      const updatedInsuline = insuline.map((record) => {
+        if (record.id === id) {
+          return {
+            ...record,
+            dose: data.dosis,
+            insulineType: data.insulineType,
+            doseType: data.doseType,
+            medition: data.medition,
+          };
+        }
+        return record;
+      });
+      setInsuline(updatedInsuline);
+      filterData(glucosa, water, atipicDay, updatedInsuline);
     } catch (error) {
       console.log(error);
     }
@@ -293,8 +415,64 @@ export default function EditRecords() {
       if (error) throw error;
       const updatedWater = water.filter((record) => !ids.includes(record.id));
       setWater(updatedWater);
-      filterData(glucosa, updatedWater);
+      filterData(glucosa, updatedWater, atipicDay, insuline);
       setOpenWater(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteDataAtpicDay = async (ids) => {
+    try {
+      console.log(ids);
+      const { error } = await supabase
+        .from("registroDiaAtipico")
+        .delete()
+        .in("id", ids);
+      if (error) throw error;
+      const updatedDataAtipicDay = atipicDay.filter(
+        (record) => !ids.includes(record.id)
+      );
+      setAtipicDay(updatedDataAtipicDay);
+      filterData(glucosa, water, updatedDataAtipicDay, insuline);
+      setOpenAtipicDay(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteDataInsuline = async (ids) => {
+    try {
+      const { error } = await supabase
+        .from("registroInsulina")
+        .delete()
+        .in("id", ids);
+      if (error) throw error;
+      const updatedInsuline = insuline.filter(
+        (record) => !ids.includes(record.id)
+      );
+      setInsuline(updatedInsuline);
+      filterData(glucosa, water, atipicDay, updatedInsuline);
+      setopenInsuline(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteDataGlucose = async (ids) => {
+    try {
+      const { error } = await supabase
+        .from("registroGlucosa")
+        .delete()
+        .in("id", ids);
+      if (error) throw error;
+      console.log("Registro eliminado");
+      const updatedGlucosa = glucosa.filter(
+        (record) => !ids.includes(record.idGlucose)
+      );
+      setGlucosa(updatedGlucosa);
+      filterData(updatedGlucosa, water, atipicDay, insuline);
+      setOpenGlucose(false);
     } catch (error) {
       console.log(error);
     }
@@ -307,6 +485,9 @@ export default function EditRecords() {
       getWater();
       getAtipicDay();
       getMeditionGlucose();
+      getAtipicDays();
+      getInsulineType();
+      getInsulineDose();
     }
   }, [user]);
 
@@ -349,7 +530,9 @@ export default function EditRecords() {
                             <input
                               type="number"
                               name="glucosa"
-                              className="mx-3 w-48  border-gray-400 rounded-xl"
+                              className={
+                                "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                              }
                               defaultValue={values.glucosa}
                               onChange={handleChange}
                             ></input>
@@ -357,7 +540,7 @@ export default function EditRecords() {
                             <select
                               name="medition"
                               id=""
-                              className="mx-3 w-48  border-gray-400 rounded-xl"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                               defaultValue={values.medition}
                               onChange={handleChange}
                             >
@@ -447,57 +630,112 @@ export default function EditRecords() {
               <div className="flex mt-2 mb-2">
                 {newDataInsuline &&
                   newDataInsuline.map((record) => {
+                    console.log(record);
                     return (
-                      <div key={record.id} className=" flex flex-col">
-                        <span>Dosis de insulina:</span>
-                        <input
-                          type="number"
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.dosis}
-                          onChange={(e) => {
-                            record.dosis = e.target.value;
-                            setEditRecordData({
-                              ...editRecordData,
-                              glucosa: record.glucose,
-                            });
-                          }}
-                        ></input>
-                        <span className="mt-5">Medicion:</span>
-                        <select
-                          name=""
-                          id=""
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.medition}
-                          onChange={(e) => {
-                            setEditRecordData({
-                              ...editRecordData,
-                              medition: e.target.value,
-                            });
-                            console.log(editRecordData);
-                          }}
-                        >
-                          {meditionGlucose.map((medition) => {
-                            return (
-                              <option value={medition.idMedicion}>
-                                {medition.measurement}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <div className="flex justify-between mt-5">
-                          <button className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center">
-                            Guardar
-                          </button>
-                          <button
-                            onClick={() => {
-                              deleteDataGlucose([record.idGlucose]);
-                            }}
-                            className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
+                      <Formik
+                        initialValues={{
+                          dosis: record.dose,
+                          insulineType: record.insulineType,
+                          doseType: record.doseType,
+                          medition: record.medition,
+                        }}
+                        key={record.id}
+                      >
+                        {({ values, handleChange }) => (
+                          <div
+                            key={record.id}
+                            className=" flex flex-col border-2 border-gray-900 shadow-xl shadow-gray-400 p-5 rounded-lg mx-5"
                           >
-                            Eliminar
-                          </button>
-                        </div>
-                      </div>
+                            <span>Dosis de insulina:</span>
+                            <input
+                              type="number"
+                              className={
+                                "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                              }
+                              name="dosis"
+                              defaultValue={values.dosis}
+                              onChange={handleChange}
+                            ></input>
+                            <span className="mt-5">Tipo de insulina:</span>
+                            <select
+                              name="insulineType"
+                              id="insulineType"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                              value={values.insulineType}
+                              onChange={handleChange}
+                            >
+                              {insulineType.map((type) => {
+                                return (
+                                  <option
+                                    key={type.idTipoInsulina}
+                                    value={type.idTipoInsulina}
+                                  >
+                                    {type.insulin}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            <span className="mt-5">Tipo de dosis:</span>
+                            <select
+                              name="doseType"
+                              id="doseType"
+                              className="bg-gray-50 border mb-3 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                              value={values.doseType}
+                              onChange={handleChange}
+                            >
+                              {insulineDose.map((type) => {
+                                return (
+                                  <option key={type.id} value={type.id}>
+                                    {type.tipoDosis}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            {values.doseType === "1" ||
+                            values.doseType === 1 ? (
+                              <select
+                                name="medition"
+                                id="medition"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                onChange={handleChange}
+                                value={values.medition}
+                              >
+                                <option value="Desayuno">Desayuno</option>
+                                <option value="Colacion Matutina">
+                                  Colación Matutina
+                                </option>
+                                <option value="Comida">Comida</option>
+                                <option value="Colacion Vespertina">
+                                  Colación Vespertina
+                                </option>
+                                <option value="Ejercicio">Ejercicio</option>
+                                <option value="Cena">Cena</option>
+                                <option value="Nocturna">Nocturna</option>
+                              </select>
+                            ) : (
+                              <div></div>
+                            )}
+                            <div className="flex justify-between mt-5">
+                              <button
+                                onClick={() => {
+                                  updateDataInsuline(values, record.id);
+                                }}
+                                className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
+                              >
+                                Guardar
+                              </button>
+                              <button
+                                onClick={() => {
+                                  deleteDataInsuline([record.id]);
+                                }}
+                                className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Formik>
                     );
                   })}
               </div>
@@ -522,10 +760,10 @@ export default function EditRecords() {
               <button
                 onClick={() => {
                   const meditionIds = [];
-                  newDataGlucosa.map((medition) => {
-                    return meditionIds.push(medition.idGlucose);
+                  newDataInsuline.map((medition) => {
+                    return meditionIds.push(medition.id);
                   });
-                  deleteDataGlucose(meditionIds);
+                  deleteDataInsuline(meditionIds);
                 }}
                 className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
               >
@@ -565,7 +803,9 @@ export default function EditRecords() {
                           <input
                             type="number"
                             name="agua"
-                            className="mx-3 w-48  border-gray-400 rounded-xl"
+                            className={
+                              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                            }
                             defaultValue={values.agua}
                             onChange={handleChange}
                           ></input>
@@ -606,7 +846,7 @@ export default function EditRecords() {
             <div className="flex justify-end mt-5">
               <button
                 onClick={() => {
-                  setopenInsuline(false);
+                  setOpenWater(false);
                 }}
                 className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
               >
@@ -638,64 +878,89 @@ export default function EditRecords() {
             <div className="overflow-x-auto flex flex-col">
               <div className="flex justify-center flex-col items-center">
                 <h1 className="font-semibold text-lg">
-                  Editar registro de glucosa
+                  Editar registro de día atípico
                 </h1>
                 <p>Ingrese los nuevos datos</p>
               </div>
               <div className="flex mt-2 mb-2">
-                {newDataGlucosa &&
-                  newDataGlucosa.map((record) => {
+                {newDataAtipicDay &&
+                  newDataAtipicDay.map((record) => {
+                    console.log(record);
                     return (
-                      <div key={record.idGlucose} className=" flex flex-col">
-                        <span>Glucosa:</span>
-                        <input
-                          type="number"
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.glucose}
-                          onChange={(e) => {
-                            record.glucose = e.target.value;
-                            setEditRecordData({
-                              ...editRecordData,
-                              glucosa: record.glucose,
-                            });
-                          }}
-                        ></input>
-                        <span className="mt-5">Medicion:</span>
-                        <select
-                          name=""
-                          id=""
-                          className="mx-3 w-48  border-gray-400 rounded-xl"
-                          defaultValue={record.medition}
-                          onChange={(e) => {
-                            setEditRecordData({
-                              ...editRecordData,
-                              medition: e.target.value,
-                            });
-                            console.log(editRecordData);
-                          }}
-                        >
-                          {meditionGlucose.map((medition) => {
-                            return (
-                              <option value={medition.idMedicion}>
-                                {medition.measurement}
-                              </option>
-                            );
-                          })}
-                        </select>
-                        <div className="flex justify-between mt-5">
-                          <button className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center">
-                            Guardar
-                          </button>
-                          <button
-                            onClick={() => {
-                              deleteDataGlucose([record.idGlucose]);
-                            }}
-                            className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </div>
+                      <Formik
+                        initialValues={{
+                          atipicDay: record.atipicDay,
+                          otherAtipicDay: record.otherAtipicDay,
+                        }}
+                        key={record.id}
+                      >
+                        {({ values, handleChange }) => (
+                          <div className=" flex flex-col border-2 border-gray-900 shadow-xl shadow-gray-400 p-5 rounded-lg mx-5 w-[18rem]">
+                            <span>
+                              Fecha: {formatDateSeconds(record.created_at)}
+                            </span>
+                            <span className="mb-5">Dia atipico:</span>
+
+                            <select
+                              name="atipicDay"
+                              id="atipicDay"
+                              value={values.atipicDay}
+                              onChange={handleChange}
+                              className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            >
+                              {atipicDayData.map((day) => {
+                                return (
+                                  <option key={day.id} value={day.idDiaatipico}>
+                                    {day.typeDay}
+                                  </option>
+                                );
+                              })}
+                            </select>
+
+                            {values.atipicDay === "6" ||
+                            values.atipicDay === 6 ? (
+                              <div>
+                                <input
+                                  type="text"
+                                  name="otherAtipicDay"
+                                  onChange={handleChange}
+                                  autoComplete="off"
+                                  aria-describedby="helper-text-explanation"
+                                  className={
+                                    "bg-gray-50 mb-5 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  "
+                                  }
+                                  defaultValue={
+                                    values.atipicDay === 6
+                                      ? record.otherAtipicDay
+                                      : ""
+                                  }
+                                  placeholder="Ingresa el motivo de tu dia atipico"
+                                />
+                              </div>
+                            ) : (
+                              <div></div>
+                            )}
+                            <div className="flex justify-between mt-5">
+                              <button
+                                onClick={() => {
+                                  updateDataAtipicDay(values, record.id);
+                                }}
+                                className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
+                              >
+                                Guardar
+                              </button>
+                              <button
+                                onClick={() => {
+                                  deleteDataAtpicDay([record.idGlucose]);
+                                }}
+                                className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Formik>
                     );
                   })}
               </div>
@@ -703,7 +968,7 @@ export default function EditRecords() {
           </div>
         ) : (
           <div className="">
-            <h1>Eliminar registro de Insulina</h1>{" "}
+            <h1>Eliminar registro de Día Atípico</h1>{" "}
             <p>
               ¿Estas seguro de eliminar? Se eliminaran TODOS los datos de los
               registros
@@ -711,7 +976,7 @@ export default function EditRecords() {
             <div className="flex justify-end mt-5">
               <button
                 onClick={() => {
-                  setopenInsuline(false);
+                  setOpenAtipicDay(false);
                 }}
                 className="bg-[#AB1A1A] text-white rounded-lg px-5 py-1 flex items-center justify-center"
               >
@@ -719,11 +984,11 @@ export default function EditRecords() {
               </button>
               <button
                 onClick={() => {
-                  const meditionIds = [];
-                  newDataGlucosa.map((medition) => {
-                    return meditionIds.push(medition.idGlucose);
+                  const atipicIds = [];
+                  newDataAtipicDay.map((atipic) => {
+                    return atipicIds.push(atipic.id);
                   });
-                  deleteDataGlucose(meditionIds);
+                  deleteDataAtpicDay(atipicIds);
                 }}
                 className="bg-blue-500 text-white rounded-lg px-5 py-1 ml-3 flex items-center justify-center"
               >
@@ -746,7 +1011,7 @@ export default function EditRecords() {
 
           <button
             onClick={() => {
-              filterData(glucosa, water);
+              filterData(glucosa, water, atipicDay, insuline);
             }}
             className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
           >
