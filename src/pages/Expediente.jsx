@@ -13,6 +13,111 @@ export default function Expediente() {
   const [updateInformacionPersonal, setUpdateInformacionPersonal] = useState(false);
   const [medicalEvaluation, setMedicalEvaluation] = useState({});
   const [updateMedicalEvaluation, setUpdateMedicalEvaluation] = useState(false)
+  
+  const [familyHistory, setFamilyHistory] = useState({});
+  const [updateFamilyHistory, setUpdateFamilyHistory] = useState(false);
+
+  const [habitsData, setHabitsData] = useState({});
+  const [updateHabitsData, setUpdateHabitsData] = useState(false);
+
+  const validationSchemaFamilyHistory = Yup.object({
+    diabetesInFamily: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+    diabetesType1: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+    diabetesType2: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+    hypertension: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+    cancer: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+    cancerType: Yup.string()
+      .max(255, "Máximo 255 caracteres")
+      .nullable()
+      .when("cancer", (cancer, schema) =>
+        cancer === "Si" ? schema.required("Especifica el tipo de cáncer") : schema.notRequired()
+      ),
+  });
+
+  const submitFamilyHistory = async (values, { setErrors, resetForm }) => {
+    const info = {
+      diabetesInFamily: values.diabetesInFamily,
+      diabetesType1: values.diabetesType1,
+      diabetesType2: values.diabetesType2,
+      hypertension: values.hypertension,
+      cancer: values.cancer,
+      cancerType: values.cancerType || "",
+    };
+
+    try {
+      if (updateFamilyHistory) {
+        const { data, error } = await supabase
+          .from("antecedentesFamiliares")
+          .update([info])
+          .eq("uid", "user_id");  // Reemplaza 'user_id' con el ID real del usuario
+        if (error) throw error;
+        toast.success("Campos actualizados");
+      } else {
+        const { data, error } = await supabase
+          .from("antecedentesFamiliares")
+          .insert([{ ...info, uid: "user_id" }]);
+        if (error) throw error;
+        toast.success("Datos Guardados");
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      resetForm();
+    }
+  };
+
+  const submitHabitsData = async (values, { resetForm }) => {
+    try {
+      if (updateHabitsData) {
+        const { data, error } = await supabase
+          .from("habitsAndTreatment")
+          .update(values)
+          .eq("uid", "user_id"); // Reemplaza 'user_id' con el ID real del usuario
+        if (error) throw error;
+        toast.success("Datos actualizados correctamente");
+      } else {
+        const { data, error } = await supabase
+          .from("habitsAndTreatment")
+          .insert([{ ...values, uid: "user_id" }]);
+        if (error) throw error;
+        toast.success("Datos guardados correctamente");
+      }
+      resetForm();
+    } catch (error) {
+      console.error("Error al guardar los datos:", error.message);
+    }
+  };
+
+  const validationSchema = Yup.object({
+    diabetesTreatment: Yup.string().required("Campo obligatorio"),
+    insulinName: Yup.string().nullable(),
+    insulinDose: Yup.number().positive("Debe ser un número positivo").nullable(),
+    treatmentLocation: Yup.string().required("Campo obligatorio"),
+    hyperglycemiaAction: Yup.string().required("Campo obligatorio"),
+    hypoglycemiaAction: Yup.string().required("Campo obligatorio"),
+    otherMedications: Yup.string().nullable(),
+    foodControl: Yup.string().required("Campo obligatorio"),
+    dailyWaterIntake: Yup.number().positive("Debe ser un número positivo").nullable(),
+    drugUse: Yup.string().required("Campo obligatorio"),
+    alcoholUse: Yup.string().required("Campo obligatorio"),
+    rightFootObservation: Yup.string().required("Campo obligatorio"),
+    leftFootObservation: Yup.string().required("Campo obligatorio"),
+    exercise: Yup.string().required("Campo obligatorio"),
+    exerciseType: Yup.string().nullable(),
+    exerciseDuration: Yup.number().positive("Debe ser un número positivo").nullable(),
+    exerciseFrequency: Yup.string().required("Campo obligatorio"),
+  });
+
 
   const [isLoading, setIsLoading] = useState(true);
   const inputStyle = `border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
@@ -575,7 +680,132 @@ export default function Expediente() {
           </Formik>
         )}
 
-        {/*Formulario 2 */}
+
+        <div className="flex flex-row items-center mt-8">
+          <h2 className="text-3x1 font-semibold">Antecedentes Heredo-Familiares</h2>
+        </div>
+        <hr className="border-gray-400" />
+          <Formik
+          initialValues={{
+            diabetesInFamily: "disabled",
+            diabetesType1: "disabled",
+            diabetesType2: "disabled",
+            hypertension: "disabled",
+            cancer: "disabled",
+            cancerType: "",
+          }}
+          enableReinitialize
+          validationSchema={validationSchemaFamilyHistory}
+          onSubmit={submitFamilyHistory}
+        >
+          {({ values, errors, touched, handleSubmit, handleChange }) => (
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-5 gap-4 mt-5 pl-5">
+                <div className="col-span-2">
+                  <p className="font-semibold mb-0">
+                    ¿Sus padres o abuelos padecen o padecieron diabetes?
+                  </p>
+                  <select
+                    name="diabetesInFamily"
+                    value={values.diabetesInFamily}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  <p className="text-sm text-red-500">{touched.diabetesInFamily && errors.diabetesInFamily}</p>
+                </div>
+
+                <div className="col-span-2">
+                  <label className="font-semibold">Diabetes tipo 1</label>
+                  <select
+                    name="diabetesType1"
+                    value={values.diabetesType1}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  <p className="text-sm text-red-500">{touched.diabetesType1 && errors.diabetesType1}</p>
+                </div>
+
+                <div className="col-span-1">
+                  <label className="font-semibold">Diabetes tipo 2</label>
+                  <select
+                    name="diabetesType2"
+                    value={values.diabetesType2}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  <p className="text-sm text-red-500">{touched.diabetesType2 && errors.diabetesType2}</p>
+                </div>
+
+                <div className="col-span-2">
+                  <label className="font-semibold">Hipertensión</label>
+                  <select
+                    name="hypertension"
+                    value={values.hypertension}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  <p className="text-sm text-red-500">{touched.hypertension && errors.hypertension}</p>
+                </div>
+
+                <div className="col-span-2">
+                  <label className="font-semibold">¿Algún tipo de Cáncer?</label>
+                  <div className="flex gap-2">
+                    <select
+                      name="cancer"
+                      value={values.cancer}
+                      onChange={handleChange}
+                      className={inputStyle + " w-1/3"}
+                    >
+                      <option value="disabled" disabled>--Selecciona una opción--</option>
+                      <option value="Si">Si</option>
+                      <option value="No">No</option>
+                    </select>
+                    {values.cancer === "Si" && (
+                      <input
+                        name="cancerType"
+                        type="text"
+                        value={values.cancerType}
+                        onChange={handleChange}
+                        className={inputStyle + " w-2/3"}
+                        placeholder="¿Cuál?"
+                      />
+                    )}
+                  </div>
+                  <p className="text-sm text-red-500">{touched.cancer && errors.cancer}</p>
+                  {values.cancer === "Si" && (
+                    <p className="text-sm text-red-500">{touched.cancerType && errors.cancerType}</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-end pr-8 h-11 mt-4">
+                <button
+                  type="submit"
+                  className="h-10 w-28 font-light place-self bg-azulHover text-white border-2 border-azulHover border-solid px-3 rounded-lg hover:bg-azul hover:border-azul"
+                >
+                  GUARDAR
+                </button>
+              </div>
+            </form>
+          )}
+        </Formik>
+
+        {/*Formulario 4 */}
         <div className="flex flex-row items-center">
           <h2 className="text-2xl font-semibold mt-4 mb-6">
             Evaluaciones Médicas Recientes
@@ -934,8 +1164,245 @@ export default function Expediente() {
             )}
           </Formik>
         )}
+
+        {/*Formulario 5 */}
+        <div className="flex flex-row items-center">
+          <h2 className="text-2xl font-semibold mt-4 mb-6">Hábitos y Tratamiento</h2>
+        </div>
+        <hr className="border-gray-400" />
+      
+        <Formik
+          initialValues={{
+            diabetesTreatment: "",
+            insulinName: "",
+            insulinDose: "",
+            treatmentLocation: "",
+            hyperglycemiaAction: "",
+            hypoglycemiaAction: "",
+            otherMedications: "",
+            foodControl: "",
+            dailyWaterIntake: "",
+            drugUse: "",
+            alcoholUse: "",
+            rightFootObservation: "",
+            leftFootObservation: "",
+            exercise: "",
+            exerciseType: "",
+            exerciseDuration: "",
+            exerciseFrequency: "",
+          }}
+          validationSchema={validationSchema}
+          onSubmit={submitHabitsData}
+        >
+          {({ values, errors, touched, handleChange, handleSubmit }) => (
+            <form onSubmit={handleSubmit} className="mt-5 pl-5">
+              <div className="grid grid-cols-12 gap-4">
+                {/* Tratamiento actual para diabetes tipo 1 */}
+                <div className="col-span-4">
+                  <label className="font-semibold">Tratamiento actual para la diabetes tipo 1</label>
+                  <div className="flex flex-row gap-2 mt-2">
+                    <select
+                      name="diabetesTreatment"
+                      value={values.diabetesTreatment}
+                      onChange={handleChange}
+                      className={`${inputStyle} w-1/3`}
+                    >
+                      <option value="">--Selecciona una opción--</option>
+                      <option value="Insulina Lenta">Insulina Lenta</option>
+                      <option value="Insulina Rápida">Insulina Rápida</option>
+                    </select>
+                    <input
+                      type="text"
+                      name="insulinName"
+                      value={values.insulinName}
+                      onChange={handleChange}
+                      placeholder="Nombre de insulina"
+                      className={`${inputStyle} w-1/3`}
+                    />
+                    <input
+                      type="number"
+                      name="insulinDose"
+                      value={values.insulinDose}
+                      onChange={handleChange}
+                      placeholder="Dosis"
+                      className={`${inputStyle} w-1/3`}
+                      min="0"
+                    />
+                  </div>
+                  <label className="font-semibold">Lugar de tratamiento actual</label>
+                  <select
+                    name="treatmentLocation"
+                    value={values.treatmentLocation}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="IMSS">IMSS</option>
+                    <option value="ISSSTE">ISSSTE</option>
+                    <option value="Particular">Particular</option>
+                  </select>
+                  <label className="font-semibold">¿Qué hace en caso de hiperglicemia?</label>
+                  <input
+                    type="text"
+                    name="hyperglycemiaAction"
+                    value={values.hyperglycemiaAction}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  />
+                  <label className="font-semibold">¿Consume estupefacientes?</label>
+                  <select
+                    name="drugUse"
+                    value={values.drugUse}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  <label className="font-semibold">¿Hace ejercicio?</label>
+                  <select
+                    name="exercise"
+                    value={values.exercise}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  
+                  {values.exercise === "Si" && (
+                    <div className="flex flex-col gap-2 mt-2">
+                      <div className="flex flex-row gap-2">
+                        <input
+                          type="text"
+                          name="exerciseType"
+                          value={values.exerciseType}
+                          onChange={handleChange}
+                          placeholder="Tipo de ejercicio"
+                          className={`${inputStyle} w-1/2`}
+                        />
+                        <input
+                          type="number"
+                          name="exerciseDuration"
+                          value={values.exerciseDuration}
+                          onChange={handleChange}
+                          placeholder="Duración en horas"
+                          className={`${inputStyle} w-1/2`}
+                          min="0"
+                        />
+                      </div>
+                      <select
+                        name="exerciseFrequency"
+                        value={values.exerciseFrequency}
+                        onChange={handleChange}
+                        className={`${inputStyle}`}
+                      >
+                        <option value="">--Selecciona una opción--</option>
+                        <option value="Diario">Diario</option>
+                        <option value="Semanal">Semanal</option>
+                        <option value="Mensual">Mensual</option>
+                      </select>
+                    </div>
+                  )}  
+                </div>
+
+                {/* Otros medicamentos */}
+                <div className="col-span-5">
+                  <label className="font-normal text-sm">¿Qué otros medicamentos utiliza para cualquier otro padecimiento?</label>
+                  <textarea
+                    name="otherMedications"
+                    value={values.otherMedications}
+                    onChange={handleChange}
+                    className={`${inputStyle} h-20`}
+                  />
+
+                  <label className="font-semibold mt-2">¿Qué hace en caso de hipoglicemia?</label>
+                  <input
+                    type="text"
+                    name="hypoglycemiaAction"
+                    value={values.hypoglycemiaAction}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  />
+
+                  <label className="font-semibold">¿Observaciones en el pie derecho?</label>
+                  <select
+                    name="rightFootObservation"
+                    value={values.rightFootObservation}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="Ampollas">Ampollas</option>
+                    <option value="Callosidad">Callosidad</option>
+                    <option value="Resequedad">Resequedad</option>
+                  </select>
+                  
+                </div>
+
+                {/* Control de alimentos y agua */}
+                <div className="col-span-3">
+                  <label className="font-semibold">¿Cómo controla sus alimentos?</label>
+                  <select
+                    name="foodControl"
+                    value={values.foodControl}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="Por raciones">Por raciones</option>
+                    <option value="Por calorías">Por calorías</option>
+                    <option value="Sin control">Sin control</option>
+                  </select>
+                  <label className="font-semibold mt-2">¿Cuánta agua consume al día? (en litros)</label>
+                  <input
+                    type="number"
+                    name="dailyWaterIntake"
+                    value={values.dailyWaterIntake}
+                    onChange={handleChange}
+                    className={inputStyle}
+                    min="0"
+                  />
+                  <label className="font-semibold mt-2">¿Consume alcohol?</label>
+                  <select
+                    name="alcoholUse"
+                    value={values.alcoholUse}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="Si">Si</option>
+                    <option value="No">No</option>
+                  </select>
+                  <label className="font-semibold mt-2">¿Observaciones en el pie izquierdo?</label>
+                  <select
+                    name="leftFootObservation"
+                    value={values.leftFootObservation}
+                    onChange={handleChange}
+                    className={inputStyle}
+                  >
+                    <option value="">--Selecciona una opción--</option>
+                    <option value="Ampollas">Ampollas</option>
+                    <option value="Callosidad">Callosidad</option>
+                    <option value="Resequedad">Resequedad</option>
+                  </select>
+                </div>            
+              </div>
+
+              <div className="flex justify-end pr-8 h-11 mt-4">
+                <button
+                  type="submit"
+                  className="h-10 w-28 font-light bg-azulHover text-white border-2 border-azulHover rounded-lg mt-4 hover:bg-azul hover:border-azul"
+                >
+                  GUARDAR
+                </button>
+              </div>
+            </form>
+          )}
+        </Formik>
       </div>
     </div>
   );
 }
-
