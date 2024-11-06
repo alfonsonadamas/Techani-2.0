@@ -16,6 +16,7 @@ export default function InsulineRegister() {
 
   const getInsulineType = async () => {
     const { data, error } = await supabase.from("insulina").select("*");
+    console.log(data);
     if (error) throw error;
     setinsulineTypes(data);
   };
@@ -52,7 +53,7 @@ export default function InsulineRegister() {
     { dose, doseType, insulineType, medition },
     { setSubmitting, setErrors, resetForm }
   ) => {
-    console.log(medition);
+    console.log(dose, doseType, insulineType, medition);
     if (doseType === "none") {
       setErrors({ doseType: "Selecciona un tipo de insulina" });
       return;
@@ -71,11 +72,12 @@ export default function InsulineRegister() {
 
     if (records.length > 0) {
       records.forEach((record) => {
-        if (record.medicion === medition) {
+        if (record.medicion === medition && record.medicion !== "") {
           setErrors({
             medition: "Ya existe un registro con este tipo de medición",
           });
           duplicate = true;
+          console.log(record);
         }
       });
     }
@@ -104,8 +106,10 @@ export default function InsulineRegister() {
         if (error) throw error;
         console.log(data);
         toast.success("Registro exitoso");
-        resetForm();
         getRecords();
+      } else {
+        console.log("Registro duplicado");
+        console.log(duplicate);
       }
     } catch (error) {
       console.log(error);

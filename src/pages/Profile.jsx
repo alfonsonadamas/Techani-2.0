@@ -34,13 +34,11 @@ export default function Profile() {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showAdditionalData, setShowAdditionalData] = useState(false);
   const [showSupportingFamily, setShowSupportingFamily] = useState(false);
-  const [showSupportingPhoto, setShowSupportingPhoto] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [file, setFile] = useState(null);
   const [showAddFamilyForm, setShowAddFamilyForm] = useState(false);
   const [showAddDataAditional, setShowAddDataAditional] = useState(false);
   const [showAddTypeInsuline, setAddTypeInsuline] = useState(false);
-  const [editingFamilyMember, setEditingFamilyMember] = useState(null);
   const [editFamily, setEditFamily] = useState([]);
   const [previewImage, setPreviewImage] = useState(profile.picture);
   const [datosInsulina, setDatosInsulina] = useState([]);
@@ -220,7 +218,7 @@ export default function Profile() {
   ) => {
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.from("glucosaRango").insert([
+      const { error } = await supabase.from("glucosaRango").insert([
         {
           uid: user.id,
           bajo: bajo,
@@ -244,7 +242,7 @@ export default function Profile() {
     setSubmitting(true);
 
     try {
-      const { data, error } = await supabase.from("datosAdicionales").insert([
+      const { error } = await supabase.from("datosAdicionales").insert([
         {
           marcaInsulina: marcaInsulina,
           uid: user.id,
@@ -340,7 +338,7 @@ export default function Profile() {
 
   const onSubmit = async (values, { setSubmitting }) => {
     try {
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         data: {
           full_name: values.fullName,
           birthday: values.birthday,
@@ -428,7 +426,7 @@ export default function Profile() {
 
   const getFamily = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("Familiares")
         .select("*")
         .eq("uid", user.id)
@@ -445,7 +443,7 @@ export default function Profile() {
   ) => {
     try {
       setSubmitting(true);
-      const { data, error } = await supabase.from("Familiares").insert({
+      await supabase.from("Familiares").insert({
         uid: user.id,
         name: familyName,
         phone: familyPhone,
@@ -1457,26 +1455,7 @@ export default function Profile() {
                           </div>
                         )}
                       </div>
-                      <hr className="w-full my-8 border-gray-300" />
-                      <div className="flex flex-col w-full">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowSupportingPhoto(!showSupportingPhoto)
-                          }
-                          className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
-                        >
-                          FOTO DE PERFIL{" "}
-                          {showSupportingPhoto ? (
-                            <FaCaretUp />
-                          ) : (
-                            <FaCaretDown />
-                          )}
-                        </button>
-                        {showSupportingPhoto && (
-                          <div className="mt-4 bg-white p-4 rounded shadow-md"></div>
-                        )}
-                      </div>
+
                       <div className="flex justify-end w-full">
                         <button
                           type="submit"

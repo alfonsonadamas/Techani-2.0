@@ -142,7 +142,7 @@ export default function Files() {
                     type="date"
                     name="date"
                     autoComplete="off"
-                    min={new Date().toISOString().split("T")[0]}
+                    max={new Date().toISOString().split("T")[0]}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     aria-describedby="helper-text-explanation"

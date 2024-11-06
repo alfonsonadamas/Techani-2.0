@@ -223,7 +223,8 @@ export default function EditRecords() {
           });
           return updatedData;
         });
-        filterData(glucosa);
+
+        filterData(glucosa, water, atipicDay, insuline);
 
         toast.success("Registro actualizado");
       } else {
