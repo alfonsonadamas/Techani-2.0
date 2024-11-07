@@ -9,114 +9,19 @@ import { useUserContext } from "../context/UserContext";
 
 export default function Expediente() {
   const { user } = useUserContext();
+
   const [personalInformation, setPersonalInformation] = useState({});
   const [updateInformacionPersonal, setUpdateInformacionPersonal] = useState(false);
-  const [medicalEvaluation, setMedicalEvaluation] = useState({});
-  const [updateMedicalEvaluation, setUpdateMedicalEvaluation] = useState(false)
   
   const [familyHistory, setFamilyHistory] = useState({});
   const [updateFamilyHistory, setUpdateFamilyHistory] = useState(false);
 
+  const [medicalEvaluation, setMedicalEvaluation] = useState({});
+  const [updateMedicalEvaluation, setUpdateMedicalEvaluation] = useState(false)
+
   const [habitsData, setHabitsData] = useState({});
   const [updateHabitsData, setUpdateHabitsData] = useState(false);
 
-  const validationSchemaFamilyHistory = Yup.object({
-    diabetesInFamily: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
-    diabetesType1: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
-    diabetesType2: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
-    hypertension: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
-    cancer: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
-    cancerType: Yup.string()
-      .max(255, "Máximo 255 caracteres")
-      .nullable()
-      .when("cancer", (cancer, schema) =>
-        cancer === "Si" ? schema.required("Especifica el tipo de cáncer") : schema.notRequired()
-      ),
-  });
-
-  const submitFamilyHistory = async (values, { setErrors, resetForm }) => {
-    const info = {
-      diabetesInFamily: values.diabetesInFamily,
-      diabetesType1: values.diabetesType1,
-      diabetesType2: values.diabetesType2,
-      hypertension: values.hypertension,
-      cancer: values.cancer,
-      cancerType: values.cancerType || "",
-    };
-
-    try {
-      if (updateFamilyHistory) {
-        const { data, error } = await supabase
-          .from("antecedentesFamiliares")
-          .update([info])
-          .eq("uid", "user_id");  // Reemplaza 'user_id' con el ID real del usuario
-        if (error) throw error;
-        toast.success("Campos actualizados");
-      } else {
-        const { data, error } = await supabase
-          .from("antecedentesFamiliares")
-          .insert([{ ...info, uid: "user_id" }]);
-        if (error) throw error;
-        toast.success("Datos Guardados");
-      }
-    } catch (error) {
-      console.log(error.message);
-    } finally {
-      resetForm();
-    }
-  };
-
-  const submitHabitsData = async (values, { resetForm }) => {
-    try {
-      if (updateHabitsData) {
-        const { data, error } = await supabase
-          .from("habitsAndTreatment")
-          .update(values)
-          .eq("uid", "user_id"); // Reemplaza 'user_id' con el ID real del usuario
-        if (error) throw error;
-        toast.success("Datos actualizados correctamente");
-      } else {
-        const { data, error } = await supabase
-          .from("habitsAndTreatment")
-          .insert([{ ...values, uid: "user_id" }]);
-        if (error) throw error;
-        toast.success("Datos guardados correctamente");
-      }
-      resetForm();
-    } catch (error) {
-      console.error("Error al guardar los datos:", error.message);
-    }
-  };
-
-  const validationSchema = Yup.object({
-    diabetesTreatment: Yup.string().required("Campo obligatorio"),
-    insulinName: Yup.string().nullable(),
-    insulinDose: Yup.number().positive("Debe ser un número positivo").nullable(),
-    treatmentLocation: Yup.string().required("Campo obligatorio"),
-    hyperglycemiaAction: Yup.string().required("Campo obligatorio"),
-    hypoglycemiaAction: Yup.string().required("Campo obligatorio"),
-    otherMedications: Yup.string().nullable(),
-    foodControl: Yup.string().required("Campo obligatorio"),
-    dailyWaterIntake: Yup.number().positive("Debe ser un número positivo").nullable(),
-    drugUse: Yup.string().required("Campo obligatorio"),
-    alcoholUse: Yup.string().required("Campo obligatorio"),
-    rightFootObservation: Yup.string().required("Campo obligatorio"),
-    leftFootObservation: Yup.string().required("Campo obligatorio"),
-    exercise: Yup.string().required("Campo obligatorio"),
-    exerciseType: Yup.string().nullable(),
-    exerciseDuration: Yup.number().positive("Debe ser un número positivo").nullable(),
-    exerciseFrequency: Yup.string().required("Campo obligatorio"),
-  });
 
 
   const [isLoading, setIsLoading] = useState(true);
@@ -174,6 +79,47 @@ export default function Expediente() {
 
 
   };
+
+  const submitFamilyHistory = async (
+    values,
+     { setErrors, resetForm }
+    ) => {
+    const info = {
+      diabetesInFamily: values?.diabetesInFamily || null,
+      diabetesType1: values?.diabetesType1 || null,
+      diabetesType2: values?.diabetesType2 || null,
+      hypertension: values?.hypertension || null,
+      cancer: values?.cancer || null,
+      cancerType: values?.cancerType || null
+    }
+
+    try {
+      if (updateFamilyHistory === true) {
+        const { data, error } = await supabase
+          .from("antecedentesHeredo")
+          .update([info])
+          .eq("uid", user.id);
+        if (error) throw error;
+        toast.success("Campos actualizados");
+      } 
+      else {
+        let infoWithUser = { ...info, uid: user.id }
+        const { data, error } = await supabase
+          .from("antecedentesHeredo")
+          .insert([
+            infoWithUser
+          ]);
+        if (error) console.log(error.message);
+        else console.log(data);
+        toast.success("Datos Guardados");
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      resetForm();
+    }
+  }
+
   const sumbitMedicalEvaluation = async (
     values,
     { setErrors, resetForm }
@@ -225,6 +171,61 @@ export default function Expediente() {
       resetForm();
     }
   }
+
+  const submitHabitsData = async (
+    values, 
+    { setErrors, resetForm }
+  ) => {
+    // Crear el objeto info con valores del formulario
+    let info = {
+      diabetesTreatment: values?.diabetesTreatment || null,
+      insulinName: values?.insulinName || null,
+      insulinDose: values?.insulinDose || null,
+      treatmentLocation: values?.treatmentLocation || null,
+      hyperglycemiaAction: values?.hyperglycemiaAction || null,
+      hypoglycemiaAction: values?.hypoglycemiaAction || null,
+      otherMedications: values?.otherMedications || null,
+      foodControl: values?.foodControl || null,
+      dailyWaterIntake: values?.dailyWaterIntake || null,
+      drugUse: values?.drugUse || null,
+      alcoholUse: values?.alcoholUse || null,
+      rightFootObservation: values?.rightFootObservation || null,
+      leftFootObservation: values?.leftFootObservation || null,
+      exercise: values?.exercise || null,
+      exerciseType: values?.exerciseType || null,
+      exerciseDuration: values?.exerciseDuration || null,
+      exerciseFrequency: values?.exerciseFrequency || null
+    }
+  
+    try {
+      // Verificar si estamos en modo actualización o inserción
+      if (updateHabitsData === true) {
+        const { data, error } = await supabase
+          .from("habitosTratamiento")
+          .update([info])
+          .eq("uid", user.id);
+  
+        if (error) throw error;
+        toast.success("Campos actualizados");
+      } 
+      else {
+        let infoWithUser = { ...info, uid: user.id }
+        const { data, error } = await supabase
+          .from("habitosTratamiento")
+          .insert([infoWithUser]);
+  
+        if (error) console.log(error.message);
+        else console.log(data);
+        toast.success("Datos guardados");
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      resetForm();
+    }
+  }
+  
+
   const validationSchema1 = Yup.object({
     fullName: Yup.string().matches(/^[^\d]+$/, "El campo debe ser texto"),
     birthdate: Yup.date().min(new Date(), 'La fecha no puede ser mayor a la actua'),
@@ -263,6 +264,77 @@ export default function Expediente() {
     glucoseGoal: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     averageGlucose: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
   });
+  const validationSchema3 = Yup.object({
+    diabetesTreatment: Yup.string()
+      .required("Campo obligatorio"),
+    insulinName: Yup.string()
+      .nullable(), // Opcional
+    insulinDose: Yup.number("El campo debe ser un número")
+      .positive("Debe ser un número positivo")
+      .nullable(), // Opcional
+    treatmentLocation: Yup.string()
+      .required("Campo obligatorio"),
+    hyperglycemiaAction: Yup.string()
+      .required("Campo obligatorio"),
+    hypoglycemiaAction: Yup.string()
+      .required("Campo obligatorio"),
+    otherMedications: Yup.string()
+      .nullable(), // Opcional
+    foodControl: Yup.string()
+      .required("Campo obligatorio"),
+    dailyWaterIntake: Yup.number("El campo debe ser un número")
+      .positive("Debe ser un número positivo")
+      .nullable(), // Opcional
+    drugUse: Yup.string()
+      .required("Campo obligatorio"),
+    alcoholUse: Yup.string()
+      .required("Campo obligatorio"),
+    rightFootObservation: Yup.string()
+      .nullable(), // Opcional
+    leftFootObservation: Yup.string()
+      .nullable(), // Opcional
+    exercise: Yup.string()
+      .required("Campo obligatorio"),
+    exerciseType: Yup.string()
+      .nullable(), // Opcional
+    exerciseDuration: Yup.number("El campo debe ser un número")
+      .positive("Debe ser un número positivo")
+      .nullable(), // Opcional
+    exerciseFrequency: Yup.string()
+      .nullable(), // Opcional
+  });
+  const validationSchema4 = Yup.object({
+    diabetesInFamily: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+  
+    diabetesType1: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+  
+    diabetesType2: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+  
+    hypertension: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+  
+    cancer: Yup.string()
+      .oneOf(["Si", "No"], "Seleccione una opción válida")
+      .required("Este campo es obligatorio"),
+  
+    cancerType: Yup.string()
+      .nullable()
+      .max(255, "Máximo 255 caracteres")
+      .when("cancer", {
+        is: "Si",
+        then: (schema) => schema.required("Especifica el tipo de cáncer"),
+        otherwise: (schema) => schema.notRequired(),
+      }),
+  });
+  
+  
 
   useEffect(() => {
     if (user) {
@@ -291,19 +363,14 @@ export default function Expediente() {
             apgarScore: data[0]?.apgarScore || '',
             complicationsInPregnancy: data[0]?.complicationsInPregnancy || 'disabled',
             specificPregnancyProblem: data[0]?.specificPregnancyProblem || '',
-
           });
-          if (data[0] !== undefined) {
-            setUpdateInformacionPersonal(true);
-          } else {
-            setUpdateInformacionPersonal(false);
-          }
+          setUpdateInformacionPersonal(data[0] !== undefined);
           setIsLoading(false);
-          console.log(data[0]);
         } catch (error) {
           console.log(error);
         }
       };
+  
       const initialMedicalEvaluations = async () => {
         try {
           const { data, error } = await supabase
@@ -330,22 +397,75 @@ export default function Expediente() {
             glucoseGoal: data[0]?.glucoseGoal || '',
             averageGlucose: data[0]?.averageGlucose || '',
           });
-          if (data[0] !== undefined) {
-            setUpdateMedicalEvaluation(true);
-          } else {
-            setUpdateMedicalEvaluation(false);
-          }
+          setUpdateMedicalEvaluation(data[0] !== undefined);
           setIsLoading(false);
-          console.log(updateMedicalEvaluation)
-          console.log(medicalEvaluation)
         } catch (error) {
           console.log(error);
         }
       };
+  
+      const initialHabitsData = async () => {
+        try {
+          const { data, error } = await supabase
+            .from("habitosTratamiento")
+            .select("*")
+            .eq("uid", user.id)
+          if (error) throw error;
+            setHabitsData({
+              diabetesTreatment: data[0]?.diabetesTreatment || '',
+              insulinName: data[0]?.insulinName || '',
+              insulinDose: data[0]?.insulinDose || '',
+              treatmentLocation: data[0]?.treatmentLocation || '',
+              hyperglycemiaAction: data[0]?.hyperglycemiaAction || '',
+              hypoglycemiaAction: data[0]?.hypoglycemiaAction || '',
+              otherMedications: data[0]?.otherMedications || '',
+              foodControl: data[0]?.foodControl || '',
+              dailyWaterIntake: data[0]?.dailyWaterIntake || '',
+              drugUse: data[0]?.drugUse || '',
+              alcoholUse: data[0]?.alcoholUse || '',
+              rightFootObservation: data[0]?.rightFootObservation || '',
+              leftFootObservation: data[0]?.leftFootObservation || '',
+              exercise: data[0]?.exercise || '',
+              exerciseType: data[0]?.exerciseType || '',
+              exerciseDuration: data[0]?.exerciseDuration || '',
+              exerciseFrequency: data[0]?.exerciseFrequency || '',
+            });
+            setUpdateHabitsData(data[0] !== undefined);
+            setIsLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      const initialFamilyHistory = async () => {
+        try {
+          const { data, error } = await supabase
+            .from("antecedentesHeredo")
+            .select("*")
+            .eq("uid", user.id);
+          if (error) throw error;
+          setFamilyHistory({
+            diabetesInFamily: data[0]?.diabetesInFamily || '',
+            diabetesType1: data[0]?.diabetesType1 || '',
+            diabetesType2: data[0]?.diabetesType2 || '',
+            hypertension: data[0]?.hypertension || '',
+            cancer: data[0]?.cancer || '',
+            cancerType: data[0]?.cancerType || '',
+          });
+          setUpdateFamilyHistory(data[0] !== undefined);
+          setIsLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+  
       initialPersonalInformation();
       initialMedicalEvaluations();
+      initialHabitsData();
+      initialFamilyHistory();
     }
   }, [user]);
+  
   /*{
                          
                           } 
@@ -686,19 +806,12 @@ export default function Expediente() {
         </div>
         <hr className="border-gray-400" />
           <Formik
-          initialValues={{
-            diabetesInFamily: "disabled",
-            diabetesType1: "disabled",
-            diabetesType2: "disabled",
-            hypertension: "disabled",
-            cancer: "disabled",
-            cancerType: "",
-          }}
+          initialValues={familyHistory}
           enableReinitialize
-          validationSchema={validationSchemaFamilyHistory}
           onSubmit={submitFamilyHistory}
+          validationSchema={validationSchema4}
         >
-          {({ values, errors, touched, handleSubmit, handleChange }) => (
+          {({ handleSubmit, handleChange, values, errors, touched }) => (
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-5 gap-4 mt-5 pl-5">
                 <div className="col-span-2">
@@ -711,7 +824,7 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={inputStyle}
                   >
-                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="" disabled>--Selecciona una opción--</option>
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
@@ -726,7 +839,7 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={inputStyle}
                   >
-                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="" disabled>--Selecciona una opción--</option>
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
@@ -741,7 +854,7 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={inputStyle}
                   >
-                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="" disabled>--Selecciona una opción--</option>
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
@@ -756,7 +869,7 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={inputStyle}
                   >
-                    <option value="disabled" disabled>--Selecciona una opción--</option>
+                    <option value="" disabled>--Selecciona una opción--</option>
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
@@ -772,7 +885,7 @@ export default function Expediente() {
                       onChange={handleChange}
                       className={inputStyle + " w-1/3"}
                     >
-                      <option value="disabled" disabled>--Selecciona una opción--</option>
+                      <option value="" disabled>--Selecciona una opción--</option>
                       <option value="Si">Si</option>
                       <option value="No">No</option>
                     </select>
@@ -1172,29 +1285,12 @@ export default function Expediente() {
         <hr className="border-gray-400" />
       
         <Formik
-          initialValues={{
-            diabetesTreatment: "",
-            insulinName: "",
-            insulinDose: "",
-            treatmentLocation: "",
-            hyperglycemiaAction: "",
-            hypoglycemiaAction: "",
-            otherMedications: "",
-            foodControl: "",
-            dailyWaterIntake: "",
-            drugUse: "",
-            alcoholUse: "",
-            rightFootObservation: "",
-            leftFootObservation: "",
-            exercise: "",
-            exerciseType: "",
-            exerciseDuration: "",
-            exerciseFrequency: "",
-          }}
-          validationSchema={validationSchema}
+          initialValues={habitsData}
+          enableReinitialize
           onSubmit={submitHabitsData}
+          validationSchema={validationSchema3}
         >
-          {({ values, errors, touched, handleChange, handleSubmit }) => (
+          {({ handleSubmit, handleChange, values, errors, touched }) => (
             <form onSubmit={handleSubmit} className="mt-5 pl-5">
               <div className="grid grid-cols-12 gap-4">
                 {/* Tratamiento actual para diabetes tipo 1 */}
@@ -1315,7 +1411,7 @@ export default function Expediente() {
                     name="otherMedications"
                     value={values.otherMedications}
                     onChange={handleChange}
-                    className={`${inputStyle} h-20`}
+                    className={`${inputStyle} h-20 resize-none`}
                   />
 
                   <label className="font-semibold mt-2">¿Qué hace en caso de hipoglicemia?</label>
