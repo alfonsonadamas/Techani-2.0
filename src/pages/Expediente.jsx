@@ -1322,7 +1322,8 @@ export default function Expediente() {
                       onChange={handleChange}
                       placeholder="Dosis"
                       className={`${inputStyle} w-1/3`}
-                      min="0"
+                      min={"0"}
+                      step={0.01}
                     />
                   </div>
                   <label className="font-semibold">Lugar de tratamiento actual</label>
@@ -1459,7 +1460,8 @@ export default function Expediente() {
                     value={values.dailyWaterIntake}
                     onChange={handleChange}
                     className={inputStyle}
-                    min="0"
+                    min={"0"}
+                    step={0.01}
                   />
                   <label className="font-semibold mt-2">¿Consume alcohol?</label>
                   <select
