@@ -7,6 +7,8 @@ import edit from "../assets/img/edit.png";
 import delate from "../assets/img/delate.png";
 import * as Yup from "yup";
 import { Formik } from "formik";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function MyExercise() {
   const { user } = useUserContext();
@@ -23,15 +25,14 @@ export default function MyExercise() {
   const [weightOption, setWeightOption] = useState("no");
 
   const openModal = (record) => {
-    setActivity([])
-    setWeightOption(getWeightOption(record.weight))
-    console.log("record seleccionado: ",record)
-    const name = getNameActivity(record.idActividades,record.actividadUsuario);
-    if(record.idActividades === 12){
-      setActivity([{id: record.actividadUsuario, name: name}])
-    }
-    else {
-      setActivity([{id: record.idActividades, name: name}])
+    setActivity([]);
+    setWeightOption(getWeightOption(record.weight));
+    console.log("record seleccionado: ", record);
+    const name = getNameActivity(record.idActividades, record.actividadUsuario);
+    if (record.idActividades === 12) {
+      setActivity([{ id: record.actividadUsuario, name: name }]);
+    } else {
+      setActivity([{ id: record.idActividades, name: name }]);
     }
     setEditRecord(record);
     setModalIsOpen(true);
@@ -72,9 +73,7 @@ export default function MyExercise() {
       .nullable(true)
       .typeError("El peso debe de ser un número")
       .notRequired(),
-    actividadUsuario: Yup.number()
-      .positive("debe ser positivo"),
-    
+    actividadUsuario: Yup.number().positive("debe ser positivo"),
   });
 
   const getActivities = async () => {
@@ -91,7 +90,8 @@ export default function MyExercise() {
     try {
       const { data, error } = await supabase
         .from("actividadesUsuario")
-        .select();
+        .select()
+        .eq("uid", user.id);
       if (error) throw error;
       setActivitiesUs(data);
     } catch (error) {
@@ -100,22 +100,30 @@ export default function MyExercise() {
   };
 
   const updateEjercicio = async (
-    { idEjercicio, idActividad, time, weight, weightOption, actividadUsuario, nameActividad },
+    {
+      idEjercicio,
+      idActividad,
+      time,
+      weight,
+      weightOption,
+      actividadUsuario,
+      nameActividad,
+    },
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
-      console.log(idActividad)
+      console.log(idActividad);
       console.log("idEjercicio", editRecord.idEjercicio);
       setSubmitting(true);
       const weightValue = weightOption === "si" ? weight : null;
-      console.log("Peso:",weightOption)
+      console.log("Peso:", weightOption);
       let dataExercise = {
         time: time,
         weight: weightValue,
       };
 
       const selectedActivity = activity[0];
-      console.log(selectedActivity)
+      console.log(selectedActivity);
       if (!selectedActivity) {
         throw new Error("No se ha seleccionado una actividad.");
       }
@@ -147,6 +155,7 @@ export default function MyExercise() {
       if (error) throw error;
       else console.log(data);
       closeModal();
+      toast.success("Registro modificado");
       resetForm();
       Ejercicios(); // Actualiza
     } catch (error) {
@@ -189,6 +198,7 @@ export default function MyExercise() {
     } catch (error) {
       console.log(error);
     } finally {
+      toast.success("Registro eliminado");
       setLoading(false);
       Ejercicios(); //actualiza
     }
@@ -220,7 +230,7 @@ export default function MyExercise() {
     Ejercicios();
     getActivities();
     getActivitiesUs();
-  }, []);
+  }, [user]);
 
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
@@ -249,24 +259,26 @@ export default function MyExercise() {
   };
 
   const getNameActivity = (id, actUs) => {
-    if(id === 12){
-      let act = activitiesUs.find((activity) => activity.idActividades === actUs);
-      return act ? act.nameActivity : 'No encontrada'
-    }
-    else{
+    if (id === 12) {
+      let act = activitiesUs.find(
+        (activity) => activity.idActividades === actUs
+      );
+      return act ? act.nameActivity : "No encontrada";
+    } else {
       let act = activities.find((activity) => activity.idActividades === id);
-      return act ? act.nameActivity : 'Actividad no encontrada';
-}
-};
+      return act ? act.nameActivity : "Actividad no encontrada";
+    }
+  };
   const getWeightOption = (weight) => {
-    if(weight !== null){
-      return "si"
-    } else return "no"
+    if (weight !== null) {
+      return "si";
+    } else return "no";
   };
 
   return (
     <div>
       <SideBar />
+      <ToastContainer></ToastContainer>
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <h2 className="text-2xl font-semibold mt-10">Ejercicios anteriores</h2>
         <p className="mb-5">Filtro por rango de fecha</p>
@@ -296,7 +308,7 @@ export default function MyExercise() {
           </button>
         </div>
         {loading ? (
-          <p className="">Cargando registros...</p>
+          <p className="">Cargando nuevos..</p>
         ) : (
           <div>
             <div
@@ -327,7 +339,11 @@ export default function MyExercise() {
                           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADRUlEQVR4nO2XR2iUURDHf9HYUA+2g70Q7A1sKKLYT4qIFw3oQSKC2FA8CKK5xJOKBY2CUZBgPWiiXjwowYKKIGIFS2JEFCyxYU1WBv4fjMtu8q1uNoXvB8u3b16d92bmzYOIiIiIiIiI5kk/4ABQCfzUt1DyJsNs4BMQS/Az+SyaAP2dEmeBsUB7fUsk/wj0pZFzwCmRiECZ/XHybsBgoA2NhEotdEyS+nGqr1B5CnDbmZ6d1l6gDw3MDy2oQ5L6jqr/Dsxw7c0cy51CJj8IDKCBeBHyRKzdQ2dmgUkNAY4Cv1X3CzgCDCTDFGoB5guJKFX9PadQqwTtcoAihe6YFCsGhpIh+rmoVaoT6KBvqfOD4H9BiPEKnQlWAyeBUZlQZpYWm+geMflM4JbK40OO2RvYDXxTvxrgTC0mnDb6yvYrtJv23eei0WMtaFCK43YHtgNf3OacBybSQJzUIlY4WRdgLdA5RH+7d7bFZRAXFc4zyiJNftXJ1of0G48pnQ98cApdVmjPCO2AKk0chNY5Kt/4h/HsfloDvHYKXQPmAlnUM0WacIvK7eVP5sjXJZ8AtEhhTIuQG4E3TqGbwLz6VGiaJnriJilLEOneyqeWAz1Djm0XrLV/6ca5CywBWqZbkRaKZjEXdbaqXKYo9zROqRrlZgVy7Ow65mgLrHTzBJfxonQrdFiDWwQypqpsphVgPrQauAB8jVPsHbALGFnHPK2BPOCZ6/tIJ1TXZtTJMF1wtsvTJZvszCDZDtvDbYfL1WIuSOTJ8ZNhi17q7rGYTn2ZlE2ZVi59NxNCCwgmsJAahtHAHuC9W9hn4BAwqZZ+ZlaLgfuuX7myjpTId45u0co4IdkdhedUsJPKBS7phIPF2ULXAV1r8dOFmjNITmvbgL8YrvS8WqZkrNJAVcp8/4ccBYNXTiF7/xxXHpgonGe5zU2WuSdN9XeqPN7dHwtIH9m6P0q0cYFS5vCbgV5x7Qeq/kHYCU6rQ66SwOBlaMlgfdED2CRTjjkzOgfMlxLFkp8KO2iuGyh4Z1xJ8sBKN1m6iIvdk8D/vimahmaDEj1T5ljIjDfddJJv2uX7XO+bEUFlrJn8aDaKREREREREREREUC/8Ae4ZfBBuF8VKAAAAAElFTkSuQmCC"
                         />
                         <h3 className="text-center mt-2">
-                          Actividad: {getNameActivity(record.idActividades,record.actividadUsuario)}
+                          Actividad:{" "}
+                          {getNameActivity(
+                            record.idActividades,
+                            record.actividadUsuario
+                          )}
                         </h3>
                         <h3 className="text-center mt-2">
                           Fecha: {record.date}
@@ -371,7 +387,10 @@ export default function MyExercise() {
                       idActividad: editRecord.idActividades,
                       weight: editRecord.weight,
                       weightOption: weightOption,
-                      nameActividad: getNameActivity(editRecord.idActividades,editRecord.actividadUsuario),
+                      nameActividad: getNameActivity(
+                        editRecord.idActividades,
+                        editRecord.actividadUsuario
+                      ),
                       time: editRecord.time,
                     }}
                     validationSchema={validationSchema}
@@ -406,7 +425,6 @@ export default function MyExercise() {
                                 name="nameActividad"
                                 autoComplete="off"
                                 defaultValue={values.nameActividad}
-                                
                                 onChange={handleSearch}
                                 className="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="Buscar actividad..."
@@ -473,7 +491,7 @@ export default function MyExercise() {
                             name="weightOption"
                             id="weightOption"
                             onChange={(event) =>
-                                setWeightOption(event.target.value)
+                              setWeightOption(event.target.value)
                             }
                             className="bg-gray-50 border mb-5 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           >

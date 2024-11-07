@@ -10,14 +10,15 @@ import { useUserContext } from "../context/UserContext";
 export default function Expediente() {
   const { user } = useUserContext();
   const [personalInformation, setPersonalInformation] = useState({});
-  const [updateInformacionPersonal, setUpdateInformacionPersonal] = useState(false);
+  const [updateInformacionPersonal, setUpdateInformacionPersonal] =
+    useState(false);
   const [medicalEvaluation, setMedicalEvaluation] = useState({});
-  const [updateMedicalEvaluation, setUpdateMedicalEvaluation] = useState(false)
+  const [updateMedicalEvaluation, setUpdateMedicalEvaluation] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const inputStyle = `border-radius text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-          dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`
+          dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-md`;
 
   const submitPersonalInformation = async (
     values,
@@ -50,29 +51,21 @@ export default function Expediente() {
     if (updateInformacionPersonal === true) {
       const { data, error } = await supabase
         .from("informacionPersonal")
-        .update([
-          info
-        ])
+        .update([info])
         .eq("uid", user.id);
       if (error) throw error;
       toast.success("Campos actualizados");
       console.log(data)
     }
     else {
-      let infoWithUser = { ...info, uid: user.uid }
+      let infoWithUser = {...info, uid: user.uid}
       const { data, error } = await supabase.from("informacionPersonal").insert([infoWithUser]);
       if (error) throw error;
       else console.log(data);
       toast.success("Datos Guardados");
     }
-
-
-
   };
-  const sumbitMedicalEvaluation = async (
-    values,
-    { setErrors, resetForm }
-  ) => {
+  const sumbitMedicalEvaluation = async (values, { setErrors, resetForm }) => {
     let info = {
       lastHemoglobin: values?.lastHemoglobin || null,
       systolicBloodPressure: values?.systolicBloodPressure || null,
@@ -90,8 +83,7 @@ export default function Expediente() {
       lastCholesterol: values?.lastCholesterol || null,
       dateLastCholesterol: values?.dateLastCholesterol || null,
       glucoseGoal: values?.glucoseGoal || null,
-      averageGlucose: values?.averageGlucose || null
-    }
+      averageGlucose: values?.averageGlucose || null,}
     try {
       if (updateMedicalEvaluation === true) {
         const { data, error } = await supabase
@@ -100,61 +92,65 @@ export default function Expediente() {
           .eq("uid", user.id);
         if (error) throw error;
         toast.success("Campos actualizados");
+        console.log(data);
 
       }
       else {
-        let infoWithUser = { ...info, uid: user.id }
+        let infoWithUser = {...info,uid:user.id}
         const { data, error } = await supabase
           .from("evaluacionesMedicas")
           .insert([
-            infoWithUser
+            infoWithUser  
           ]);
-        if (error) console.log(error.message);
+        if (error) console.log( error.message);
         else console.log(data);
         toast.success("Datos Guardados");
-
       }
     } catch (error) {
       console.log(error.message);
     } finally {
       resetForm();
     }
-  }
+  };
   const validationSchema1 = Yup.object({
     fullName: Yup.string().matches(/^[^\d]+$/, "El campo debe ser texto"),
-    birthdate: Yup.date().min(new Date(), 'La fecha no puede ser mayor a la actua'),
+    birthdate: Yup.date().min(new Date(), 'La fecha no puede ser mayor a hoy'),
     placeOfBirth: Yup.string().matches(/^[^\d]+$/, "El campo debe ser texto"),
-    weightAtBirth: Yup.number("El campo debe ser un numero").positive("El peso debe ser positivo"),
+    weightAtBirth:  Yup.number("El campo debe ser un numero").positive("El peso debe ser positivo"),
     typeOfDelivery: Yup.string(),
     bloodType: Yup.string(),
     email: Yup.string().email("Ingresa una dirección de correo válida"),
     maritalStatus: Yup.string(),
     stateOfBirth: Yup.string().matches(/^[^\d]+$/, "El campo de ser texto"),
-    sizeAtBirth: Yup.number("El campo debe ser un numero").positive("La talla debe ser positivo"),
-    gestationalWeeks: Yup.number("El campo debe ser un numero").positive("Las semanas deben ser positivas"),
+    sizeAtBirth: Yup.number("El campo debe ser un numero").positive(
+      "La talla debe ser positivo"
+    ),
+    gestationalWeeks: Yup.number("El campo debe ser un numero").positive(
+      "Las semanas deben ser positivas"
+    ),
     biologicalSex: Yup.string(),
     ocupation: Yup.string().matches(/^[^\d]+$/, "El campo de ser sólo texto"),
     actualState: Yup.string().matches(/^[^\d]+$/, "El campo de ser texto"),
-    apgarScore: Yup.number().max(10, "La calificación mayor es 10").min(0, "La calificación mínima es 0"),
+    apgarScore: Yup.number().max(10,"La calificación mayor es 10").min(0,"La calificación mínima es 0"),
     complicationsInPregnancy: Yup.string(),
-    specificPregnancyProblem: Yup.string().max(255, "Describa de una manera más corta"),
+    specificPregnancyProblem: Yup.string().max(255,"Describa de una manera más corta"),
   });
   const validationSchema2 = Yup.object({
     lastHemoglobin: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
-    dateLastHemoglobin: Yup.date().max(new Date(), "La fecha no puede ser mayor a la actual"),
+    dateLastHemoglobin: Yup.date(),
     systolicBloodPressure: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     diastolicBloodPressure: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     lastTriglycerides: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
-    dateLastTriglycerides: Yup.date().max(new Date(), "La fecha no puede ser mayor a la actual"),
+    dateLastTriglycerides: Yup.date(),
     colesterolHDL: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     currentWeight: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     currentFastingGlucose: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     lastUricAcid: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
-    dateLastUricAcid: Yup.date().max(new Date(), "La fecha no puede ser mayor a la actual"),
+    dateLastUricAcid: Yup.date(),
     timeInRange: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     currentSize: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     lastCholesterol: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
-    dateLastCholesterol: Yup.date().max(new Date(), "La fecha no puede ser mayor a la actual"),
+    dateLastCholesterol: Yup.date(),
     glucoseGoal: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
     averageGlucose: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
   });
@@ -169,24 +165,24 @@ export default function Expediente() {
             .eq("uid", user.id);
           if (error) throw error;
           setPersonalInformation({
-            fullName: data[0]?.fullName || '',
-            birthdate: data[0]?.birthdate || '',
-            placeOfBirth: data[0]?.placeOfBirth || '',
-            weightAtBirth: data[0]?.weightAtBirth || '',
-            typeOfDelivery: data[0]?.typeOfDelivery || 'disabled',
-            bloodType: data[0]?.bloodType || 'disabled',
-            email: data[0]?.email || '',
-            maritalStatus: data[0]?.maritalStatus || '',
-            stateOfBirth: data[0]?.stateOfBirth || '',
-            sizeAtBirth: data[0]?.sizeAtBirth || '',
-            gestationalWeeks: data[0]?.gestationalWeeks || '',
-            biologicalSex: data[0]?.biologicalSex || 'disabled',
-            ocupation: data[0]?.ocupation || '',
-            actualState: data[0]?.actualState || '',
-            apgarScore: data[0]?.apgarScore || '',
-            complicationsInPregnancy: data[0]?.complicationsInPregnancy || 'disabled',
-            specificPregnancyProblem: data[0]?.specificPregnancyProblem || '',
-
+            fullName: data[0]?.fullName || "",
+            birthdate: data[0]?.birthdate || "",
+            placeOfBirth: data[0]?.placeOfBirth || "",
+            weightAtBirth: data[0]?.weightAtBirth || "",
+            typeOfDelivery: data[0]?.typeOfDelivery || "disabled",
+            bloodType: data[0]?.bloodType || "disabled",
+            email: data[0]?.email || "",
+            maritalStatus: data[0]?.maritalStatus || "",
+            stateOfBirth: data[0]?.stateOfBirth || "",
+            sizeAtBirth: data[0]?.sizeAtBirth || "",
+            gestationalWeeks: data[0]?.gestationalWeeks || "",
+            biologicalSex: data[0]?.biologicalSex || "disabled",
+            ocupation: data[0]?.ocupation || "",
+            actualState: data[0]?.actualState || "",
+            apgarScore: data[0]?.apgarScore || "",
+            complicationsInPregnancy:
+              data[0]?.complicationsInPregnancy || "disabled",
+            specificPregnancyProblem: data[0]?.specificPregnancyProblem || "",
           });
           if (data[0] !== undefined) {
             setUpdateInformacionPersonal(true);
@@ -207,23 +203,23 @@ export default function Expediente() {
             .eq("uid", user.id);
           if (error) throw error;
           setMedicalEvaluation({
-            lastHemoglobin: data[0]?.lastHemoglobin || '',
-            dateLastHemoglobin: data[0]?.dateLastHemoglobin || '',
-            systolicBloodPressure: data[0]?.systolicBloodPressure || '',
-            diastolicBloodPressure: data[0]?.diastolicBloodPressure || '',
-            lastTriglycerides: data[0]?.lastTriglycerides || '',
-            dateLastTriglycerides: data[0]?.dateLastTriglycerides || '',
-            colesterolHDL: data[0]?.colesterolHDL || '',
-            currentWeight: data[0]?.currentWeight || '',
-            currentFastingGlucose: data[0]?.currentFastingGlucose || '',
-            lastUricAcid: data[0]?.lastUricAcid || '',
-            dateLastUricAcid: data[0]?.dateLastUricAcid || '',
-            timeInRange: data[0]?.timeInRange || '',
-            currentSize: data[0]?.currentSize || '',
-            lastCholesterol: data[0]?.lastCholesterol || '',
-            dateLastCholesterol: data[0]?.dateLastCholesterol || '',
-            glucoseGoal: data[0]?.glucoseGoal || '',
-            averageGlucose: data[0]?.averageGlucose || '',
+            lastHemoglobin: data[0]?.lastHemoglobin || "",
+            dateLastHemoglobin: data[0]?.dateLastHemoglobin || "",
+            systolicBloodPressure: data[0]?.systolicBloodPressure || "",
+            diastolicBloodPressure: data[0]?.diastolicBloodPressure || "",
+            lastTriglycerides: data[0]?.lastTriglycerides || "",
+            dateLastTriglycerides: data[0]?.dateLastTriglycerides || "",
+            colesterolHDL: data[0]?.colesterolHDL || "",
+            currentWeight: data[0]?.currentWeight || "",
+            currentFastingGlucose: data[0]?.currentFastingGlucose || "",
+            lastUricAcid: data[0]?.lastUricAcid || "",
+            dateLastUricAcid: data[0]?.dateLastUricAcid || "",
+            timeInRange: data[0]?.timeInRange || "",
+            currentSize: data[0]?.currentSize || "",
+            lastCholesterol: data[0]?.lastCholesterol || "",
+            dateLastCholesterol: data[0]?.dateLastCholesterol || "",
+            glucoseGoal: data[0]?.glucoseGoal || "",
+            averageGlucose: data[0]?.averageGlucose || "",
           });
           if (data[0] !== undefined) {
             setUpdateMedicalEvaluation(true);
@@ -231,8 +227,8 @@ export default function Expediente() {
             setUpdateMedicalEvaluation(false);
           }
           setIsLoading(false);
-          console.log(updateMedicalEvaluation)
-          console.log(medicalEvaluation)
+          console.log(updateMedicalEvaluation);
+          console.log(medicalEvaluation);
         } catch (error) {
           console.log(error);
         }
@@ -255,16 +251,16 @@ export default function Expediente() {
             Información personal
           </h2>
           <p className="text-sm mt-10 mb-6 ml-10">
-            ⚠️En caso de ser menor, llama a un padre o tutor para que te
-            ayude a llenar el registro
+            ⚠️En caso de ser menor, llama a un padre o tutor para que te ayude a
+            llenar el registro
           </p>
         </div>
         <hr className="border-gray-400" />
-        {isLoading ? (<div>Cargando registros...</div>) : (
+        {isLoading ? (
+          <div>Cargando registros...</div>
+        ) : (
           <Formik
-            initialValues={
-              personalInformation
-            }
+            initialValues={personalInformation}
             enableReinitialize
             onSubmit={submitPersonalInformation}
             validationSchema={validationSchema1}
@@ -285,11 +281,12 @@ export default function Expediente() {
                     <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
                       {touched.fullName && errors.fullName}
                     </p>
-
                   </div>
                   <div className="col-span-4 col-start-1 row-start-2">
                     <div className="w-11/12">
-                      <label htmlFor="question" className="font-semibold">Fecha de Nacimiento</label>
+                      <label htmlFor="question" className="font-semibold">
+                        Fecha de Nacimiento
+                      </label>
                       <input
                         name="birthdate"
                         type="date"
@@ -302,11 +299,12 @@ export default function Expediente() {
                         {touched.birthdate && errors.birthdate}
                       </p>
                     </div>
-
                   </div>
                   <div className="col-span-4 col-start-1 row-start-3">
                     <div className="w-11/12">
-                      <label htmlFor="question" className="font-semibold">Lugar de Nacimiento</label>
+                      <label htmlFor="question" className="font-semibold">
+                        Lugar de Nacimiento
+                      </label>
                       <input
                         name="placeOfBirth"
                         type="text"
@@ -322,7 +320,9 @@ export default function Expediente() {
                   </div>
                   <div className="col-span-4 col-start-1 row-start-4">
                     <div className="w-11/12">
-                      <label htmlFor="question" className="font-semibold">Peso a nacer</label>
+                      <label htmlFor="question" className="font-semibold">
+                        Peso a nacer
+                      </label>
                       <input
                         name="weightAtBirth"
                         type="number"
@@ -335,16 +335,18 @@ export default function Expediente() {
                         {touched.weightAtBirth && errors.weightAtBirth}
                       </p>
                     </div>
-
                   </div>
                   <div className="col-span-4 col-start-1 row-start-5 w-11/12">
                     <p className="font-semibold">Tipo de parto</p>
                     <select
                       name="typeOfDelivery"
                       value={values.typeOfDelivery}
-                      onChange={handleChange} className={inputStyle}
+                      onChange={handleChange}
+                      className={inputStyle}
                     >
-                      <option value="disabled" disabled>--Selecciona una opción--</option>
+                      <option value="disabled" disabled>
+                        --Selecciona una opción--
+                      </option>
                       <option value="parto natural">Parto Natural</option>
                       <option value="cesarea">Cesarea</option>
                     </select>
@@ -364,7 +366,9 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.bloodType}
                     >
-                      <option value="disabled" disabled >--Selecciona una opción--</option>
+                      <option value="disabled" disabled>
+                        --Selecciona una opción--
+                      </option>
                       <option value="A+">A+</option>
                       <option value="A-">A-</option>
                       <option value="B+">B+</option>
@@ -373,7 +377,6 @@ export default function Expediente() {
                       <option value="AB-">B-</option>
                       <option value="O+">O+</option>
                       <option value="O-">O-</option>
-
                     </select>
                   </div>
                   {/*FIN Lado izquierdo del contenedor */}
@@ -400,7 +403,9 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.maritalStatus}
                     >
-                      <option value="disabled" disabled>--Selecciona una opción--</option>
+                      <option value="disabled" disabled>
+                        --Selecciona una opción--
+                      </option>
                       <option value="soltero">Soltero</option>
                       <option value="casado">Casado</option>
                       <option value="viudo">Viudo</option>
@@ -438,7 +443,9 @@ export default function Expediente() {
                     </p>
                   </div>
                   <div className="col-span-4 col-start-5 row-start-5 w-11/12">
-                    <p className="font-semibold">Semanas de gestiación al nacer</p>
+                    <p className="font-semibold">
+                      Semanas de gestiación al nacer
+                    </p>
                     <input
                       name="gestationalWeeks"
                       type="number"
@@ -461,7 +468,9 @@ export default function Expediente() {
                       className={inputStyle}
                       value={values.biologicalSex}
                     >
-                      <option value="disabled" disabled >--Selecciona una opción--</option>
+                      <option value="disabled" disabled>
+                        --Selecciona una opción--
+                      </option>
                       <option value="femenino">Femenino</option>
                       <option value="masculino">Masculino</option>
                     </select>
@@ -479,7 +488,9 @@ export default function Expediente() {
                       value={values.ocupation}
                     />
                     <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
-                      {errors.ocupation && touched.ocupation && errors.ocupation}{" "}
+                      {errors.ocupation &&
+                        touched.ocupation &&
+                        errors.ocupation}{" "}
                     </p>
                   </div>
                   <div className="col-span-4 col-start-9 row-start-3 w-11/12">
@@ -523,17 +534,21 @@ export default function Expediente() {
                     </div>
                     <div className="col-span-4 col-start-1 row-start-2 grid-cols-4 flex flex-row items-start gap-1">
                       <div className="w-1/3">
-                        <select name="complicationsInPregnancy"
+                        <select
+                          name="complicationsInPregnancy"
                           onChange={handleChange}
                           className={inputStyle}
                           value={values.complicationsInPregnancy}
                         >
-                          <option value="disabled" disabled>--Seleciona una opción--</option>
+                          <option value="disabled" disabled>
+                            --Seleciona una opción--
+                          </option>
                           <option value="si">Si</option>
                           <option value="no">No</option>
                         </select>
                         <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
-                          {errors.complicationsInPregnancy && touched.complicationsInPregnancy}
+                          {errors.complicationsInPregnancy &&
+                            touched.complicationsInPregnancy}
                         </p>
                       </div>
                       <div className="w-2/3">
@@ -543,7 +558,7 @@ export default function Expediente() {
                           onChange={handleChange}
                           placeholder="¿Cuál?"
                           value={values.specificPregnancyProblem}
-                          disabled={values.complicationsInPregnancy === "no" || values.complicationsInPregnancy === "disabled"}
+                          disabled={values.complicationsInPregnancy === "no"}
                           className={values.complicationsInPregnancy === "si"
                             ? `${inputStyle}bg-white  text-gray-900 shadow-md`  // Clases si no está deshabilitado.
                             : `${inputStyle}bg-gray-200 border border-gray-300 text-gray-500 shadow-sm cursor-not-allowed `}
@@ -555,7 +570,7 @@ export default function Expediente() {
                         </p>
                       </div>
 
-
+                      
                     </div>
                   </div>
                   {/* fin contenedor con  inputs en la misma linea */}
@@ -583,7 +598,9 @@ export default function Expediente() {
         </div>
 
         <hr className="border-gray-400" />
-        {isLoading ? (<div>Cargando registros...</div>) : (
+        {isLoading ? (
+          <div>Cargando registros...</div>
+        ) : (
           <Formik
             initialValues={medicalEvaluation}
             enableReinitialize
@@ -592,7 +609,6 @@ export default function Expediente() {
           >
             {({ handleSubmit, handleChange, values, errors, touched }) => (
               <form onSubmit={handleSubmit}>
-
                 {/* grid para formulario 1*/}
                 <div className="grid grid-cols-12 grid-rows-4 justify-items-stretch mt-5 pl-5 gap-1">
                   {/*Lado izquierdo del contenedor */}
@@ -616,9 +632,9 @@ export default function Expediente() {
                             min={"0"}
                           />
                           <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
-                            {errors.lastHemoglobin && touched.lastHemoglobin}{""}
+                            {errors.lastHemoglobin && touched.lastHemoglobin}
+                            {""}
                           </p>
-
                         </div>
                         <div className=" w-2/3 ">
                           <input
@@ -629,7 +645,8 @@ export default function Expediente() {
                             className={inputStyle}
                           />
                           <p className="mb-2 text-sm text-red-500 dark:text-white w-full h-1">
-                            {errors.dateLastHemoglobin && touched.dateLastHemoglobin}
+                            {errors.dateLastHemoglobin &&
+                              touched.dateLastHemoglobin}
                           </p>
                         </div>
                       </div>
@@ -712,9 +729,7 @@ export default function Expediente() {
                     {/* fin contenedor con  inputs en la misma linea */}
                   </div>
                   <div className="col-span-4 col-start-1 row-start-4 w-11/12">
-                    <p className="font-semibold mb-0">
-                      Colesterol HDL
-                    </p>
+                    <p className="font-semibold mb-0">Colesterol HDL</p>
                     <input
                       name="colesterolHDL"
                       type="number"
@@ -734,9 +749,7 @@ export default function Expediente() {
 
                   {/* lado medio del contenedor */}
                   <div className="col-span-4 col-start-5 row-start-1 w-11/12">
-                    <p className="font-semibold mb-0">
-                      Peso actual
-                    </p>
+                    <p className="font-semibold mb-0">Peso actual</p>
                     <input
                       name="currentWeight"
                       type="number"
@@ -809,9 +822,7 @@ export default function Expediente() {
                     {/* fin contenedor con  inputs en la misma linea */}
                   </div>
                   <div className="col-span-4 col-start-5 row-start-4 w-11/12">
-                    <p className="font-semibold mb-0">
-                      Tiempo en rango
-                    </p>
+                    <p className="font-semibold mb-0">Tiempo en rango</p>
                     <input
                       name="timeInRange"
                       type="number"
@@ -831,9 +842,7 @@ export default function Expediente() {
 
                   {/*Inicio del contenedor derecho */}
                   <div className="col-span-4 col-start-9 row-start-1 w-11/12">
-                    <p className="font-semibold mb-0">
-                      Talla actual
-                    </p>
+                    <p className="font-semibold mb-0">Talla actual</p>
                     <input
                       name="currentSize"
                       type="number"
@@ -938,4 +947,3 @@ export default function Expediente() {
     </div>
   );
 }
-

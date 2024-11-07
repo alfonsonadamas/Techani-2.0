@@ -99,7 +99,7 @@ export default function GlucoseRegister() {
   const validationSchema = Yup.object().shape({
     glucose: Yup.number()
       .min(0, "La glucosa no puede ser menor a 0")
-      .max(200, "La glucosa no puede ser mayor a 200")
+      .max(1000, "La glucosa no puede ser mayor a 1000")
       .required("La glucosa es requerida"),
 
     meditionType: Yup.string().required("El tipo de medición es requerido"),

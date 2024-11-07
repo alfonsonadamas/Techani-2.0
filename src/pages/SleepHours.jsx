@@ -14,6 +14,7 @@ export default function SleepHours() {
   const { user } = useUserContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [items, setItems] = useState([]);
+  const [date, setDate] = useState("");
 
   const options = {
     weekday: "long",
@@ -60,6 +61,22 @@ export default function SleepHours() {
     } finally {
       setSubmitting(false);
       resetForm();
+    }
+  };
+
+  const filterItems = async () => {
+    if (date) {
+      const { data, error } = await supabase
+        .from("calidadS")
+        .select("*")
+        .eq("uid", user.id)
+        .eq("fecha", date);
+      if (error) {
+        console.log(error);
+      }
+      setItems(data);
+    } else {
+      getData();
     }
   };
 
@@ -213,7 +230,7 @@ export default function SleepHours() {
                     type="text"
                     name="sleepQuality"
                     onChange={handleChange}
-                    placeholder="Ingrese las horas que durmió"
+                    placeholder="Ingrese la calidad de sueño"
                     className={
                       errors.sleepQuality
                         ? "bg-gray-50 mb-2 border border-red-500 text-red-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -263,25 +280,24 @@ export default function SleepHours() {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-5">
             Historial de Sueño
           </h2>
-          <form action="">
-            <input className="rounded-lg" type="date" />
+          <div>
+            <input
+              onChange={(e) => {
+                setDate(e.target.value);
+              }}
+              className="rounded-lg"
+              type="date"
+            />
             <button
               type="submit"
+              onClick={filterItems}
               className=" ml-5 w-28 items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white disabled:opacity-50"
             >
               Filtrar
             </button>
-          </form>
+          </div>
         </div>
         <div className="flex flex-wrap mt-5">
-          {/* <ul>
-            {currentItems.map((item) => (
-              <li key={item.id} className="border-b py-2">
-                {item.horas}
-              </li>
-            ))}
-          </ul> */}
-
           {currentItems.map((item) => (
             <div className="border-2 w-[31.5%] px-2 py-3 rounded-lg shadow-lg my-3 mx-1">
               <h3 className="mb-5">{formatDate(item.fecha)}</h3>

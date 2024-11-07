@@ -16,7 +16,10 @@ export default function ViewEstados() {
   const [fechafin, setFechafin] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
-
+  const [meditionType, setMeditionType] = useState([]);
+  const [date, setDate] = useState("");
+  const [datefin, setDateFin] = useState("");
+  const [effectRan, setEffectRan] = useState(false);
   const openModal = (record) => {
     setEditRecord(record);
     setModalIsOpen(true);
@@ -56,16 +59,24 @@ export default function ViewEstados() {
       setSubmitting(false);
     }
   };
+  const getMeditionType = async () => {
+    const { data, error } = await supabase.from("medicion").select("*");
+    if (error) throw error;
+    setMeditionType(data);
+  };
 
   const emotions = async () => {
+    const fechaInicio = document.getElementById("idFIni").value;
+    const fechaFin = document.getElementById("idFfin").value;
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("emociones")
         .select()
         .eq("uid", user.id)
-        .order("created_at", { ascending: false }) // Ordenar por created_at de forma descendente
-        .limit(5); //limitar registros
+        .order("created_at", { ascending: false })
+        .gte("created_at", fechaInicio)
+        .lte("created_at", fechaFin);
       if (error) {
         console.log("error", error);
       } else {
@@ -93,15 +104,26 @@ export default function ViewEstados() {
   };
 
   const [em, setEmotions] = useState([]);
+  const fetchData = async () => {
+    const emotionData = await getEmotions();
+    setEmotions(emotionData);
+    emotions();
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const emotionData = await getEmotions();
-      setEmotions(emotionData);
-      emotions();
-    };
-
+    getMeditionType();
+    if (!effectRan) {
+      const ranIn = new Date();
+      ranIn.setDate(ranIn.getDate() - 5);
+      const formattedDate = ranIn.toISOString().split("T")[0];
+      setDate(formattedDate);
+      const ranFin = new Date();
+      const formattedDateFin = ranFin.toISOString().split("T")[0];
+      setDateFin(formattedDateFin);
+      setEffectRan(true);
+    }
     fetchData();
+    emotions();
   }, [user]);
 
   const deleteEmotion = async (id) => {
@@ -245,11 +267,6 @@ export default function ViewEstados() {
     }
   };
 
-  const formatDate = (fecha) => {
-    const fechaObjeto = new Date(fecha);
-    return fechaObjeto.toLocaleDateString();
-  };
-
   const handleFilter = async () => {
     const fechaInicio = document.getElementById("idFIni").value;
     const fechaFin = document.getElementById("idFfin").value;
@@ -269,6 +286,7 @@ export default function ViewEstados() {
       console.log(error);
     } finally {
       setLoading(false);
+      console.log(fechaInicio, fechaFin);
     }
   };
 
@@ -285,6 +303,8 @@ export default function ViewEstados() {
           <input
             id="idFIni"
             type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
           />
           <div className="ml-5 mr-5">
@@ -293,6 +313,8 @@ export default function ViewEstados() {
           <input
             id="idFfin"
             type="date"
+            value={datefin}
+            onChange={(e) => setDateFin(e.target.value)}
             className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
           />
 
@@ -304,7 +326,7 @@ export default function ViewEstados() {
           </button>
         </div>
         {loading ? (
-          <p className="bg-blue-500">Cargando registros...</p>
+          <div></div>
         ) : (
           <div
             className=""
@@ -315,7 +337,7 @@ export default function ViewEstados() {
             }}
           >
             {records.length === 0 ? (
-              <p className="bg-yellow-500">No hay registros disponibles.</p>
+              <div></div>
             ) : (
               filterRecords().map((record) => (
                 <div key={record.idEmocion} className="p-5">
@@ -331,7 +353,7 @@ export default function ViewEstados() {
                         {mapNameEmotion(record.idEmocion)}
                       </h2>
                       <h1 className="text-center mt-2">
-                        Fecha: {formatDate(record.created_at)}
+                        Fecha: {record.created_at}
                       </h1>
                       <h1 className="text-center mt-2">
                         Intensidad: {record.Intencidad}
@@ -459,11 +481,14 @@ export default function ViewEstados() {
                             <option disabled value="">
                               -- Selecciona una opcion --
                             </option>
-                            <option required value="Desayuno">
-                              Desayuno
-                            </option>
-                            <option value="Comida">Comida</option>
-                            <option value="Cena">Cena</option>
+                            {meditionType.map((medition) => (
+                              <option
+                                key={medition.idMedicion}
+                                value={medition.idMedicion}
+                              >
+                                {medition.measurement}
+                              </option>
+                            ))}
                           </select>
                         </div>
 

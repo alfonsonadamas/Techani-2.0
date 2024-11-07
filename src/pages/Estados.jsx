@@ -1,13 +1,14 @@
-import React, { useState } from "react";
 import SideBar from "../components/SideBar";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
-
+import { toast, ToastContainer } from "react-toastify";
+import React, { useEffect, useState } from "react";
 export default function Estados() {
   const [estados, setEstados] = useState({ idEmocion: null, value: null });
   const [error, setError] = useState("");
   const [SaveSuccessfully, setSaveSuccessfully] = useState(false);
   const { user } = useUserContext();
+  const [meditionType, setMeditionType] = useState([]);
 
   const handleMoodChange = (idEmocion, value) => {
     setEstados({ idEmocion, value });
@@ -20,9 +21,15 @@ export default function Estados() {
   const mostrarValor = (event) => {
     setValor(event.target.value);
   };
-
+  const getMeditionType = async () => {
+    const { data, error } = await supabase.from("medicion").select("*");
+    if (error) throw error;
+    setMeditionType(data);
+  };
   const [timeRegistroEm, setTimeRegistroEm] = useState("");
-
+  useEffect(() => {
+    getMeditionType();
+  });
   const handleTimeChange = (e) => {
     setTimeRegistroEm(e.target.value);
   };
@@ -53,7 +60,7 @@ export default function Estados() {
         throw error;
       }
 
-      console.log("Estado de ánimo guardado exitosamente:", data);
+      toast.success("¡Se a guardado tu emoción!");
 
       setSaveSuccessfully(true);
 
@@ -76,6 +83,7 @@ export default function Estados() {
   return (
     <div>
       <SideBar />
+      <ToastContainer />
       <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
         <label htmlFor="day" className="block mb-2 text-xl font-semibold mt-2">
           Registro del estado de ánimo:
@@ -617,7 +625,7 @@ export default function Estados() {
                 type="range"
                 id="rango"
                 name="rango"
-                min="0"
+                min="1"
                 max="5"
                 step="1"
                 className="form-range w-full mt-2"
@@ -644,27 +652,15 @@ export default function Estados() {
                 <option disabled value="">
                   -- Selecciona una opcion --
                 </option>
-                <option required value="Desayuno">
-                  Desayuno
-                </option>
-                <option value="Comida">Comida</option>
-                <option value="Cena">Cena</option>
+                {meditionType.map((medition) => (
+                  <option key={medition.idMedicion} value={medition.idMedicion}>
+                    {medition.measurement}
+                  </option>
+                ))}
               </select>
             </div>
 
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            {SaveSuccessfully && (
-              <div
-                className="flex items-center p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
-                role="alert"
-              >
-                <span className="sr-only">Info</span>
-                <div className="text-green-400">
-                  <span class="font-medium ">Felicidades! </span>
-                  Se ha registrado tu ejercicio correctamente.{" "}
-                </div>
-              </div>
-            )}
           </div>
           <div className="flex items-center justify-between">
             <button
