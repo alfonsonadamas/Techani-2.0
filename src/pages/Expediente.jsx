@@ -305,24 +305,24 @@ export default function Expediente() {
   });
   const validationSchema4 = Yup.object({
     diabetesInFamily: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
+      .oneOf(["Si", "No"], "Seleccione una opción válida"),
+      
   
     diabetesType1: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
+      .oneOf(["Si", "No"], "Seleccione una opción válida"),
+      
   
     diabetesType2: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
+      .oneOf(["Si", "No"], "Seleccione una opción válida"),
+      
   
     hypertension: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
+      .oneOf(["Si", "No"], "Seleccione una opción válida"),
+      
   
     cancer: Yup.string()
-      .oneOf(["Si", "No"], "Seleccione una opción válida")
-      .required("Este campo es obligatorio"),
+      .oneOf(["Si", "No"], "Seleccione una opción válida"),
+      
   
     cancerType: Yup.string()
       .nullable()
@@ -1293,6 +1293,7 @@ export default function Expediente() {
           {({ handleSubmit, handleChange, values, errors, touched }) => (
             <form onSubmit={handleSubmit} className="mt-5 pl-5">
               <div className="grid grid-cols-12 gap-4">
+                
                 {/* Tratamiento actual para diabetes tipo 1 */}
                 <div className="col-span-4">
                   <label className="font-semibold">Tratamiento actual para la diabetes tipo 1</label>
@@ -1307,6 +1308,10 @@ export default function Expediente() {
                       <option value="Insulina Lenta">Insulina Lenta</option>
                       <option value="Insulina Rápida">Insulina Rápida</option>
                     </select>
+                    {touched.diabetesTreatment && errors.diabetesTreatment && (
+                      <p className="text-sm text-red-500">{errors.diabetesTreatment}</p>
+                    )}
+                    
                     <input
                       type="text"
                       name="insulinName"
@@ -1315,6 +1320,10 @@ export default function Expediente() {
                       placeholder="Nombre de insulina"
                       className={`${inputStyle} w-1/3`}
                     />
+                    {touched.insulinName && errors.insulinName && (
+                      <p className="text-sm text-red-500">{errors.insulinName}</p>
+                    )}
+                    
                     <input
                       type="number"
                       name="insulinDose"
@@ -1325,7 +1334,11 @@ export default function Expediente() {
                       min={"0"}
                       step={0.01}
                     />
+                    {touched.insulinDose && errors.insulinDose && (
+                      <p className="text-sm text-red-500">{errors.insulinDose}</p>
+                    )}
                   </div>
+
                   <label className="font-semibold">Lugar de tratamiento actual</label>
                   <select
                     name="treatmentLocation"
@@ -1338,6 +1351,10 @@ export default function Expediente() {
                     <option value="ISSSTE">ISSSTE</option>
                     <option value="Particular">Particular</option>
                   </select>
+                  {touched.treatmentLocation && errors.treatmentLocation && (
+                    <p className="text-sm text-red-500">{errors.treatmentLocation}</p>
+                  )}
+
                   <label className="font-semibold">¿Qué hace en caso de hiperglicemia?</label>
                   <input
                     type="text"
@@ -1346,6 +1363,10 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={inputStyle}
                   />
+                  {touched.hyperglycemiaAction && errors.hyperglycemiaAction && (
+                    <p className="text-sm text-red-500">{errors.hyperglycemiaAction}</p>
+                  )}
+
                   <label className="font-semibold">¿Consume estupefacientes?</label>
                   <select
                     name="drugUse"
@@ -1357,6 +1378,10 @@ export default function Expediente() {
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
+                  {touched.drugUse && errors.drugUse && (
+                    <p className="text-sm text-red-500">{errors.drugUse}</p>
+                  )}
+
                   <label className="font-semibold">¿Hace ejercicio?</label>
                   <select
                     name="exercise"
@@ -1368,6 +1393,9 @@ export default function Expediente() {
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
+                  {touched.exercise && errors.exercise && (
+                    <p className="text-sm text-red-500">{errors.exercise}</p>
+                  )}
                   
                   {values.exercise === "Si" && (
                     <div className="flex flex-col gap-2 mt-2">
@@ -1380,6 +1408,10 @@ export default function Expediente() {
                           placeholder="Tipo de ejercicio"
                           className={`${inputStyle} w-1/2`}
                         />
+                        {touched.exerciseType && errors.exerciseType && (
+                          <p className="text-sm text-red-500">{errors.exerciseType}</p>
+                        )}
+                        
                         <input
                           type="number"
                           name="exerciseDuration"
@@ -1389,6 +1421,9 @@ export default function Expediente() {
                           className={`${inputStyle} w-1/2`}
                           min="0"
                         />
+                        {touched.exerciseDuration && errors.exerciseDuration && (
+                          <p className="text-sm text-red-500">{errors.exerciseDuration}</p>
+                        )}
                       </div>
                       <select
                         name="exerciseFrequency"
@@ -1401,8 +1436,11 @@ export default function Expediente() {
                         <option value="Semanal">Semanal</option>
                         <option value="Mensual">Mensual</option>
                       </select>
+                      {touched.exerciseFrequency && errors.exerciseFrequency && (
+                        <p className="text-sm text-red-500">{errors.exerciseFrequency}</p>
+                      )}
                     </div>
-                  )}  
+                  )}
                 </div>
 
                 {/* Otros medicamentos */}
@@ -1414,6 +1452,9 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={`${inputStyle} h-20 resize-none`}
                   />
+                  {touched.otherMedications && errors.otherMedications && (
+                    <p className="text-sm text-red-500">{errors.otherMedications}</p>
+                  )}
 
                   <label className="font-semibold mt-2">¿Qué hace en caso de hipoglicemia?</label>
                   <input
@@ -1423,6 +1464,9 @@ export default function Expediente() {
                     onChange={handleChange}
                     className={inputStyle}
                   />
+                  {touched.hypoglycemiaAction && errors.hypoglycemiaAction && (
+                    <p className="text-sm text-red-500">{errors.hypoglycemiaAction}</p>
+                  )}
 
                   <label className="font-semibold">¿Observaciones en el pie derecho?</label>
                   <select
@@ -1436,7 +1480,9 @@ export default function Expediente() {
                     <option value="Callosidad">Callosidad</option>
                     <option value="Resequedad">Resequedad</option>
                   </select>
-                  
+                  {touched.rightFootObservation && errors.rightFootObservation && (
+                    <p className="text-sm text-red-500">{errors.rightFootObservation}</p>
+                  )}
                 </div>
 
                 {/* Control de alimentos y agua */}
@@ -1453,6 +1499,10 @@ export default function Expediente() {
                     <option value="Por calorías">Por calorías</option>
                     <option value="Sin control">Sin control</option>
                   </select>
+                  {touched.foodControl && errors.foodControl && (
+                    <p className="text-sm text-red-500">{errors.foodControl}</p>
+                  )}
+
                   <label className="font-semibold mt-2">¿Cuánta agua consume al día? (en litros)</label>
                   <input
                     type="number"
@@ -1463,6 +1513,10 @@ export default function Expediente() {
                     min={"0"}
                     step={0.01}
                   />
+                  {touched.dailyWaterIntake && errors.dailyWaterIntake && (
+                    <p className="text-sm text-red-500">{errors.dailyWaterIntake}</p>
+                  )}
+
                   <label className="font-semibold mt-2">¿Consume alcohol?</label>
                   <select
                     name="alcoholUse"
@@ -1474,6 +1528,10 @@ export default function Expediente() {
                     <option value="Si">Si</option>
                     <option value="No">No</option>
                   </select>
+                  {touched.alcoholUse && errors.alcoholUse && (
+                    <p className="text-sm text-red-500">{errors.alcoholUse}</p>
+                  )}
+
                   <label className="font-semibold mt-2">¿Observaciones en el pie izquierdo?</label>
                   <select
                     name="leftFootObservation"
@@ -1486,7 +1544,10 @@ export default function Expediente() {
                     <option value="Callosidad">Callosidad</option>
                     <option value="Resequedad">Resequedad</option>
                   </select>
-                </div>            
+                  {touched.leftFootObservation && errors.leftFootObservation && (
+                    <p className="text-sm text-red-500">{errors.leftFootObservation}</p>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end pr-8 h-11 mt-4">
@@ -1500,6 +1561,7 @@ export default function Expediente() {
             </form>
           )}
         </Formik>
+
       </div>
     </div>
   );
