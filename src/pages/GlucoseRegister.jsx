@@ -6,12 +6,44 @@ import { supabase } from "../config/supabase";
 import SideBar from "../components/SideBar";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
+import emailjs from "@emailjs/browser";
 
 export default function GlucoseRegister() {
   const { user } = useUserContext();
   const [meditionType, setMeditionType] = useState([]);
   const [submited, setSubmited] = useState(false);
   const [records, setRecords] = useState([{}]);
+  const [glucoseRange, setGlucoseRange] = useState({});
+  const [families, setFamilies] = useState([]);
+
+  const getGlucoseRange = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("glucosaRango")
+        .select("alto, bajo")
+        .eq("uid", user.id);
+      if (error) throw error;
+      console.log(data);
+      setGlucoseRange(data[0]);
+      console.log(glucoseRange);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const supportFamilies = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("Familiares")
+        .select("email, name")
+        .eq("uid", user.id);
+      if (error) throw error;
+      console.log(data);
+      setFamilies(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getMeditionType = async () => {
     const { data, error } = await supabase.from("medicion").select("*");
@@ -77,6 +109,19 @@ export default function GlucoseRegister() {
     try {
       setSubmitting(true);
       if (!duplicate) {
+        if (glucose < glucoseRange.bajo || glucose > glucoseRange.alto) {
+          await emailjs.send(
+            "service_3ok3mgs",
+            "template_jt5p6ui",
+            {
+              to_name: families[0].name,
+              to_email: families[0].email,
+              message: `Se ha registrado una medición de glucosa con el valor de ${glucose} mg/dL`,
+            },
+            "RBjxGi8gd0qdpEToN"
+          );
+        }
+
         await supabase.from("registroGlucosa").insert([
           {
             uid: user.id,
@@ -106,9 +151,12 @@ export default function GlucoseRegister() {
   });
 
   useEffect(() => {
-    getMeditionType();
-
-    getRecords();
+    if (user) {
+      getMeditionType();
+      getRecords();
+      getGlucoseRange();
+      supportFamilies();
+    }
   }, [user]);
 
   return (

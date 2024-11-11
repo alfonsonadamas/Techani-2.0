@@ -52,7 +52,7 @@ export default function Activities() {
     <div>
       <SideBar />
       <ToastContainer />
-      <div className="p-16 pt-20 sm:ml-64" data-aos="fade-up">
+      <div className="p-16 pt-20 sm:ml-64 mt-10" data-aos="fade-up">
         {activitieDuplicated && (
           <div
             class="flex items-center p-4 mb-4 text-sm text-red-600 border border-red-300 rounded-lg bg-red-300 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
@@ -66,7 +66,7 @@ export default function Activities() {
           </div>
         )}
 
-        <label className=" mb-2 text-sm font-medium text-gray-900 dark:text-white">
+        <label className=" mt-10 text-lg font-medium text-gray-900 dark:text-white">
           Registro de Nueva Actividad
         </label>
         <Formik
@@ -87,7 +87,7 @@ export default function Activities() {
           }) => (
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="day" className="block mb-1">
+                <label htmlFor="day" className="block mb-1 mt-5">
                   Nombre de la Actividad:
                 </label>
                 <input

@@ -416,7 +416,7 @@ export default function Profile() {
     familyName: Yup.string().required("El nombre es obligatorio"),
     familyPhone: Yup.number()
       .typeError("Solo se permiten numeros")
-      .min(1000000000, "El teléfono debe tener exactamente 10 dígitos")
+      .min(100000000, "El teléfono debe tener exactamente 10 dígitos")
       .required("El teléfono es obligatorio"),
     familyEmail: Yup.string()
       .email("Correo electrónico no válido")
@@ -657,8 +657,10 @@ export default function Profile() {
                     </label>
                     <input
                       id="phone"
-                      type="text"
+                      type="number"
                       name="phone"
+                      maxLength={10}
+                      max={10}
                       value={values.phone}
                       onChange={handleChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -1221,7 +1223,7 @@ export default function Profile() {
                               type="text"
                               name="familyPhone"
                               value={values.familyPhone}
-                              max={10}
+                              maxLength={10}
                               onChange={handleChange}
                               onBlur={handleBlur}
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"

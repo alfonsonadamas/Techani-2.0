@@ -13,6 +13,7 @@ export default function InsulineRegister() {
   const [doseTypes, setdoseTypes] = useState([]);
   const [submited, setSubmited] = useState(false);
   const [records, setRecords] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getInsulineType = async () => {
     const { data, error } = await supabase.from("insulina").select("*");
@@ -53,6 +54,7 @@ export default function InsulineRegister() {
     { dose, doseType, insulineType, medition },
     { setSubmitting, setErrors, resetForm }
   ) => {
+    setIsLoading(true);
     console.log(dose, doseType, insulineType, medition);
     if (doseType === "none") {
       setErrors({ doseType: "Selecciona un tipo de insulina" });
@@ -107,6 +109,7 @@ export default function InsulineRegister() {
         console.log(data);
         toast.success("Registro exitoso");
         getRecords();
+        resetForm();
       } else {
         console.log("Registro duplicado");
         console.log(duplicate);
@@ -114,7 +117,7 @@ export default function InsulineRegister() {
     } catch (error) {
       console.log(error);
     } finally {
-      setSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -275,7 +278,7 @@ export default function InsulineRegister() {
                       <button
                         className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                       >
                         Guardar
                       </button>

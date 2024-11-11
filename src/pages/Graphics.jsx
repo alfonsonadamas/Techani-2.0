@@ -63,39 +63,34 @@ export default function Grapics() {
       offsetX: 40,
     },
   });
+  const [glucoseRange, setGlucoseRange] = useState();
 
-  const handleDate1 = (e) => {
-    const date = e.target.value;
-    var parts = date.split("-");
-    var day = parts[2];
-    var month = parts[1];
-    var year = parts[0];
-    const formatDate = new Date(year, month - 1, day);
-    setDate1(formatDate);
-    console.log(date);
-  };
-
-  const handleDate2 = (e) => {
-    const date = e.target.value;
-    var parts = date.split("-");
-    var day = parts[2];
-    var month = parts[1];
-    var year = parts[0];
-    const formatDate = new Date(year, month - 1, day);
-    setDate2(formatDate);
+  const formatDate = (dateFormat) => {
+    const newDate = new Date(dateFormat);
+    return `${newDate.getFullYear()}-${newDate.getMonth() + 1}-${
+      newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate()
+    }`;
   };
 
   const filterData = () => {
     const filteredData = data.filter((record) => {
-      const recordDate = new Date(record.created_at);
-      return recordDate >= date1 && recordDate <= date2;
+      return (
+        formatDate(record.created_at) >= date1 &&
+        formatDate(record.created_at) <= date2
+      );
     });
 
-    const low = filteredData.filter((record) => record.glucosa < 100).length;
-    const normal = filteredData.filter(
-      (record) => record.glucosa >= 101 && record.glucosa <= 130
+    const low = filteredData.filter(
+      (record) => record.glucosa < glucoseRange.bajo
     ).length;
-    const high = filteredData.filter((record) => record.glucosa > 130).length;
+    const normal = filteredData.filter(
+      (record) =>
+        record.glucosa >= glucoseRange.bajo &&
+        record.glucosa <= glucoseRange.alto
+    ).length;
+    const high = filteredData.filter(
+      (record) => record.glucosa > glucoseRange.alto
+    ).length;
 
     setBarData({
       series: [
@@ -164,7 +159,24 @@ export default function Grapics() {
         console.log(error);
       }
     };
+
+    const getGlucoseRange = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("glucosaRango")
+          .select("alto, bajo")
+          .eq("uid", user.id);
+        if (error) throw error;
+        console.log(data);
+        setGlucoseRange(data[0]);
+        console.log(glucoseRange);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     getRecords();
+    getGlucoseRange();
   }, [user]);
 
   return (
@@ -174,11 +186,33 @@ export default function Grapics() {
         <div className="flex flex-col ">
           <div className="mb-5">
             <h2 className="text-2xl mb-5 font-semibold">Gráficas</h2>
-            <FiltroFecha
-              eventClick={filterData}
-              handleDate1={handleDate1}
-              handleDate2={handleDate2}
-            ></FiltroFecha>
+            <div>
+              <h1 className="font-semibold text-xl mt-5">
+                Registros de Glucosa
+              </h1>
+              <div className="mt-5 mb-24">
+                <span>Fecha inicio:</span>
+                <input
+                  type="date"
+                  className="mx-3 w-48 text-center border-gray-400 rounded-xl"
+                  onChange={(e) => setDate1(e.target.value)}
+                ></input>
+                <span>Fecha fin:</span>
+                <input
+                  type="date"
+                  className="mx-3 w-48 text-center border-gray-400 rounded-xl"
+                  onChange={(e) => setDate2(e.target.value)}
+                ></input>
+                <button
+                  onClick={() => {
+                    filterData();
+                  }}
+                  className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
+                >
+                  Filtrar
+                </button>
+              </div>
+            </div>
           </div>
           <div className="w-full border-gray-400 border-2">
             <ReactApexChart

@@ -41,6 +41,7 @@ module.exports = {
     "./src/pages/SleepHours.jsx",
     "./src/pages/MyGlucoseRegister.jsx",
     "./src/pages/EditRecords.jsx",
+    "./src/pages/NewActivity.jsx",
     "./node_modules/flowbite-react/lib/esm/**/*.js",
   ],
   theme: {
