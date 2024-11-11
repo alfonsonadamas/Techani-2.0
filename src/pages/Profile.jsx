@@ -242,18 +242,49 @@ export default function Profile() {
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.from("datosAdicionales").insert([
+      // Verificar cuántos registros de insulina ya existen para este usuario
+      const { data: currentInsulinData, error: countError } = await supabase
+        .from("datosAdicionales")
+        .select("id")
+        .eq("uid", user.id);
+
+      if (countError) throw countError;
+
+      if (currentInsulinData.length >= 2) {
+        // Si ya hay 2 registros, muestra un toast y detiene el proceso
+        toast.error("No puedes agregar más de dos tipos de insulina.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Verificar si ya existe un registro con el mismo tipo de insulina
+      const { data: existingData, error: fetchError } = await supabase
+        .from("datosAdicionales")
+        .select("id")
+        .eq("uid", user.id)
+        .eq("tipoInsulina", tipoInsulina);
+
+      if (fetchError) throw fetchError;
+
+      if (existingData && existingData.length > 0) {
+        // Si ya existe un registro para el mismo tipo de insulina, muestra un error y detiene el proceso
+        toast.error("Ya tienes un registro para este tipo de insulina.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Si no existe un registro duplicado y el usuario tiene menos de 2 registros, realiza la inserción
+      const { data, error } = await supabase.from("datosAdicionales").insert([
         {
           marcaInsulina: marcaInsulina,
           uid: user.id,
           tipoInsulina: tipoInsulina,
         },
       ]);
-      if (error) {
-        throw error;
-      }
-      toast.success("Datos Adicionales Guardados");
 
+      if (error) throw error;
+
+      toast.success("Datos Adicionales Guardados");
       setAddTypeInsuline(false);
       veriInsulina();
     } catch (error) {
@@ -264,6 +295,7 @@ export default function Profile() {
       console.error(error);
     } finally {
       resetForm();
+      setSubmitting(false);
     }
   };
 
@@ -271,10 +303,18 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from("datosAdicionales")
-        .select()
+        .select(
+          `
+        *,
+        marcaInsulina (
+          nombreInsulina
+        )
+      `
+        )
         .eq("uid", user.id);
       if (error) throw error;
       setDatosInsulina(data);
+      console.log(datosInsulina);
     } catch (error) {
       console.log(error);
     }
@@ -526,8 +566,8 @@ export default function Profile() {
     return (
       <div>
         <SideBar />
+        <ToastContainer />
         <div className="p-16 pt-16 sm:ml-64">
-          <ToastContainer />
           <Formik
             initialValues={{ image: profile.avatar }}
             enableReinitialize={true}
@@ -837,67 +877,76 @@ export default function Profile() {
             </button>
             {showAdditionalData && (
               <div className="flex justify-end mt-4 p-4 bg-white rounded shadow-md flex-col">
-                <div className=" flex flex-row justify-center w-full">
-                  <div className=" flex flex-row w-2/3 ">
-                    {datosInsulina.map((item) => {
-                      return (
-                        <div className="flex flex-col w-full border-r-2 border-slate-800">
-                          <div className="justify-start items-start ml-10">
-                            <p className="text-sm text-neutral-500 mb-1">
-                              Tipo de insulina
-                            </p>
-                            <p className="font-bold text-base mb-4">
-                              {item.tipoInsulina}
-                            </p>
-                            <p className="text-sm text-neutral-600 mb-1">
-                              Nombre de la insulina utilizada:
-                            </p>
-                            <p className="font-bold text-base mb-5">
-                              {nombreInsulina}
-                            </p>
+                <div className="flex flex-row justify-center w-full">
+                  <div
+                    className={`flex flex-row justify-${
+                      datosInsulina.length + datoRango.length === 1
+                        ? "center"
+                        : "between"
+                    } w-full`}
+                  >
+                    {datosInsulina.map((item, index) => (
+                      <div
+                        key={index}
+                        className={`flex flex-col w-full px-4 ${
+                          index === 0 &&
+                          datoRango.length === 0 &&
+                          datosInsulina.length === 2
+                            ? "border-r-2 border-slate-800"
+                            : ""
+                        }`}
+                      >
+                        <div className="justify-start items-start ml-10">
+                          <p className="text-sm text-neutral-500 mb-1">
+                            Tipo de insulina
+                          </p>
+                          <p className="font-bold text-base mb-4">
+                            {item.tipoInsulina}
+                          </p>
+                          <p className="text-sm text-neutral-600 mb-1">
+                            Nombre de la insulina utilizada:
+                          </p>
+                          <p className="font-bold text-base mb-5">
+                            {item.marcaInsulina?.nombreInsulina || "N/A"}
+                          </p>
+                        </div>
+                        <div className="flex justify-center items-center mt-2">
+                          <button
+                            type="button"
+                            onClick={() => deleteDatosAdicionales(item.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {datoRango.length > 0 && (
+                      <div className="w-full flex flex-col items-center px-4">
+                        <h3 className="text-center text-sm text-neutral-600 mb-1 mt-3">
+                          Glucosa en Rango
+                        </h3>
+                        <div className="flex flex-row w-full justify-center items-center gap-x-10 mt-5">
+                          <div className="flex flex-col">
+                            <p>Bajo</p>
+                            <p className="font-bold">{datoRango[0].bajo}</p>
                           </div>
-                          <div className="flex flex-row justify-center items-center">
-                            <button
-                              type="button"
-                              onClick={() => deleteDatosAdicionales(item.id)}
-                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
-                            >
-                              Eliminar
-                            </button>
+                          <div className="flex flex-col">
+                            <p>Alto:</p>
+                            <p className="font-bold">{datoRango[0].alto}</p>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                  <div className="w-1/3 flex flex-row justify-center ">
-                    {datoRango.map((item) => {
-                      return (
-                        <div className="w-full justify-center">
-                          <h3 className="text-center text-sm text-neutral-600 mb-1 mt-3">
-                            Glucosa en Rango
-                          </h3>
-                          <div className="flex flex-row w-full justify-center items-center gap-x-28 mt-5">
-                            <div className="flex flex-col">
-                              <p>Bajo</p>
-                              <p className="font-bold">{item.bajo}</p>
-                            </div>
-                            <div className="">
-                              <p>Alto:</p>
-                              <p className="font-bold">{item.alto}</p>
-                            </div>
-                          </div>
-                          <div className="flex flex-row justify-center items-center mt-7">
-                            <button
-                              type="button"
-                              onClick={() => deleteRango(item.id)}
-                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center "
-                            >
-                              Eliminar
-                            </button>
-                          </div>
+                        <div className="flex flex-row justify-center items-center mt-7">
+                          <button
+                            type="button"
+                            onClick={() => deleteRango(datoRango[0].id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
+                          >
+                            Eliminar
+                          </button>
                         </div>
-                      );
-                    })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -912,7 +961,7 @@ export default function Profile() {
                               onClick={() =>
                                 setAddTypeInsuline(!showAddTypeInsuline)
                               }
-                              className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                              className="flex items-center mt-4 space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                             >
                               <FaPlus></FaPlus>
                               <span>Agregar Insulina</span>
@@ -931,7 +980,7 @@ export default function Profile() {
                             onClick={() =>
                               setShowAddDataAditional(!showAddDataAditional)
                             }
-                            className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                            className="flex items-center space-x-1 mt-4 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                           >
                             <FaPlus></FaPlus>
                             <span>Agregar rango de glucosa</span>
@@ -1040,6 +1089,7 @@ export default function Profile() {
                               <button
                                 type="submit"
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                disabled={isSubmitting}
                               >
                                 Guardar
                               </button>
@@ -1130,6 +1180,7 @@ export default function Profile() {
                             <div className="flex justify-end mt-4">
                               <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                               >
                                 Guardar
