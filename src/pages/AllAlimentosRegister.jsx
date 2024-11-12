@@ -234,59 +234,62 @@ export default function AllAlimentosRegister() {
       <SideBar />
       <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
         <h2 className="text-2xl font-semibold mb-4">Tus Alimentos</h2>
-        <div className="flex items-center mb-3 px-2 space-x-2">
-          {/* filtrados */}
-          <label className="block text-sm font-medium text-gray-900 dark:text-white">
-            Tipo de alimento:
-          </label>
-          <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            name="filterfoodtype"
-            id="filterfoodtype"
-            value={foodTypeSelect}
-            onChange={changefilter_foodTyple}
-          >
-            <option value="">Seleccione un filtrado</option>
-            {foodTypes.map((type) => (
-              <option
-                key={type.idTipoAlimento}
-                value={type.idTipoAlimento} // Usamos el índice como valor
-              >
-                {type.food}
-              </option>
-            ))}
-          </select>
+        <div className="space-y-1 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-1 mb-3">
+  <div className="flex items-center space-x-1">
+    <label className="text-sm font-medium text-gray-900 dark:text-white">
+      Tipo de alimento:
+    </label>
+    <select
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      name="filterfoodtype"
+      id="filterfoodtype"
+      value={foodTypeSelect}
+      onChange={changefilter_foodTyple}
+    >
+      <option value="">Seleccione un filtrado</option>
+      {foodTypes.map((type) => (
+        <option key={type.idTipoAlimento} value={type.idTipoAlimento}>
+          {type.food}
+        </option>
+      ))}
+    </select>
+  </div>
 
-          <label className="block text-sm font-medium text-gray-900 dark:text-white">
-            Cantidad por porción:
-          </label>
-          <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            name="filterportionAmount"
-            id="filterportionAmount"
-            value={portionAmountSelect}
-            onChange={changefilter_portionAmount}
-          >
-            <option value="">Seleccione un filtrado</option>
-            <option value="asc">Mayor a menor</option>
-            <option value="des">Menor a mayor</option>
-          </select>
+  <div className="flex items-center space-x-1">
+    <label className="text-sm font-medium text-gray-900 dark:text-white">
+      Cantidad por porción:
+    </label>
+    <select
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      name="filterportionAmount"
+      id="filterportionAmount"
+      value={portionAmountSelect}
+      onChange={changefilter_portionAmount}
+    >
+      <option value="">Seleccione un filtrado</option>
+      <option value="asc">Mayor a menor</option>
+      <option value="des">Menor a mayor</option>
+    </select>
+  </div>
 
-          <label className="block text-sm font-medium text-gray-900 dark:text-white">
-            Carbohidratos:
-          </label>
-          <select
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            name="filtercarbohidrates"
-            id="filtercarbohidrates"
-            value={carbohydratesSelect}
-            onChange={changefilter_carbohydrates}
-          >
-            <option value="">Seleccione un filtrado</option>
-            <option value="asc">Mayor a menor</option>
-            <option value="des">Menor a mayor</option>
-          </select>
-        </div>
+  <div className="flex items-center space-x-1">
+    <label className="text-sm font-medium text-gray-900 dark:text-white">
+      Carbohidratos:
+    </label>
+    <select
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      name="filtercarbohidrates"
+      id="filtercarbohidrates"
+      value={carbohydratesSelect}
+      onChange={changefilter_carbohydrates}
+    >
+      <option value="">Seleccione un filtrado</option>
+      <option value="asc">Mayor a menor</option>
+      <option value="des">Menor a mayor</option>
+    </select>
+  </div>
+</div>
+
 
         <div className="w-full h-full">
           {records && records.length === 0 && (
@@ -328,49 +331,50 @@ export default function AllAlimentosRegister() {
           )}
 
           {records && records.length > 0 && (
-            <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md">
-              <table className="w-full h-full text-center">
+            <div className="w-full overflow-x-auto mb-6">
+            <table className="min-w-full table-auto text-center border-collapse">
+              <thead>
                 <tr>
-                  <th className="border-slate-300 border">Comida</th>
-                  <th className="border-slate-300 border">Tipo de alimento</th>
-                  <th className="border-slate-300 border">
-                    Cantidad por porción
-                  </th>
-                  <th className="border-slate-300 border">Carbohidratos</th>
+                  <th className="border border-slate-300 p-2">Comida</th>
+                  <th className="border border-slate-300 p-2">Tipo de alimento</th>
+                  <th className="border border-slate-300 p-2">Cantidad por porción</th>
+                  <th className="border border-slate-300 p-2">Carbohidratos</th>
+                  <th className="border border-slate-300 p-2">Acciones</th>
                 </tr>
+              </thead>
+              <tbody>
                 {records.map((record) => (
-                  <tr>
-                    <td className="border-slate-300 border">{record.food}</td>
-                    <td className="border-slate-300 border">
+                  <tr key={record.idBancoAlimentos}>
+                    <td className="border border-slate-300 p-2">{record.food}</td>
+                    <td className="border border-slate-300 p-2">
                       {record.tipoAlimento.food}
                     </td>
-                    <td className="border-slate-300 border">
+                    <td className="border border-slate-300 p-2">
                       {record.portionamount} {record.unidadesMedida.name}
                     </td>
-                    <td className="border-slate-300 border">
-                      {record.carbohydrates}{" "}
-                    </td>
-                    <td className="">
-                      <button
-                        type="button"
-                        onClick={() => openModal(record)}
-                        className="bg-azulHover p-1 rounded hover:bg-azul"
-                      >
-                        <img src={edit} alt="editar" className="h-5" />
-                      </button>
-                    </td>
-                    <td className="">
-                      <button
-                        type="button"
-                        onClick={() => deletefood(record.idBancoAlimentos)}
-                        className="bg-red-600 p-1 rounded hover:bg-red-800"
-                      >
-                        <img src={delate} alt="borrar" className="h-5" />
-                      </button>
+                    <td className="border border-slate-300 p-2">{record.carbohydrates}</td>
+                    <td className="border border-slate-300 p-2">
+                      <div className="flex flex-col sm:flex-row sm:space-x-2 items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => openModal(record)}
+                          className="bg-azulHover p-2 rounded hover:bg-azul w-full sm:w-auto mb-2 sm:mb-0"
+                        >
+                          <img src={edit} alt="editar" className="h-5 mx-auto" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deletefood(record.idBancoAlimentos)}
+                          className="bg-red-600 p-2 rounded hover:bg-red-800 w-full sm:w-auto"
+                        >
+                          <img src={delate} alt="borrar" className="h-5 mx-auto" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
-              </table>
+              </tbody>
+            </table>
 
               <Modal
                 isOpen={modalIsOpen}

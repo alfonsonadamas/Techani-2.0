@@ -425,128 +425,145 @@ export default function AllFoodsRegister() {
 
     return (
         <div>
-            <SideBar />
-            <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
-                <h2 className="text-2xl font-semibold mb-4">Tus Comidas</h2>
-                <div className="flex items-center mb-3 px-2 space-x-2">
-                    <div>
-                        <span>Dia:</span>
-                        <input
-                            type="date"
-                            onChange={handleDay}
-                            className="mx-3 w-48 text-center border-gray-400 rounded-xl"
-                        />
-                        <button
-                            onClick={filterDay}
-                            className="bg-blue-500 text-white rounded-lg px-3 py-1.5 ml-3"
-                            // disabled={loading}
-                        >
-                            Filtrar
-                        </button>
-                        <button
-                            onClick={filterDay}
-                            className="bg-red-600 text-white rounded-lg px-3 py-1.5 ml-3"
-                        >
-                            Actualizar
-                        </button>
-                        <div className="w-full mt-4">
-                            {meals && meals.length === 0 &&(
-                            <div>
-                                {loading && (
-                                    <div
-                                    role="status"
-                                    class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
-                                >
-                                    <svg
-                                    aria-hidden="true"
-                                    class="w-8 h-8 text-gray-200 animate-spin  fill-blue-600"
-                                    viewBox="0 0 100 101"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                    <path
-                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                        fill="currentColor"
-                                    />
-                                    <path
-                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                        fill="currentFill"
-                                    />
-                                    </svg>
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                                )}
-                                <p
-                                    className={
-                                    loading
-                                        ? "text-lg font-medium text-center text-gray-400 opacity-20"
-                                        : "text-lg font-medium text-center text-gray-400 "
-                                    }
-                                >
-                                    Sin registros
-                                </p>
-                            </div>
-                            )}
+    <SideBar />
+    <div className="mt-8 p-4 sm:p-8 md:p-16 pt-24 sm:ml-64" data-aos="fade-up">
+        <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-center sm:text-left">Tus Comidas</h2>
+        
+        {/* Contenedor de filtros y botones */}
+        <div className="flex flex-col sm:flex-row sm:items-center mb-3 px-2 space-y-4 sm:space-y-0 sm:space-x-4">
+            {/* Sección de fecha */}
+            <div className="flex items-center space-x-2">
+                <span className="text-sm sm:text-base">Día:</span>
+                <input
+                    type="date"
+                    onChange={handleDay}
+                    className="w-full sm:w-48 text-center border-gray-400 rounded-xl"
+                />
+            </div>
 
-                            {meals.length > 0 && meals.map(comida => (
-                                <div className="mb-6" key={comida.tipoComida.idTipocomida}>
-                                    <div className="flex items-center">
-                                        <h3 className="text-xl font-semibold cursor-pointer hover:underline" onClick={() =>handleBotonMealType(comida.tipoComida.idTipocomida)}>{comida.tipoComida.meal} - {comida.hour}</h3>
-                                        {IDmealtype === comida.tipoComida.idTipocomida && (
-                                            <div className="flex" data-aos="fade-left" data-aos-duration="250">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>openModalMealType(comida)}
-                                                    className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
-                                                >
-                                                    <img src={edit} alt="editar" className="h-5" />
-                                                    <p className="px-2">Editar</p>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>deletemeals(comida)}
-                                                    className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
-                                                >
-                                                    <img src={delate} alt="borrar" className="h-5" />
-                                                    <p className="px-2">Borrar</p>
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className='border-solid border-l-2 border-l-black pl-2'>
-                                        <ul>
-                                            {comida.meal.map(alimento => (
-                                                <li key={alimento.idAlimentos} className="flex items-center pb-2">
-                                                    <a className="cursor-pointer hover:underline" onClick={ () => handleBoton(alimento.idAlimentos)}> 
-                                                        {alimento.portion} {alimento.BancoAlimentos.food}
-                                                    </a>
-                                                    {IDmeal === alimento.idAlimentos && (
-                                                        <div className="flex" data-aos="fade-left" data-aos-duration="250">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => openModal(alimento)}
-                                                                className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
-                                                            >
-                                                                <img src={edit} alt="editar" className="h-5" />
-                                                                <p className="px-2">Editar</p>
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => deletemeal(alimento.idAlimentos)}
-                                                                className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
-                                                            >
-                                                                <img src={delate} alt="borrar" className="h-5" />
-                                                                <p className="px-2">Borrar</p>
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ))} 
+            {/* Botones de Filtrar y Actualizar */}
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                <button
+                    onClick={filterDay}
+                    className="bg-blue-500 text-white rounded-lg px-4 py-2 sm:px-3 sm:py-1.5 whitespace-nowrap"
+                >
+                    Filtrar
+                </button>
+                <button
+                    onClick={filterDay}
+                    className="bg-red-600 text-white rounded-lg px-4 py-2 sm:px-3 sm:py-1.5 whitespace-nowrap"
+                >
+                    Actualizar
+                </button>
+            </div>
+        </div>
+
+        {/* Contenedor de registros de comidas */}
+        <div className="w-full mt-4">
+            {meals && meals.length === 0 && (
+                <div>
+                    {loading && (
+                        <div role="status" className="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">
+                            <svg
+                                aria-hidden="true"
+                                className="w-8 h-8 text-gray-200 animate-spin fill-blue-600"
+                                viewBox="0 0 100 101"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                    fill="currentColor"
+                                />
+                                <path
+                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                    fill="currentFill"
+                                />
+                            </svg>
+                            <span className="sr-only">Loading...</span>
                         </div>
+                    )}
+                    <p
+                        className={
+                            loading
+                                ? "text-lg font-medium text-center text-gray-400 opacity-20"
+                                : "text-lg font-medium text-center text-gray-400"
+                        }
+                    >
+                        Sin registros
+                    </p>
+                </div>
+            )}
+
+            {/* Mapeo de registros de comidas */}
+            {meals.length > 0 && meals.map(comida => (
+                <div className="mb-6" key={comida.tipoComida.idTipocomida}>
+                    <div className="flex items-center">
+                        <h3
+                            className="text-xl font-semibold cursor-pointer hover:underline"
+                            onClick={() => handleBotonMealType(comida.tipoComida.idTipocomida)}
+                        >
+                            {comida.tipoComida.meal} - {comida.hour}
+                        </h3>
+                        {IDmealtype === comida.tipoComida.idTipocomida && (
+                            <div className="flex" data-aos="fade-left" data-aos-duration="250">
+                                <button
+                                    type="button"
+                                    onClick={() => openModalMealType(comida)}
+                                    className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
+                                >
+                                    <img src={edit} alt="editar" className="h-5" />
+                                    <p className="px-2">Editar</p>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => deletemeals(comida)}
+                                    className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
+                                >
+                                    <img src={delate} alt="borrar" className="h-5" />
+                                    <p className="px-2">Borrar</p>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                    <div className="border-solid border-l-2 border-l-black pl-2">
+                        <ul>
+                            {comida.meal.map(alimento => (
+                                <li key={alimento.idAlimentos} className="flex items-center pb-2">
+                                    <a
+                                        className="cursor-pointer hover:underline"
+                                        onClick={() => handleBoton(alimento.idAlimentos)}
+                                    >
+                                        {alimento.portion} {alimento.BancoAlimentos.food}
+                                    </a>
+                                    {IDmeal === alimento.idAlimentos && (
+                                        <div className="flex" data-aos="fade-left" data-aos-duration="250">
+                                            <button
+                                                type="button"
+                                                onClick={() => openModal(alimento)}
+                                                className="bg-azulHover mx-4 p-1 rounded hover:bg-azul text-white flex"
+                                            >
+                                                <img src={edit} alt="editar" className="h-5" />
+                                                <p className="px-2">Editar</p>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => deletemeal(alimento.idAlimentos)}
+                                                className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
+                                            >
+                                                <img src={delate} alt="borrar" className="h-5" />
+                                                <p className="px-2">Borrar</p>
+                                            </button>
+                                        </div>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
                         <Modal
                             isOpen={modalMealTypeIsOpen}
                             onClose={closeModalMealType}
@@ -742,8 +759,6 @@ export default function AllFoodsRegister() {
                             )}
                         </Modal>
                     </div>
-                </div>
-            </div>
-        </div>
+                
     );
 }

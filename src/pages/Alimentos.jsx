@@ -259,62 +259,76 @@ export default function Alimentos() {
                 </div>
               </div>
               <div>
-                <button
-                type="button" 
-                className="bg-blue-700 text-white py-2 px-4 rounded-t-lg hover:bg-blue-800 w-full"
-                onClick={() => openModal()}
-                >
-                  Agregar alimento
-                </button>
-              </div>
-              <div className="w-full h-full">
-                {alimentsSelect && alimentsSelect.length === 0 && (
-                  <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-b-lg shadow-md ">
-                    <p className="text-lg font-medium text-center text-gray-400 ">
-                      Sin alimentos seleccionados
-                    </p>
-                  </div>
-                )}
-                
-                {alimentsSelect && alimentsSelect.length > 0 && (
-                  <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-b-lg shadow-md">
-                    <table className='w-full h-full text-center'>
-                      <tr>
-                        <th className="border-slate-300 border">Porción</th>
-                        <th className="border-slate-300 border">Alimento</th>
-                        <th className="border-slate-300 border">Cantidad</th>
-                        <th className="border-slate-300 border">Carbohidratos por porcion</th>
-                        <th className="border-slate-300 border">Carbohidratos totales</th>
-                      </tr>
-                      {alimentsSelect.map((aliments,index) => (
-                        <tr key={index}>
-                          <td className="border-slate-300 border">
-                            <input
-                              type="number"
-                              name="portion"
-                              id="portion"
-                              defaultValue={1}
-                              min={1} max={100}
-                              onChange={(e) => handleCheckboxPortion(e, index)}
-                              className="p-0 py-1 pl-2 text-center w-full border-transparent"
-                            />
-                          </td>
-                          <td className="border-slate-300 border">{aliments.name}</td>
-                          <td className="border-slate-300 border">{aliments.amount} {aliments.unitMeasurement}</td>
-                          <td className="border-slate-300 border">{aliments.carbohydrates}</td>
-                          <td className="border-slate-300 border">{aliments.carbohydratesall}</td>
-                        </tr>
-                      ))}
-                    </table>
-                    <div className='flex justify-end mt-4'>
-                      <p><span className="font-bold">Carbohidratos totales: </span>{carbohydratetotal}</p>
-                    </div>
-                  </div>
-                )}
-                {alimentsSelect.length === 0 && (
-                  <p className="text-red-500 mt-2">Debe haber al menos un alimento seleccionado</p>
-                )}
-              </div>
+  <button
+    type="button" 
+    className="bg-blue-700 text-white py-2 px-4 rounded-t-lg hover:bg-blue-800 w-full sm:w-full"
+    onClick={() => openModal()}
+  >
+    Agregar alimento
+  </button>
+</div>
+
+<div className="w-full h-full">
+  {alimentsSelect && alimentsSelect.length === 0 && (
+    <div className="relative items-center block p-4 bg-white border border-gray-100 rounded-b-lg shadow-md w-full sm:w-full">
+      <p className="text-md font-medium text-center text-gray-400 sm:text-lg">
+        Sin alimentos seleccionados
+      </p>
+    </div>
+  )}
+  
+  {alimentsSelect && alimentsSelect.length > 0 && (
+    <div className="relative items-center block p-4 bg-white border border-gray-100 rounded-b-lg shadow-md w-full sm:w-full">
+      <div className="overflow-x-auto">
+        {/* Contenedor con desplazamiento vertical y altura máxima */}
+        <div className="max-h-64 overflow-y-auto">
+          <table className="w-full text-center text-xs sm:text-sm">
+            <thead>
+              <tr>
+                <th className="border-slate-300 border px-1 sm:px-2">Porción</th>
+                <th className="border-slate-300 border px-1 sm:px-2">Alimento</th>
+                <th className="border-slate-300 border px-1 sm:px-2">Cantidad</th>
+                <th className="border-slate-300 border px-1 sm:px-2">Carbohidratos por porción</th>
+                <th className="border-slate-300 border px-1 sm:px-2">Carbohidratos totales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {alimentsSelect.map((aliments, index) => (
+                <tr key={index}>
+                  <td className="border-slate-300 border p-1 sm:p-2">
+                    <input
+                      type="number"
+                      name="portion"
+                      id="portion"
+                      defaultValue={1}
+                      min={1} max={100}
+                      onChange={(e) => handleCheckboxPortion(e, index)}
+                      className="w-full p-1 text-center border-transparent text-xs sm:text-sm"
+                    />
+                  </td>
+                  <td className="border-slate-300 border p-1 sm:p-2">{aliments.name}</td>
+                  <td className="border-slate-300 border p-1 sm:p-2">{aliments.amount} {aliments.unitMeasurement}</td>
+                  <td className="border-slate-300 border p-1 sm:p-2">{aliments.carbohydrates}</td>
+                  <td className="border-slate-300 border p-1 sm:p-2">{aliments.carbohydratesall}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="flex justify-end mt-4">
+        <p className="text-xs sm:text-base">
+          <span className="font-bold">Carbohidratos totales: </span>{carbohydratetotal}
+        </p>
+      </div>
+    </div>
+  )}
+  
+  {alimentsSelect.length === 0 && (
+    <p className="text-red-500 mt-2 text-xs sm:text-sm">Debe haber al menos un alimento seleccionado</p>
+  )}
+</div>
+
 
               <Modal isOpen={modalIsOpen} onClose={closeModal} title="Seleccione un alimento" width="max-w-md">
                 <div className="mb-4">

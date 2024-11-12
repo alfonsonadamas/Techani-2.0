@@ -16,9 +16,8 @@ function MyDates() {
 
   const formattedDate = () => {
     const dateObj = new Date();
-    return `${dateObj.getFullYear()}-${
-      dateObj.getMonth() + 1
-    }-${dateObj.getDate()}`;
+    return `${dateObj.getFullYear()}-${dateObj.getMonth() + 1
+      }-${dateObj.getDate()}`;
   };
 
   async function obtenerCitas() {
@@ -133,177 +132,178 @@ function MyDates() {
   return (
     <div>
       <SideBar />
-      <div className="p-16 pt-20 sm:ml-64 h-screen" data-aos="fade-up">
-        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+      <div className="p-4 sm:ml-64 h-screen" data-aos="fade-up">
+        <h2 className="block mt-20 mb-4 text-2xl font-medium text-gray-900 dark:text-white">
           Próximas citas
         </h2>
-
-        <div className="flex overflow-x-auto">
+        {/* Contenedor con barra de desplazamiento horizontal */}
+        <div className="overflow-x-auto flex flex-nowrap space-x-4">
           {setNextDates().length === 0 ? (
             <div className="flex justify-center items-center w-full h-36">
               <h3 className="text-gray-400 text-2xl">No hay citas próximas</h3>
             </div>
           ) : (
-            <div className="flex">
+            <div className="flex flex-nowrap space-x-4">
               {setNextDates().map((cita) => (
-                <div className="mx-5 mb-5">
-                  <h3 className="font-semibold w-52">{cita.typecites}</h3>
+                <div className="inline-block flex-shrink-0 w-72 mx-2 mb-4 p-4 bg-white shadow-md rounded-md">
+                  <h3 className="font-semibold text-lg sm:text-xl">{cita.typecites}</h3>
                   <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
-                    <div className="flex ">
+                    <div className="flex justify-between">
                       <div className="mr-7">
-                        <p className="text-xs font-semibold">Fecha</p>
+                        <p className="text-xs sm:text-sm font-semibold">Fecha</p>
                         <p>{cita.date}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold">Hora</p>
+                        <p className="text-xs sm:text-sm font-semibold">Hora</p>
                         <p>{cita.time}</p>
                       </div>
                     </div>
                     <div className="mt-3">
-                      <p className="text-xs font-semibold">Lugar</p>
+                      <p className="text-xs sm:text-sm font-semibold">Lugar</p>
                       <p className="w-36">{cita.place}</p>
                     </div>
                     <div className="mt-3">
-                      <p className="text-xs font-semibold">Nombre del Doctor</p>
+                      <p className="text-xs sm:text-sm font-semibold">Nombre del Doctor</p>
                       <p>{cita.doctorName}</p>
                     </div>
                   </div>
-                  <div className="w-full mt-5">
+                  <div className="w-full mt-5 flex flex-col sm:flex-row">
                     <button
                       onClick={() => updateDate(cita.idCita)}
-                      className="bg-[#116C09] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#319927] transition-all duration-300"
+                      className="bg-[#116C09] px-3 py-1 mb-2 sm:mb-0 sm:mr-4 text-white rounded-lg text-sm hover:bg-[#319927] transition-all duration-300"
                     >
                       Completado
                     </button>
-                    <buttton
+                    <button
                       onClick={() => handleAbrirModalEdicion(cita)}
-                      className="bg-[#277BC0] px-3 py-1 mx-5 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
+                      className="bg-[#277BC0] px-3 py-1 mb-2 sm:mb-0 sm:mr-4 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
                     >
                       Editar
-                    </buttton>
-                    <buttton
+                    </button>
+                    <button
                       onClick={() => handleEliminarCita(cita.idCita)}
                       className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
                     >
                       Eliminar
-                    </buttton>
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-        <h2 className=" block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
+        </div>        <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
           Asistido
         </h2>
-        <div className="flex flex-col overflow-x-auto">
+        {/* Contenedor con barra de desplazamiento horizontal para la sección de Asistidos */}
+        <div className="overflow-x-auto flex flex-nowrap space-x-4">
           {setAssitedDates().length === 0 ? (
             <div className="flex justify-center items-center w-full h-36">
               <h3 className="text-gray-400 text-2xl">No hay citas asistidas</h3>
             </div>
           ) : (
-            <div className="flex">
+            <div className="flex flex-nowrap space-x-4">
               {setAssitedDates().map((cita) => (
-                <div className="mx-5 mb-5">
-                  <h3 className="font-semibold w-52">{cita.typecites}</h3>
+                <div className="inline-block flex-shrink-0 w-72 mx-2 mb-4 p-4 bg-white shadow-md rounded-md">
+                  <h3 className="font-semibold text-lg sm:text-xl">{cita.typecites}</h3>
                   <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
-                    <div className="flex ">
+                    <div className="flex justify-between">
                       <div className="mr-7">
-                        <p className="text-xs font-semibold">Fecha</p>
+                        <p className="text-xs sm:text-sm font-semibold">Fecha</p>
                         <p>{cita.date}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold">Hora</p>
+                        <p className="text-xs sm:text-sm font-semibold">Hora</p>
                         <p>{cita.time}</p>
                       </div>
                     </div>
                     <div className="mt-3">
-                      <p className="text-xs font-semibold">Lugar</p>
+                      <p className="text-xs sm:text-sm font-semibold">Lugar</p>
                       <p className="w-36">{cita.place}</p>
                     </div>
                     <div className="mt-3">
-                      <p className="text-xs font-semibold">Nombre del Doctor</p>
+                      <p className="text-xs sm:text-sm font-semibold">Nombre del Doctor</p>
                       <p>{cita.doctorName}</p>
                     </div>
                   </div>
-                  <div className="w-full mt-5">
-                    <buttton
+                  <div className="w-full mt-5 flex flex-col sm:flex-row">
+                    <button
                       onClick={() => handleAbrirModalEdicion(cita)}
-                      className="bg-[#277BC0] px-3 py-1 mx-5 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
+                      className="bg-[#277BC0] px-3 py-1 mb-2 sm:mb-0 sm:mr-4 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
                     >
                       Editar
-                    </buttton>
-                    <buttton
+                    </button>
+                    <button
                       onClick={() => handleEliminarCita(cita.idCita)}
                       className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
                     >
                       Eliminar
-                    </buttton>
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
         <h2 className="block mb-2 text-2xl font-medium text-gray-900 dark:text-white">
           No asistido
         </h2>
-        {setPastDates().length === 0 ? (
-          <div className="flex justify-center items-center w-full h-36">
-            <h3 className="text-gray-400 text-2xl">
-              No hay citas no asistidas
-            </h3>
-          </div>
-        ) : (
-          <div className="flex overflow-x-auto">
-            {setPastDates().map((cita) => (
-              <div className="mx-5 mb-5">
-                <h3 className="font-semibold w-52">{cita.typecites}</h3>
-                <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
-                  <div className="flex ">
-                    <div className="mr-7">
-                      <p className="text-xs font-semibold">Fecha</p>
-                      <p>{cita.date}</p>
+
+        {/* Contenedor con barra de desplazamiento horizontal para la sección de No asistidos */}
+        <div className="overflow-x-auto flex flex-nowrap space-x-4">
+          {setPastDates().length === 0 ? (
+            <div className="flex justify-center items-center w-full h-36">
+              <h3 className="text-gray-400 text-2xl">No hay citas no asistidas</h3>
+            </div>
+          ) : (
+            <div className="flex flex-nowrap space-x-4">
+              {setPastDates().map((cita) => (
+                <div key={cita.idCita} className="inline-block flex-shrink-0 w-72 mx-2 mb-4 p-4 bg-white shadow-md rounded-md">
+                  <h3 className="font-semibold text-lg sm:text-xl">{cita.typecites}</h3>
+                  <div className="pl-3 ml-2 mt-2 w-full border-l-2 border-l-black">
+                    <div className="flex justify-between">
+                      <div className="mr-7">
+                        <p className="text-xs sm:text-sm font-semibold">Fecha</p>
+                        <p>{cita.date}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-semibold">Hora</p>
+                        <p>{cita.time}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold">Hora</p>
-                      <p>{cita.time}</p>
+                    <div className="mt-3">
+                      <p className="text-xs sm:text-sm font-semibold">Lugar</p>
+                      <p className="w-36">{cita.place}</p>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-xs sm:text-sm font-semibold">Nombre del Doctor</p>
+                      <p>{cita.doctorName}</p>
                     </div>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold">Lugar</p>
-                    <p className="w-36">{cita.place}</p>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold">Nombre del Doctor</p>
-                    <p>{cita.doctorName}</p>
+                  <div className="w-full mt-5 flex flex-col sm:flex-row">
+                    <button
+                      onClick={() => updateDate(cita.idCita)}
+                      className="bg-[#116C09] px-3 py-1 mb-2 sm:mb-0 sm:mr-4 text-white rounded-lg text-sm hover:bg-[#319927] transition-all duration-300"
+                    >
+                      Completado
+                    </button>
+                    <button
+                      onClick={() => handleAbrirModalEdicion(cita)}
+                      className="bg-[#277BC0] px-3 py-1 mb-2 sm:mb-0 sm:mr-4 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleEliminarCita(cita.idCita)}
+                      className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
-                <div className="w-full mt-5">
-                  <button
-                    onClick={() => updateDate(cita.idCita)}
-                    className="bg-[#116C09] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#319927] transition-all duration-300"
-                  >
-                    Completado
-                  </button>
-                  <buttton
-                    onClick={() => handleAbrirModalEdicion(cita)}
-                    className="bg-[#277BC0] px-3 py-1 mx-5 text-white rounded-lg text-sm hover:bg-[#21669f] hover:cursor-pointer transition-all duration-300"
-                  >
-                    Editar
-                  </buttton>
-                  <buttton
-                    onClick={() => handleEliminarCita(cita.idCita)}
-                    className="bg-[#AB1A1A] px-3 py-1 text-white rounded-lg text-sm hover:bg-[#d72020] hover:cursor-pointer transition-all duration-300"
-                  >
-                    Eliminar
-                  </buttton>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <Modal open={modalIsOpen} onClose={() => setModalIsOpen(!modalIsOpen)}>
         {editingCita && (
