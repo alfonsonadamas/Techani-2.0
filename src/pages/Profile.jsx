@@ -102,7 +102,16 @@ export default function Profile() {
     }, 5000);
 
     if (datosInsulina.length > 0) {
-      nomIns(datosInsulina[0].marcaInsulina);
+      const idNInsulina =
+        typeof datosInsulina[0].marcaInsulina === "object"
+          ? datosInsulina[0].marcaInsulina.id // Ajusta esto según la estructura de datos
+          : datosInsulina[0].marcaInsulina;
+
+      // Solo llama a la función si `idNInsulina` es un número
+      if (typeof idNInsulina === "number") {
+        nomIns(idNInsulina);
+      } else {
+      }
     }
   }, [user, profile]);
 
@@ -316,7 +325,6 @@ export default function Profile() {
         .eq("uid", user.id);
       if (error) throw error;
       setDatosInsulina(data);
-      console.log(datosInsulina);
     } catch (error) {
       console.log(error);
     }
@@ -336,15 +344,27 @@ export default function Profile() {
   };
 
   const nomIns = async (idNInsulina) => {
+    idNInsulina = Number(idNInsulina); // Convierte a número si es un string
+    if (isNaN(idNInsulina)) {
+      console.log("idNInsulina no es un número válido.");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("marcaInsulina")
         .select("nombreInsulina")
         .eq("id", idNInsulina);
+
       if (error) throw error;
-      setNombreInsulina(data[0].nombreInsulina);
+
+      if (data && data.length > 0) {
+        setNombreInsulina(data[0].nombreInsulina);
+      } else {
+        console.log("No se encontró la insulina con el ID especificado.");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error en la consulta:", error.message);
     }
   };
 
