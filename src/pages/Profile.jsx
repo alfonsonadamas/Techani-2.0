@@ -1424,6 +1424,7 @@ export default function Profile() {
                   values,
                   errors,
                   touched,
+                  isSubmitting
                 }) => (
                   <form onSubmit={handleSubmit}>
                     <div className="flex flex-wrap">
@@ -1512,6 +1513,7 @@ export default function Profile() {
                       <div className="flex justify-end w-full">
                         <button
                           type="submit"
+                          disabled= {isSubmitting}
                           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
                           Guardar

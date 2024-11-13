@@ -22,6 +22,10 @@ export default function Alimentos() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [sendForm, setSendForm] = useState(false);
 
+  const [former, setFormer] = useState(0);
+  const [next, setNext] = useState(5);
+  const [Recordsength, setRecordslength] = useState();
+
   const openModal = () => {
     setModalIsOpen(true);
   };
@@ -79,6 +83,31 @@ export default function Alimentos() {
     } else {
       setRecords(originalRecords);
     }
+    lenghtRecords()
+    setFormer(0);
+    setNext(5);
+  };
+
+  const lenghtRecords = () =>{
+    if(records.length % 5 === 0){
+      setRecordslength(records.length);
+    }else{
+      setRecordslength(records.length + (5 -(records.length % 5)))
+    }
+  };
+
+  const filterRecords_Former = () => {
+    const before = former;
+    const after = next;
+    setFormer(before - 5);
+    setNext(after - 5);
+  };
+
+  const filterRecords_Next = () => {
+    const before = former;
+    const after = next;
+    setFormer(before + 5);
+    setNext(after + 5);
   };
 
   const fetchTipoAlimento = async () => {
@@ -110,6 +139,7 @@ export default function Alimentos() {
 
       setRecords(data);
       setOriginalRecords(data);
+      lenghtRecords();
     } catch (error) {
       console.log(error);
     } finally {
@@ -157,6 +187,7 @@ export default function Alimentos() {
       setAlimentsSelect([]);
       //setSendForm(true);
       toast.success("Registro exitoso");
+      setCarbohydratesTotal(0);
     } catch (error) {
       console.error("Error al agregar los alimentos:", error.message);
       setErrors({ submit: error.message });
@@ -178,11 +209,15 @@ export default function Alimentos() {
   });
 
   useEffect(() => {
-    getFilterfoodTyple();
+    // getFilterfoodTyple();
     fetchTipoAlimento();
     getMealTypes();
     getRecords();
-  }, [user, alimentsSelect, carbohydratetotal]);
+  }, [user]);
+
+  useEffect(() => {
+    lenghtRecords();
+  }, [records]);
 
   return (
     <div>
@@ -377,7 +412,7 @@ export default function Alimentos() {
                         className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         name="filterfoodtype"
                         id="filterfoodtype"
-                        value={foodTypeSelect}
+                        defaultValue={foodTypeSelect}
                         onChange={changefilter_foodTyple}
                       >
                         <option value="">Seleccione un filtrado</option>
@@ -444,7 +479,7 @@ export default function Alimentos() {
                               </th>
                               <th className="border-slate-300 border">Carb</th>
                             </tr>
-                            {records.map((record) => (
+                            {records.slice(former,next).map((record) => (
                               <tr>
                                 <td className="pr-4">
                                   <input
@@ -473,6 +508,28 @@ export default function Alimentos() {
                               </tr>
                             ))}
                           </table>
+                          {/* filtro */}
+                          <div className="flex justify-center space-x-3 mt-3">
+                            {former - 5 >= 0 && (
+                              <button
+                                onClick={filterRecords_Former}
+                                className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+                              >
+                                Anterior
+                              </button>
+                            )}
+                            {next + 5 <= Recordsength && (
+                              <button
+                                onClick={filterRecords_Next}
+                                className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+                              >
+                                Siguiente
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-center text-gray-500 text-xs mt-1">
+                            {former} - {next} / {records.length}
+                          </p>
                         </div>
                       )}
                     </div>
