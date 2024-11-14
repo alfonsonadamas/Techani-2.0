@@ -7,13 +7,13 @@ import SideBar from "../components/SideBar";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import emailjs from "@emailjs/browser";
+import { Link } from "react-router-dom";
 
 export default function GlucoseRegister() {
   const { user } = useUserContext();
   const [meditionType, setMeditionType] = useState([]);
-  const [submited, setSubmited] = useState(false);
   const [records, setRecords] = useState([{}]);
-  const [glucoseRange, setGlucoseRange] = useState({});
+  const [glucoseRange, setGlucoseRange] = useState([]);
   const [families, setFamilies] = useState([]);
 
   const getGlucoseRange = async () => {
@@ -24,7 +24,7 @@ export default function GlucoseRegister() {
         .eq("uid", user.id);
       if (error) throw error;
       console.log(data);
-      setGlucoseRange(data[0]);
+      setGlucoseRange(data);
       console.log(glucoseRange);
     } catch (error) {
       console.log(error);
@@ -166,7 +166,7 @@ export default function GlucoseRegister() {
         <ToastContainer />
         <div className="w-full h-60 flex justify-center items-center">
           <div className=" w-full mt-20">
-            {!submited ? (
+            {families.length > 0 && glucoseRange.length > 0 ? (
               <Formik
                 initialValues={{
                   glucose: "",
@@ -266,15 +266,17 @@ export default function GlucoseRegister() {
             ) : (
               <div className="w-full h-60 flex justify-center items-center">
                 <div className="w-full">
-                  <p className="mb-4 text-sm text-gray-900 dark:text-white w-full">
-                    ¡Gracias por registrar tus niveles de glucosa!{" "}
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    ¡Lo sentimos!
+                  </h1>
+                  <p className="text-base mt-5 mb-5 text-gray-900 dark:text-white">
+                    Para poder registrar tu glucosa, es necesario que completes
+                    tu perfil con la información de tu rango de glucosa y al
+                    menos un familiar de soporte.
                   </p>
-                  <button
-                    onClick={() => setSubmited(false)}
-                    className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul  px-7 py-1 rounded-lg text-white"
-                  >
-                    Registrar otro
-                  </button>
+                  <Link to={"/profile"} className="text-blue-500 underline">
+                    Registralo haciendo click aquí
+                  </Link>
                 </div>
               </div>
             )}
