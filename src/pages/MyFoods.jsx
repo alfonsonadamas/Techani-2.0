@@ -125,62 +125,163 @@ export default function Myfoods() {
             getAliments();
             const formattedHour = hour.padEnd(8, ":00");
             console.log(formattedHour);
+
+            const date = new Date(created_at);
+            // Forzar la hora a 00:00:00 en UTC
+            date.setUTCHours(0, 0, 0, 0);
+
+            // Construir el formato manualmente
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+            const day = String(date.getUTCDate()).padStart(2, "0");
+            const hours = String(date.getUTCHours()).padStart(2, "0");
+            const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+            const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+
+            const formattedCreatedAt = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+00:00`;
+            console.log(formattedCreatedAt); // Ejemplo: 2024-11-12T00:00:00+00:00
             const listMeals = aliments.filter((aliment) =>
-                aliment.created_at === created_at &&
-                aliment.tipoComida.idTipocomida === idTipoComida &&
-                aliment.BancoAlimentos.idBancoAlimentos === datameal[0].id &&
-                aliment.hour === hour
+                aliment.created_at === formattedCreatedAt &&
+                aliment.tipoComida.idTipocomida == idTipoComida &&
+                aliment.BancoAlimentos.idBancoAlimentos === datameal[0].id
             );
+            const listMeals_for_MealsType = aliments.filter((aliment) =>
+                aliment.created_at === formattedCreatedAt &&
+                aliment.tipoComida.idTipocomida == idTipoComida
+            );
+            const listMeals_for_Date = aliments.filter((aliment) =>
+                aliment.created_at === formattedCreatedAt
+            );
+            console.log("Aliments",aliments);
             console.log("Datos orginales:",editMeals);
             console.log("Datos destino",listMeals);
             console.log(editMeals.idAlimentos);
+            console.log(idTipoComida)
+            console.log(formattedCreatedAt)
+            console.log("Listmeals_for_Mealstype",listMeals_for_MealsType);
             console.log("Food:",food,"idTipoComida:",idTipoComida,"Portion:",portion,"Created_at",created_at,"Hour",hour);
 
             console.log(formattedHour,editMeals.hour);
 
-            if(editMeals.created_at === created_at){
+            if(editMeals.created_at === formattedCreatedAt){
                 console.log("Fecha igual");
                 if(idTipoComida == idActive){
                     console.log("Tipo de comida igual");
                     if(formattedHour === editMeals.hour){
                         console.log("Hora igual");
+                        if(listMeals.length > 0){
+                            console.log("Alimento Existente")
+                            if(editMeals.idAlimentos === listMeals[0].idAlimentos){
+                                console.log("Comida igual");
+                                console.log("NO SE HACE NADA");
+                            }else{
+                                console.log("Comidas diferentes");
+                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
+                            }
+                        }else{
+                            console.log("Alimento no existente");
+                            console.log("SE AÑADE LA COMIDA");
+                        }
                     }else{
                         console.log("Horas diferentes");
-                        if(datameal[0].id === editMeals.idBancoAlimentos){
-                            console.log("Comida igual");
+                        if(listMeals.length > 0){
+                            console.log("Alimento Existente")
+                            if(editMeals.idAlimentos === listMeals[0].idAlimentos){
+                                console.log("Comida igual");
+                                console.log("SE CAMBIA LA HORA DEL ALIMENTO ORIGEN Y LA DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                            }else{
+                                console.log("Comidas diferentes");
+                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                            }
                         }else{
-                            console.log("Comidas diferentes");
+                            console.log("Alimento no existente");
+                            console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
                         }
                     }
                 }else{
                     console.log("Tipo de comida diferentes");
+                    if(listMeals_for_MealsType.length > 0){ //Se revisa si existe alimentos en ese tipo de comida
+                        if(formattedHour === editMeals.hour){
+                            console.log("Hora igual");
+                            if(listMeals.length > 0){//¿El alimento existe?
+                                console.log("Alimento Existente")
+                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
+                            }else{
+                                console.log("Alimento no existente");
+                                console.log("SE AÑADE LA COMIDA");
+                            }
+                        }else{
+                            console.log("Horas diferentes");
+                            if(listMeals.length > 0){//¿El alimento existe?
+                                console.log("Alimento Existente")
+                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                            }else{
+                                console.log("Alimento no existente");
+                                console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                            }
+                        }
+                    }else{
+                        console.log("No existen alimentos en ese tipo de comida");
+                        console.log("SE AÑADE LA COMIDA");
+                    }
                 }
             }else{
                 console.log("Fecha diferente");
-                
+                if(listMeals_for_Date.length > 0){//Se revisa si existen alimentos en esa fecha
+                    if(idTipoComida == idActive){
+                        console.log("Tipo de comida igual");
+                        if(formattedHour === editMeals.hour){
+                            console.log("Hora igual");
+                            if(listMeals.length > 0){
+                                console.log("Alimento Existente")
+                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
+                            }else{
+                                console.log("Alimento no existente");
+                                console.log("SE AÑADE LA COMIDA");
+                            }
+                        }else{
+                            console.log("Horas diferentes");
+                            if(listMeals.length > 0){
+                                console.log("Alimento Existente")
+                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+
+                            }else{
+                                console.log("Alimento no existente");
+                                console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                            }
+                        }
+                    }else{
+                        console.log("Tipo de comida diferentes");
+                        if(listMeals_for_MealsType.length > 0){ //Se revisa si existe alimentos en ese tipo de comida
+                            if(formattedHour === editMeals.hour){
+                                console.log("Hora igual");
+                                if(listMeals.length > 0){//¿El alimento existe?
+                                    console.log("Alimento Existente")
+                                    console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
+                                }else{
+                                    console.log("Alimento no existente");
+                                    console.log("SE AÑADE LA COMIDA");
+                                }
+                            }else{
+                                console.log("Horas diferentes");
+                                if(listMeals.length > 0){//¿El alimento existe?
+                                    console.log("Alimento Existente")
+                                    console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                                }else{
+                                    console.log("Alimento no existente");
+                                    console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                                }
+                            }
+                        }else{
+                            console.log("No existen alimentos en ese tipo de comida");
+                            console.log("SE AÑADE LA COMIDA");
+                        }
+                    }
+                }else{
+                    console.log("No existen alimentos en esa fecha");
+                    console.log("SE AÑADE LA COMIDA");
+                }
             }
-            // if (listMeals.length > 0) {
-            //     console.log("Alimento encontrado");
-    
-            //     // Verificar si es el mismo `idAlimentos`
-            //     if (editMeals.idAlimentos === listMeals[0].idAlimentos) {
-            //         console.log("IdAlimentos iguales. No se hace nada.");
-            //     } else {
-            //         console.log("IdAlimentos diferentes. Sumando porciones.");
-            //         // Sumar las porciones del alimento original y el destino
-            //     }
-            // } else {
-            //     console.log("Alimento no encontrado. Añadiendo o cambiando tipo/fecha."); 
-            //     // Cambiar la hora de todos los alimentos del mismo tipo de comida si es diferente
-            //     if (editMeals.hour !== formattedHour) {
-            //         console.log("Actualizando horas de todos los alimentos del tipo de comida.");
-            //     }
-    
-            //     // Cambiar la fecha de todos los alimentos si es diferente
-            //     if (editMeals.created_at !== created_at) {
-            //         console.log("Actualizando fechas de todos los alimentos.");
-            //     }
-            // }
         } catch (error) {
             console.log(error);
         }
