@@ -134,31 +134,53 @@ export default function Myfoods() {
             console.log("Datos orginales:",editMeals);
             console.log("Datos destino",listMeals);
             console.log(editMeals.idAlimentos);
+            console.log("Food:",food,"idTipoComida:",idTipoComida,"Portion:",portion,"Created_at",created_at,"Hour",hour);
 
-            console.log({idTipoComida})
+            console.log(formattedHour,editMeals.hour);
 
-            if (listMeals.length > 0) {
-                console.log("Alimento encontrado");
-    
-                // Verificar si es el mismo `idAlimentos`
-                if (editMeals.idAlimentos === listMeals[0].idAlimentos) {
-                    console.log("IdAlimentos iguales. No se hace nada.");
-                } else {
-                    console.log("IdAlimentos diferentes. Sumando porciones.");
-                    // Sumar las porciones del alimento original y el destino
+            if(editMeals.created_at === created_at){
+                console.log("Fecha igual");
+                if(idTipoComida == idActive){
+                    console.log("Tipo de comida igual");
+                    if(formattedHour === editMeals.hour){
+                        console.log("Hora igual");
+                    }else{
+                        console.log("Horas diferentes");
+                        if(datameal[0].id === editMeals.idBancoAlimentos){
+                            console.log("Comida igual");
+                        }else{
+                            console.log("Comidas diferentes");
+                        }
+                    }
+                }else{
+                    console.log("Tipo de comida diferentes");
                 }
-            } else {
-                console.log("Alimento no encontrado. Añadiendo o cambiando tipo/fecha."); 
-                // Cambiar la hora de todos los alimentos del mismo tipo de comida si es diferente
-                if (editMeals.hour !== formattedHour) {
-                    console.log("Actualizando horas de todos los alimentos del tipo de comida.");
-                }
-    
-                // Cambiar la fecha de todos los alimentos si es diferente
-                if (editMeals.created_at !== created_at) {
-                    console.log("Actualizando fechas de todos los alimentos.");
-                }
+            }else{
+                console.log("Fecha diferente");
+                
             }
+            // if (listMeals.length > 0) {
+            //     console.log("Alimento encontrado");
+    
+            //     // Verificar si es el mismo `idAlimentos`
+            //     if (editMeals.idAlimentos === listMeals[0].idAlimentos) {
+            //         console.log("IdAlimentos iguales. No se hace nada.");
+            //     } else {
+            //         console.log("IdAlimentos diferentes. Sumando porciones.");
+            //         // Sumar las porciones del alimento original y el destino
+            //     }
+            // } else {
+            //     console.log("Alimento no encontrado. Añadiendo o cambiando tipo/fecha."); 
+            //     // Cambiar la hora de todos los alimentos del mismo tipo de comida si es diferente
+            //     if (editMeals.hour !== formattedHour) {
+            //         console.log("Actualizando horas de todos los alimentos del tipo de comida.");
+            //     }
+    
+            //     // Cambiar la fecha de todos los alimentos si es diferente
+            //     if (editMeals.created_at !== created_at) {
+            //         console.log("Actualizando fechas de todos los alimentos.");
+            //     }
+            // }
         } catch (error) {
             console.log(error);
         }
