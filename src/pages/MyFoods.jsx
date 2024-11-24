@@ -117,40 +117,52 @@ export default function Myfoods() {
         }
     };
 
-    const updatemeal = async (
-        {food,idTipoComida,portion,created_at,hour},
-        { setSubmitting, setErrors, resetForm }
-    ) =>{
+    const deletemeal = async (id,bool) => {
         try {
+            setLoading(true);
+            await supabase
+                .from("alimentos")
+                .delete()
+                .eq("uid",user.id)
+                .eq("idAlimentos",id);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+            if (bool) toast.success("Alimento Eliminado");
+        }
+    }
+
+    const updatemeal = async (
+        { food, idTipoComida, portion, created_at, hour },
+        { setSubmitting, setErrors, resetForm }
+    ) => {
+        try {
+            console.log("Iniciando actualización de alimento...");
             getAliments();
+            console.log(editMeals);
+    
             const formattedHour = hour.padEnd(8, ":00");
-            console.log(formattedHour);
-
-            const date = new Date(created_at);
-            // Forzar la hora a 00:00:00 en UTC
-            date.setUTCHours(0, 0, 0, 0);
-
-            // Construir el formato manualmente
-            const year = date.getUTCFullYear();
-            const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-            const day = String(date.getUTCDate()).padStart(2, "0");
-            const hours = String(date.getUTCHours()).padStart(2, "0");
-            const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-            const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-
-            const formattedCreatedAt = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+00:00`;
-            console.log(formattedCreatedAt); // Ejemplo: 2024-11-12T00:00:00+00:00
-            const listMeals = aliments.filter((aliment) =>
-                aliment.created_at === formattedCreatedAt &&
-                aliment.tipoComida.idTipocomida == idTipoComida &&
-                aliment.BancoAlimentos.idBancoAlimentos === datameal[0].id
+            const formattedCreatedAt = new Date(created_at).toISOString().split("T")[0] + "T00:00:00+00:00";
+    
+            console.log("Hora formateada:", formattedHour);
+            console.log("Fecha formateada:", formattedCreatedAt);
+    
+            const listMeals = aliments.filter(
+                (aliment) =>
+                    aliment.created_at === formattedCreatedAt &&
+                    aliment.tipoComida.idTipocomida == idTipoComida &&
+                    aliment.BancoAlimentos.idBancoAlimentos === datameal[0].id
             );
-            const listMeals_for_MealsType = aliments.filter((aliment) =>
-                aliment.created_at === formattedCreatedAt &&
-                aliment.tipoComida.idTipocomida == idTipoComida
+    
+            const listMealsForMealType = aliments.filter(
+                (aliment) =>
+                    aliment.created_at === formattedCreatedAt &&
+                    aliment.tipoComida.idTipocomida == idTipoComida
             );
-            const listMeals_for_Date = aliments.filter((aliment) =>
-                aliment.created_at === formattedCreatedAt
+    
+            const listMealsForDate = aliments.filter(
+                (aliment) => aliment.created_at === formattedCreatedAt
             );
             console.log("Aliments",aliments);
             console.log("Datos orginales:",editMeals);
@@ -158,134 +170,229 @@ export default function Myfoods() {
             console.log(editMeals.idAlimentos);
             console.log(idTipoComida)
             console.log(formattedCreatedAt)
-            console.log("Listmeals_for_Mealstype",listMeals_for_MealsType);
+            console.log("Listmeals_for_Mealstype",listMealsForMealType);
             console.log("Food:",food,"idTipoComida:",idTipoComida,"Portion:",portion,"Created_at",created_at,"Hour",hour);
+    
+            console.log("Lista de comidas filtradas por fecha, tipo y alimento:", listMeals);
+            console.log("Lista de comidas filtradas por tipo y fecha:", listMealsForMealType);
+            console.log("Lista de comidas filtradas por fecha:", listMealsForDate);
+    
+            console.log(formattedHour,editMeals.hour,listMeals[0].hour);
+            const isSameDate = editMeals.created_at === formattedCreatedAt;
+            const isSameMealType = idTipoComida == idActive;
+            const isSameHour = formattedHour == listMeals[0].hour;
+    
+            console.log("¿Fecha igual?", isSameDate);
+            console.log("¿Tipo de comida igual?", isSameMealType);
+            console.log("¿Hora igual?", isSameHour);
+    
+            const existsInList = (list) =>
+                list.some((aliment) => aliment.idAlimentos === editMeals.idAlimentos);
+    
+            const addMeal = async () => {
+                console.log("Acción: SE AÑADE LA COMIDA");
+                const {data,error} = await supabase
+                    .from("alimentos")
+                    .insert({
+                        uid: user.id,
+                        idTipoComida: idTipoComida,
+                        portion: portion,
+                        idBancoAlimentos: datameal[0].id,
+                        hour: hour,
+                        created_at: created_at
+                    });
+                if (error){
+                    throw new Error(`Error al agregar el alimento: ${error.message}`);
+                }
+            };
+    
+            const sumPortionsAndRemove = async () => {
+                console.log("Acción: SE SUMAN PORCIONES DEL ALIMENTO DESTINO Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
+                let newPortion = listMeals[0].portion + portion;
+                
+                const {data,error} = await supabase
+                .from("alimentos")
+                .update({
+                    idTipoComida: idTipoComida,
+                    portion: newPortion,
+                    idBancoAlimentos: datameal[0].id,
+                    hour: hour,
+                    created_at: created_at
+                })
+                .eq("uid",user.id)
+                .eq("idAlimentos",listMeals[0].idAlimentos);
 
-            console.log(formattedHour,editMeals.hour);
-
-            if(editMeals.created_at === formattedCreatedAt){
-                console.log("Fecha igual");
-                if(idTipoComida == idActive){
-                    console.log("Tipo de comida igual");
-                    if(formattedHour === editMeals.hour){
-                        console.log("Hora igual");
-                        if(listMeals.length > 0){
-                            console.log("Alimento Existente")
-                            if(editMeals.idAlimentos === listMeals[0].idAlimentos){
-                                console.log("Comida igual");
-                                console.log("NO SE HACE NADA");
-                            }else{
-                                console.log("Comidas diferentes");
-                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
-                            }
-                        }else{
-                            console.log("Alimento no existente");
-                            console.log("SE AÑADE LA COMIDA");
+                if(error){
+                    console.log(error);
+                }
+                deletemeal(editMeals.idAlimentos,false);
+            };
+    
+            const changeHourAndAdjustMeals = async () => {
+                console.log("Acción: SE CAMBIA LA HORA Y SE AJUSTAN TODAS LAS COMIDAS DEL TIPO");
+                
+                await Promite.all(
+                    listMealsForMealType.map(async (item) => {
+                        const {error} = await supabase
+                        .from("alimentos")
+                        .update({
+                            hour: hour,
+                        })
+                        .eq("uid",user.id)
+                        .eq("idAlimentos",item.idAlimentos);
+                        if(error){
+                            console.log(error);
                         }
-                    }else{
-                        console.log("Horas diferentes");
-                        if(listMeals.length > 0){
-                            console.log("Alimento Existente")
-                            if(editMeals.idAlimentos === listMeals[0].idAlimentos){
-                                console.log("Comida igual");
-                                console.log("SE CAMBIA LA HORA DEL ALIMENTO ORIGEN Y LA DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
-                            }else{
-                                console.log("Comidas diferentes");
-                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                    })
+                );
+            };
+
+            const edit = async () => {
+                const {data,error} = await supabase
+                .from("alimentos")
+                .update({
+                    idTipoComida: idTipoComida,
+                    portion: portion,
+                    idBancoAlimentos: datameal[0].id,
+                    hour: hour,
+                    created_at: created_at
+                })
+                .eq("uid",user.id)
+                .eq("idAlimentos",listMeals[0].idAlimentos);
+            };
+    
+            if (isSameDate) {
+                console.log("Ruta: Fecha igual");
+                if (isSameMealType) {
+                    console.log("Ruta: Tipo de comida igual");
+                    if (isSameHour) {
+                        console.log("Ruta: Hora igual");
+                        if (listMeals.length > 0) {
+                            console.log("Ruta: Alimento existente en la lista");
+                            if (existsInList(listMeals)) {
+                                console.log("Ruta: Alimento igual al editado. NO SE HACE NADA");
+                                edit();
+                            } else {
+                                console.log("Ruta: Alimento diferente. Sumando porciones y eliminando alimento del origen.");
+                                sumPortionsAndRemove();
                             }
-                        }else{
-                            console.log("Alimento no existente");
-                            console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                        } else {
+                            console.log("Ruta: Alimento no existe en la lista. Añadiendo comida.");
+                            addMeal();
+                        }
+                    } else {
+                        console.log("Ruta: Hora diferente");
+                        if (listMeals.length > 0) {
+                            console.log("Ruta: Alimento existente en la lista");
+                            sumPortionsAndRemove();
+                            changeHourAndAdjustMeals();
+                        } else {
+                            console.log("Ruta: Alimento no existe. Añadiendo comida y ajustando horas.");
+                            addMeal();
+                            changeHourAndAdjustMeals();
                         }
                     }
-                }else{
-                    console.log("Tipo de comida diferentes");
-                    if(listMeals_for_MealsType.length > 0){ //Se revisa si existe alimentos en ese tipo de comida
-                        if(formattedHour === editMeals.hour){
-                            console.log("Hora igual");
-                            if(listMeals.length > 0){//¿El alimento existe?
-                                console.log("Alimento Existente")
-                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
-                            }else{
-                                console.log("Alimento no existente");
-                                console.log("SE AÑADE LA COMIDA");
+                } else {
+                    console.log("Ruta: Tipo de comida diferente");
+                    if (listMealsForMealType.length > 0) {
+                        console.log("Ruta: Existen alimentos en ese tipo de comida");
+                        if (isSameHour) {
+                            console.log("Ruta: Hora igual");
+                            if (listMeals.length > 0) {
+                                console.log("Ruta: Alimento existente. Sumando porciones y eliminando.");
+                                sumPortionsAndRemove();
+                            } else {
+                                console.log("Ruta: Alimento no existe. Añadiendo comida.");
+                                addMeal();
                             }
-                        }else{
-                            console.log("Horas diferentes");
-                            if(listMeals.length > 0){//¿El alimento existe?
-                                console.log("Alimento Existente")
-                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
-                            }else{
-                                console.log("Alimento no existente");
-                                console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                        } else {
+                            console.log("Ruta: Hora diferente");
+                            if (listMeals.length > 0) {
+                                console.log("Ruta: Alimento existente. Sumando porciones y ajustando horas.");
+                                sumPortionsAndRemove();
+                                changeHourAndAdjustMeals();
+                            } else {
+                                console.log("Ruta: Alimento no existe. Añadiendo comida y ajustando horas.");
+                                addMeal();
+                                changeHourAndAdjustMeals();
                             }
                         }
-                    }else{
-                        console.log("No existen alimentos en ese tipo de comida");
-                        console.log("SE AÑADE LA COMIDA");
+                    } else {
+                        console.log("Ruta: No existen alimentos en ese tipo de comida. Añadiendo comida.");
+                        addMeal();
                     }
                 }
-            }else{
-                console.log("Fecha diferente");
-                if(listMeals_for_Date.length > 0){//Se revisa si existen alimentos en esa fecha
-                    if(idTipoComida == idActive){
-                        console.log("Tipo de comida igual");
-                        if(formattedHour === editMeals.hour){
-                            console.log("Hora igual");
-                            if(listMeals.length > 0){
-                                console.log("Alimento Existente")
-                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
-                            }else{
-                                console.log("Alimento no existente");
-                                console.log("SE AÑADE LA COMIDA");
+            } else {
+                console.log("Ruta: Fecha diferente");
+                if (listMealsForDate.length > 0) {
+                    console.log("Ruta: Existen alimentos en esa fecha");
+                    if (isSameMealType) {
+                        console.log("Ruta: Tipo de comida igual");
+                        if (isSameHour) {
+                            console.log("Ruta: Hora igual");
+                            if (listMeals.length > 0) {
+                                console.log("Ruta: Alimento existente. Sumando porciones y eliminando.");
+                                sumPortionsAndRemove();
+                            } else {
+                                console.log("Ruta: Alimento no existe. Añadiendo comida.");
+                                addMeal();
                             }
-                        }else{
-                            console.log("Horas diferentes");
-                            if(listMeals.length > 0){
-                                console.log("Alimento Existente")
-                                console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
-
-                            }else{
-                                console.log("Alimento no existente");
-                                console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                        } else {
+                            console.log("Ruta: Hora diferente");
+                            if (listMeals.length > 0) {
+                                console.log("Ruta: Alimento existente. Sumando porciones y ajustando horas.");
+                                sumPortionsAndRemove();
+                                changeHourAndAdjustMeals();
+                            } else {
+                                console.log("Ruta: Alimento no existe. Añadiendo comida y ajustando horas.");
+                                addMeal();
+                                changeHourAndAdjustMeals();
                             }
                         }
-                    }else{
-                        console.log("Tipo de comida diferentes");
-                        if(listMeals_for_MealsType.length > 0){ //Se revisa si existe alimentos en ese tipo de comida
-                            if(formattedHour === editMeals.hour){
-                                console.log("Hora igual");
-                                if(listMeals.length > 0){//¿El alimento existe?
-                                    console.log("Alimento Existente")
-                                    console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN");
-                                }else{
-                                    console.log("Alimento no existente");
-                                    console.log("SE AÑADE LA COMIDA");
+                    } else {
+                        console.log("Ruta: Tipo de comida diferente");
+                        if (listMealsForMealType.length > 0) {
+                            console.log("Ruta: Existen alimentos en ese tipo de comida");
+                            if (isSameHour) {
+                                console.log("Ruta: Hora igual");
+                                if (listMeals.length > 0) {
+                                    console.log("Ruta: Alimento existente. Sumando porciones y eliminando.");
+                                    sumPortionsAndRemove();
+                                } else {
+                                    console.log("Ruta: Alimento no existe. Añadiendo comida.");
+                                    addMeal();
                                 }
-                            }else{
-                                console.log("Horas diferentes");
-                                if(listMeals.length > 0){//¿El alimento existe?
-                                    console.log("Alimento Existente")
-                                    console.log("SE SUMAN PORCIONES Y SE ELIMINA EL ALIMENTO DEL ORIGEN Y SE CAMBIA LA HORA DEL ALIMENTO DESTINO Y DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
-                                }else{
-                                    console.log("Alimento no existente");
-                                    console.log("SE AÑADE LA COMIDA Y SE CAMBIA LAS HORAS DE TODAS LAS COMIDAS QUE PERTENESCAN AL TIPO DE COMIDA");
+                            } else {
+                                console.log("Ruta: Hora diferente");
+                                if (listMeals.length > 0) {
+                                    console.log("Ruta: Alimento existente. Sumando porciones y ajustando horas.");
+                                    sumPortionsAndRemove();
+                                    changeHourAndAdjustMeals();
+                                } else {
+                                    console.log("Ruta: Alimento no existe. Añadiendo comida y ajustando horas.");
+                                    addMeal();
+                                    changeHourAndAdjustMeals();
                                 }
                             }
-                        }else{
-                            console.log("No existen alimentos en ese tipo de comida");
-                            console.log("SE AÑADE LA COMIDA");
+                        } else {
+                            console.log("Ruta: No existen alimentos en ese tipo de comida. Añadiendo comida.");
+                            addMeal();
                         }
                     }
-                }else{
-                    console.log("No existen alimentos en esa fecha");
-                    console.log("SE AÑADE LA COMIDA");
+                } else {
+                    console.log("Ruta: No existen alimentos en esa fecha. Añadiendo comida.");
+                    addMeal();
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.error("Error en la actualización:", error);
+        } finally{
+            // closeModal();
+            // toast.success("Alimento Editado");
         }
     };
+    
+    
 
     let mealsIcons = (idTipoComida,idActive) =>{
         switch (idTipoComida){
@@ -366,6 +473,7 @@ export default function Myfoods() {
     useEffect(() =>{
         getMealsType();
         getFoods();
+        getAliments();
     },[user]);
 
     return(
@@ -480,7 +588,7 @@ export default function Myfoods() {
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() =>{}}
+                                                                    onClick={() =>deletemeal(details.idAlimentos,true)}
                                                                     className="bg-red-600 p-1 rounded hover:bg-red-800 text-white flex"
                                                                 >
                                                                     <img src={delate} alt="borrar" className="h-5" />
