@@ -119,7 +119,7 @@ export default function Comidas() {
   };
 
   const handleSubmiSMAE = async (
-    {},
+    { },
     { setSubmitting, setErrors, resetForm }
   ) => {
     try {
@@ -289,21 +289,19 @@ export default function Comidas() {
             <div className="flex mb-2">
               <button
                 onClick={() => setAlimentExisting(false)}
-                className={`mr-3 ${
-                  !alimentExisting
+                className={`mr-3 ${!alimentExisting
                     ? "flex items-center justify-between transition duration-300 ease-out hover:ease-out px-7 py-1 rounded-t-lg text-white bg-azul"
                     : "bg-white text-black"
-                }`}
+                  }`}
               >
                 Registrar nuevo
               </button>
               <button
                 onClick={() => setAlimentExisting(true)}
-                className={`${
-                  alimentExisting
+                className={`${alimentExisting
                     ? "bg-azul flex items-center justify-between transition duration-300 ease-out hover:ease-out px-7 py-1 rounded-t-lg text-white"
                     : "bg-white text-black"
-                }`}
+                  }`}
               >
                 Registrar existente
               </button>
@@ -374,12 +372,12 @@ export default function Comidas() {
                       {errors.foodType && touched.foodType && errors.foodType}
                     </p>
 
-                    <div className="flex mb-4">
-                      <div>
+                    <div className="flex flex-wrap lg:flex-nowrap mb-4">
+                      <div className="w-full lg:w-auto">
                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                           Cantidad por porción
                         </label>
-                        <div className="flex">
+                        <div className="flex flex-wrap sm:flex-nowrap">
                           <input
                             name="portionAmount"
                             id="portionAmount"
@@ -391,51 +389,47 @@ export default function Comidas() {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             autoComplete="off"
-                            className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            className="mr-0 sm:mr-3 mb-3 sm:mb-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           />
                           <select
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             name="measuringunit"
                             id="measuringunit"
                             defaultValue={measuringunit}
-                            // value={values.foodType}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           >
                             {measuringunits.map((type) => (
-                              <option
-                                key={type.idUnidadMedida}
-                                value={type.idUnidadMedida} // Usamos el índice como valor
-                              >
+                              <option key={type.idUnidadMedida} value={type.idUnidadMedida}>
                                 {type.name}
                               </option>
                             ))}
                           </select>
                         </div>
                         <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
-                          {errors.portionAmount &&
-                            touched.portionAmount &&
-                            errors.portionAmount}
+                          {errors.portionAmount && touched.portionAmount && errors.portionAmount}
                         </p>
                       </div>
 
-                      <div className="ml-6">
+                      <div className="w-full lg:w-auto mt-4 lg:mt-0 lg:ml-8"> {/* Aquí se agrega el margen izquierdo */}
                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                           Carbohidratos por porción
                         </label>
-                        <input
-                          name="carbohydratesAmount"
-                          id="carbohydratesAmount"
-                          type="number"
-                          min={1}
-                          max={999}
-                          defaultValue={1}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          autoComplete="off"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                        <p className="mb-4 text-sm text-red-500 dark:text-white w-full">
+                        <div className="flex items-center">
+                          <input
+                            name="carbohydratesAmount"
+                            id="carbohydratesAmount"
+                            type="number"
+                            min={1}
+                            max={999}
+                            defaultValue={1}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            autoComplete="off"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full lg:w-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                        </div>
+                        <p className="mt-2 text-sm text-red-500 dark:text-white w-full">
                           {errors.carbohydratesAmount &&
                             touched.carbohydratesAmount &&
                             errors.carbohydratesAmount}
@@ -453,75 +447,80 @@ export default function Comidas() {
               </Formik>
             )}
 
-            {alimentExisting && (
-              <div>
-                <div className="w-full h-full">
-                  {alimentsSelect && alimentsSelect.length === 0 && (
-                    <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-t-lg shadow-md ">
-                      <p className="text-lg font-medium text-center text-gray-400 ">
-                        Sin alimentos seleccionados
-                      </p>
-                    </div>
-                  )}
+{alimentExisting && (
+  <div>
+    <div className="w-full h-full">
+      {alimentsSelect && alimentsSelect.length === 0 && (
+        <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-t-lg shadow-md">
+          <p className="text-lg font-medium text-center text-gray-400">
+            Sin alimentos seleccionados
+          </p>
+        </div>
+      )}
 
-                  {alimentsSelect && alimentsSelect.length > 0 && (
-                    <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-b-lg shadow-md">
-                      <table className="w-full h-full text-center">
-                        <tr>
-                          <th className="border-slate-300 border">Alimento</th>
-                          <th className="border-slate-300 border">
-                            Tipo de Alimento
-                          </th>
-                          <th className="border-slate-300 border">Cantidad</th>
-                          <th className="border-slate-300 border">
-                            Carbohidratos por porcion
-                          </th>
-                        </tr>
-                        {alimentsSelect.map((aliments, index) => (
-                          <tr key={index}>
-                            <td className="border-slate-300 border">
-                              {aliments.name}
-                            </td>
-                            <td className="border-slate-300 border">
-                              {aliments.type}
-                            </td>
-                            <td className="border-slate-300 border">
-                              {aliments.amount} {aliments.unitMeasurement}
-                            </td>
-                            <td className="border-slate-300 border">
-                              {aliments.carbohydrates}
-                            </td>
-                          </tr>
-                        ))}
-                      </table>
-                    </div>
-                  )}
-                </div>
-                <Formik initialValues={{}} onSubmit={handleSubmiSMAE}>
-                  {({ handleSubmit, isSubmitting }) => (
-                    <form onSubmit={handleSubmit}>
-                      <div>
-                        <button
-                          type="button"
-                          className="bg-azul text-white py-2 px-4 rounded-b-lg hover:bg-blue-800 w-full"
-                          onClick={() => openModal()}
-                        >
-                          Agregar alimento
-                        </button>
-                        <div className="flex justify-end">
-                          <button
-                            type="submit"
-                            className="bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
-                          >
-                            Guardar
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  )}
-                </Formik>
-              </div>
-            )}
+      {alimentsSelect && alimentsSelect.length > 0 && (
+        <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-b-lg shadow-md">
+          <table className="w-full text-center table-auto">
+            <thead>
+              <tr>
+                <th className="border-slate-300 border px-2 py-1">Alimento</th>
+                <th className="border-slate-300 border px-2 py-1">
+                  Tipo de Alimento
+                </th>
+                <th className="border-slate-300 border px-2 py-1">Cantidad</th>
+                <th className="border-slate-300 border px-2 py-1">
+                  Carbohidratos por porción
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {alimentsSelect.map((aliments, index) => (
+                <tr key={index}>
+                  <td className="border-slate-300 border px-2 py-1">
+                    {aliments.name}
+                  </td>
+                  <td className="border-slate-300 border px-2 py-1">
+                    {aliments.type}
+                  </td>
+                  <td className="border-slate-300 border px-2 py-1">
+                    {aliments.amount} {aliments.unitMeasurement}
+                  </td>
+                  <td className="border-slate-300 border px-2 py-1">
+                    {aliments.carbohydrates}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Botón agregado justo debajo de la tabla */}
+      <button
+        type="button"
+        className="bg-azul text-white py-2 px-4 rounded-b-lg hover:bg-blue-800 w-full"
+        onClick={() => openModal()}
+      >
+        Agregar alimento
+      </button>
+    </div>
+    <Formik initialValues={{}} onSubmit={handleSubmiSMAE}>
+      {({ handleSubmit, isSubmitting }) => (
+        <form onSubmit={handleSubmit} className="mt-4">
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul px-7 py-1 rounded-lg text-white"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      )}
+    </Formik>
+  </div>
+)}
+
           </>
         ) : (
           <div
@@ -580,87 +579,85 @@ export default function Comidas() {
                     </div>
                   )}
 
-                  {SMAE && SMAE.length > 0 && (
-                    <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md">
-                      {/* Tabla de SMAE */}
-                      <table className="w-full h-full text-center">
-                        <thead>
-                          <tr>
-                            <th></th>
-                            <th className="border-slate-300 border">Comida</th>
-                            <th className="border-slate-300 border">
-                              Tipo de alimento
-                            </th>
-                            <th className="border-slate-300 border">
-                              Cantidad
-                            </th>
-                            <th className="border-slate-300 border">
-                              Carbohidratos
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {SMAE.slice(former, next).map((foods) => (
-                            <tr key={foods.idSMAE}>
-                              <td className="pr-4">
-                                <input
-                                  type="checkbox"
-                                  name="portion"
-                                  id="portion"
-                                  onChange={(e) => handleCheckboxSMAE(e, foods)}
-                                  checked={alimentsSelect.some(
-                                    (food) => food.id === foods.idSMAE
-                                  )}
-                                />
-                              </td>
-                              <td className="border-slate-300 border">
-                                {foods.food}
-                              </td>
-                              <td className="border-slate-300 border">
-                                {foods.tipoAlimento.food}
-                              </td>
-                              <td className="border-slate-300 border">
-                                {foods.portionamount}{" "}
-                                {foods.unidadesMedida.name}
-                              </td>
-                              <td className="border-slate-300 border">
-                                {foods.carbohydrates}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {/* filtro */}
-                      <div className="flex justify-center space-x-3 mt-3">
-                        {former - 5 >= 0 && (
-                          <button
-                            onClick={filterSMAE_Former}
-                            className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
-                          >
-                            Anterior
-                          </button>
-                        )}
-                        {next + 5 <= SAMElength && (
-                          <button
-                            onClick={filterSMAE_Next}
-                            className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
-                          >
-                            Siguiente
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-center text-gray-500 text-xs mt-1">
-                        {former} - {next} / {SMAE.length}
-                      </p>
-                    </div>
+{SMAE && SMAE.length > 0 && (
+  <div className="relative items-center block p-6 bg-white border border-gray-100 rounded-lg shadow-md">
+    {/* Contenedor con scroll horizontal */}
+    <div className="overflow-x-auto">
+      <table className="min-w-full w-full text-center table-auto">
+        <thead>
+          <tr>
+            <th></th>
+            <th className="border-slate-300 border px-4 py-2">Comida</th>
+            <th className="border-slate-300 border px-4 py-2">
+              Tipo de alimento
+            </th>
+            <th className="border-slate-300 border px-4 py-2">Cantidad</th>
+            <th className="border-slate-300 border px-4 py-2">Carbohidratos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {SMAE.slice(former, next).map((foods) => (
+            <tr key={foods.idSMAE}>
+              <td className="pr-4">
+                <input
+                  type="checkbox"
+                  name="portion"
+                  id="portion"
+                  onChange={(e) => handleCheckboxSMAE(e, foods)}
+                  checked={alimentsSelect.some(
+                    (food) => food.id === foods.idSMAE
                   )}
+                />
+              </td>
+              <td className="border-slate-300 border px-4 py-2">
+                {foods.food}
+              </td>
+              <td className="border-slate-300 border px-4 py-2">
+                {foods.tipoAlimento.food}
+              </td>
+              <td className="border-slate-300 border px-4 py-2">
+                {foods.portionamount} {foods.unidadesMedida.name}
+              </td>
+              <td className="border-slate-300 border px-4 py-2">
+                {foods.carbohydrates}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    {/* filtro */}
+    <div className="flex justify-center space-x-3 mt-3">
+      {former - 5 >= 0 && (
+        <button
+          onClick={filterSMAE_Former}
+          className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+        >
+          Anterior
+        </button>
+      )}
+      {next + 5 <= SAMElength && (
+        <button
+          onClick={filterSMAE_Next}
+          className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
+        >
+          Siguiente
+        </button>
+      )}
+    </div>
+    <p className="text-center text-gray-500 text-xs mt-1">
+      {former} - {next} / {SMAE.length}
+    </p>
+  </div>
+)}
+
                 </>
               )}
             </div>
           </div>
         </Modal>
       </div>
-         
+
     </div>
   );
 }

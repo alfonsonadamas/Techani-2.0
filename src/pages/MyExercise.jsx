@@ -277,103 +277,94 @@ export default function MyExercise() {
 
   return (
     <div>
-      <SideBar />
-      <ToastContainer></ToastContainer>
-      <div className="p-16 pt-24 sm:ml-64" data-aos="fade-up">
-        <h2 className="text-2xl font-semibold mt-10">Ejercicios anteriores</h2>
-        <p className="mb-5">Filtro por rango de fecha</p>
-        <div className="flex flex-row items-center content-center mb-5">
-          <div className="ml-5 mr-5">
-            <p>Del</p>
-          </div>
-          <input
-            id="idFIni"
-            type="date"
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
-          <div className="ml-5 mr-5">
-            <p>al</p>
-          </div>
-          <input
-            id="idFfin"
-            type="date"
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
-          />
+  <SideBar />
+  <div className="px-4 sm:px-16 pt-24 sm:ml-64 max-w-full" data-aos="fade-up">
+    <h2 className="text-lg sm:text-2xl font-semibold mt-10">Ejercicios anteriores</h2>
+    <p className="mb-5">Filtro por rango de fecha</p>
+    <div className="flex flex-col sm:flex-row items-center gap-4 mb-5">
+  <div className="flex items-center gap-2">
+    <label htmlFor="idFIni" className="text-sm">Del</label>
+    <input
+      id="idFIni"
+      type="date"
+      className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+    />
+  </div>
+  <div className="flex items-center gap-2">
+    <label htmlFor="idFfin" className="text-sm">Al</label>
+    <input
+      id="idFfin"
+      type="date"
+      className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500"
+    />
+  </div>
+  <button
+    className="bg-azul hover:bg-azulHover text-white font-bold py-2 px-4 rounded shadow transition duration-300 ease-in-out"
+    onClick={handleFilter}
+  >
+    Filtrar
+  </button>
+</div>
 
-          <button
-            className="bg-azul hover:bg-azulHover ml-5 text-white font-bold py-2 px-4 rounded shadow m-10 transition duration-300 ease-in-out"
-            onClick={handleFilter}
-          >
-            Filtrar
-          </button>
-        </div>
+
         {loading ? (
           <p className="">Cargando nuevos..</p>
         ) : (
           <div>
-            <div
-              className=""
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4,1fr)",
-                gap: "15px",
-              }}
+            {/*Cambios realizados */}
+            <div className="flex flex-wrap justify-center gap-4">
+  {records && records.length === 0 ? (
+    <p className="text-center">No hay registros disponibles.</p>
+  ) : (
+    filterRecords().map((record) => (
+      <div
+        key={record.idEjercicio}
+        className="bg-white rounded-md shadow-md p-4 flex-grow" 
+        style={{ minWidth: "200px", maxWidth: "300px" }}
+      >
+        {/* Contenido de cada actividad */}
+        <div className="flex flex-col items-center">
+          {/* Imagen */}
+          <img
+            alt="exercise"
+            className="h-12 w-12 mb-3"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADRUlEQVR4nO2XR2iUURDHf9HYUA+2g70Q7A1sKKLYT4qIFw3oQSKC2FA8CKK5xJOKBY2CUZBgPWiiXjwowYKKIGIFS2JEFCyxYU1WBv4fjMtu8q1uNoXvB8u3b16d92bmzYOIiIiIiIiI5kk/4ABQCfzUt1DyJsNs4BMQS/Az+SyaAP2dEmeBsUB7fUsk/wj0pZFzwCmRiECZ/XHybsBgoA2NhEotdEyS+nGqr1B5CnDbmZ6d1l6gDw3MDy2oQ5L6jqr/Dsxw7c0cy51CJj8IDKCBeBHyRKzdQ2dmgUkNAY4Cv1X3CzgCDCTDFGoB5guJKFX9PadQqwTtcoAihe6YFCsGhpIh+rmoVaoT6KBvqfOD4H9BiPEKnQlWAyeBUZlQZpYWm+geMflM4JbK40OO2RvYDXxTvxrgTC0mnDb6yvYrtJv23eei0WMtaFCK43YHtgNf3OacBybSQJzUIlY4WRdgLdA5RH+7d7bFZRAXFc4zyiJNftXJ1of0G48pnQ98cApdVmjPCO2AKk0chNY5Kt/4h/HsfloDvHYKXQPmAlnUM0WacIvK7eVP5sjXJZ8AtEhhTIuQG4E3TqGbwLz6VGiaJnriJilLEOneyqeWAz1Djm0XrLV/6ca5CywBWqZbkRaKZjEXdbaqXKYo9zROqRrlZgVy7Ow65mgLrHTzBJfxonQrdFiDWwQypqpsphVgPrQauAB8jVPsHbALGFnHPK2BPOCZ6/tIJ1TXZtTJMF1wtsvTJZvszCDZDtvDbYfL1WIuSOTJ8ZNhi17q7rGYTn2ZlE2ZVi59NxNCCwgmsJAahtHAHuC9W9hn4BAwqZZ+ZlaLgfuuX7myjpTId45u0co4IdkdhedUsJPKBS7phIPF2ULXAV1r8dOFmjNITmvbgL8YrvS8WqZkrNJAVcp8/4ccBYNXTiF7/xxXHpgonGe5zU2WuSdN9XeqPN7dHwtIH9m6P0q0cYFS5vCbgV5x7Qeq/kHYCU6rQ66SwOBlaMlgfdED2CRTjjkzOgfMlxLFkp8KO2iuGyh4Z1xJ8sBKN1m6iIvdk8D/vimahmaDEj1T5ljIjDfddJJv2uX7XO+bEUFlrJn8aDaKREREREREREREUC/8Ae4ZfBBuF8VKAAAAAElFTkSuQmCC"
+          />
+          {/* Texto */}
+          <h3 className="text-base text-center mt-2">
+            Actividad: {getNanmeActivity(record.idActividades, record.actividadUsuario)}
+          </h3>
+          <h3 className="text-base text-center mt-2">
+            Fecha: {record.date}
+          </h3>
+          <h3 className="text-base text-center mt-2 mb-2">
+            Tiempo: {record.time} minutos
+          </h3>
+          {/* Botones */}
+          <div className="flex flex-row justify-center items-center mt-4 space-x-2">
+            <button
+              type="button"
+              onClick={() => openModal(record)}
+              className="bg-blue-500 p-2 rounded hover:bg-blue-600 transition duration-300"
             >
-              {records && records.length === 0 ? (
-                <p className="">No hay registros disponibles.</p>
-              ) : (
-                filterRecords().map((record) => (
-                  <div key={record.idEmocion} className="p-5">
-                    <div className="bg-white rounded-md shadow-md ">
-                      <div
-                        style={{
-                          marginTop: "15px",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                        }}
-                      >
-                        <img
-                          alt="exercise"
-                          className="h-12 w-12"
-                          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAADRUlEQVR4nO2XR2iUURDHf9HYUA+2g70Q7A1sKKLYT4qIFw3oQSKC2FA8CKK5xJOKBY2CUZBgPWiiXjwowYKKIGIFS2JEFCyxYU1WBv4fjMtu8q1uNoXvB8u3b16d92bmzYOIiIiIiIiI5kk/4ABQCfzUt1DyJsNs4BMQS/Az+SyaAP2dEmeBsUB7fUsk/wj0pZFzwCmRiECZ/XHybsBgoA2NhEotdEyS+nGqr1B5CnDbmZ6d1l6gDw3MDy2oQ5L6jqr/Dsxw7c0cy51CJj8IDKCBeBHyRKzdQ2dmgUkNAY4Cv1X3CzgCDCTDFGoB5guJKFX9PadQqwTtcoAihe6YFCsGhpIh+rmoVaoT6KBvqfOD4H9BiPEKnQlWAyeBUZlQZpYWm+geMflM4JbK40OO2RvYDXxTvxrgTC0mnDb6yvYrtJv23eei0WMtaFCK43YHtgNf3OacBybSQJzUIlY4WRdgLdA5RH+7d7bFZRAXFc4zyiJNftXJ1of0G48pnQ98cApdVmjPCO2AKk0chNY5Kt/4h/HsfloDvHYKXQPmAlnUM0WacIvK7eVP5sjXJZ8AtEhhTIuQG4E3TqGbwLz6VGiaJnriJilLEOneyqeWAz1Djm0XrLV/6ca5CywBWqZbkRaKZjEXdbaqXKYo9zROqRrlZgVy7Ow65mgLrHTzBJfxonQrdFiDWwQypqpsphVgPrQauAB8jVPsHbALGFnHPK2BPOCZ6/tIJ1TXZtTJMF1wtsvTJZvszCDZDtvDbYfL1WIuSOTJ8ZNhi17q7rGYTn2ZlE2ZVi59NxNCCwgmsJAahtHAHuC9W9hn4BAwqZZ+ZlaLgfuuX7myjpTId45u0co4IdkdhedUsJPKBS7phIPF2ULXAV1r8dOFmjNITmvbgL8YrvS8WqZkrNJAVcp8/4ccBYNXTiF7/xxXHpgonGe5zU2WuSdN9XeqPN7dHwtIH9m6P0q0cYFS5vCbgV5x7Qeq/kHYCU6rQ66SwOBlaMlgfdED2CRTjjkzOgfMlxLFkp8KO2iuGyh4Z1xJ8sBKN1m6iIvdk8D/vimahmaDEj1T5ljIjDfddJJv2uX7XO+bEUFlrJn8aDaKREREREREREREUC/8Ae4ZfBBuF8VKAAAAAElFTkSuQmCC"
-                        />
-                        <h3 className="text-center mt-2">
-                          Actividad:{" "}
-                          {getNameActivity(
-                            record.idActividades,
-                            record.actividadUsuario
-                          )}
-                        </h3>
-                        <h3 className="text-center mt-2">
-                          Fecha: {record.date}
-                        </h3>
-                        <h3 className="text-center mt-2 mb-2">
-                          Tiempo: {record.time} minutos
-                        </h3>
-                      </div>
+              <img src={edit} alt="editar" className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => deleteActivity(record.idEjercicio)}
+              className="bg-red-500 p-2 rounded hover:bg-red-600 transition duration-300"
+            >
+              <img src={delate} alt="borrar" className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    ))
+  )}
+</div>
 
-                      <div className=" flex flex-row justify-end items-center mr-5 mt-5">
-                        <button
-                          type="button"
-                          onClick={() => openModal(record)}
-                          className="bg-azulHover p-1 rounded hover:bg-azul mb-5 mr-3"
-                        >
-                          <img src={edit} alt="editar" className="h-5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteActivity(record.idEjercicio)}
-                          className="bg-red-600 p-1 rounded hover:bg-red-800 mb-5"
-                        >
-                          <img src={delate} alt="borrar" className="h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+
+              {/* Hasta aqui los cambios */}
             <Modal
               isOpen={modalIsOpen}
               onClose={closeModal}
