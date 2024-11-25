@@ -6,6 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import Modal from "../components/Modal";
 
 import edit from "../assets/img/edit.png";
+import time from "../assets/img/time.png";
 import * as imageMeals from "../assets/img/Alimentos";
 import delate from "../assets/img/delate.png";
 import * as Yup from "yup";
@@ -387,8 +388,10 @@ export default function Myfoods() {
         } catch (error) {
             console.error("Error en la actualización:", error);
         } finally{
-            // closeModal();
-            // toast.success("Alimento Editado");
+            closeModal();
+            getMeals();
+            toast.success("Alimento Editado");
+
         }
     };
     
@@ -546,7 +549,8 @@ export default function Myfoods() {
                                                     <img src={mealsIcons(comidas.idTipoComida,0)} alt="" className='w-6 mr-2'/>
                                                     <span>{mealsType.find(food => comidas.idTipoComida === food.idTipocomida)?.meal}</span>
                                                 </div>
-                                                <div>
+                                                <div className='flex justify-center'>
+                                                    <img src={time} alt="" className='w-6 mr-2'/>
                                                     <span>{comidas.alimentos_detalle[0].hour}</span>
                                                 </div>
                                             </div>
