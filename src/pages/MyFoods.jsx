@@ -486,6 +486,16 @@ export default function Myfoods() {
         setDataAuxMeals(newData);
     };
 
+    const validationSchema = Yup.object().shape({
+        food:Yup.string()
+            .matches(/^[^\d]+$/, "El campo debe ser texto")
+            .required("Este campo es requerido"),
+        hour:Yup.string().required('La hora es obligatoria'),
+        created_at:Yup.date().required("Este campo es requerido"),
+        portion:Yup.number().required("Este campo es requerido").min(1,"Debe ser positivo"),
+        idTipoComida:Yup.string().required("Este campo es requerido"),
+    });
+
     useEffect(() =>{
         getMealsType();
         getFoods();
@@ -640,7 +650,7 @@ export default function Myfoods() {
                                                                 created_at : editMeals.created_at,
                                                                 hour : editMeals.hour,
                                                             }}
-                                                            // validationSchema={validationSchema}
+                                                            validationSchema={validationSchema}
                                                             onSubmit={updatemeal}
                                                         >
                                                             {({
@@ -690,6 +700,7 @@ export default function Myfoods() {
                                                                                         autoComplete="off"
                                                                                         defaultValue={values.food}
                                                                                         onChange={handleSearch}
+                                                                                        onBlur={handleBlur}
                                                                                         className="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                                                         placeholder="Buscar comida..."
                                                                                     />
@@ -723,6 +734,10 @@ export default function Myfoods() {
                                                                                 </div>
                                                                             </div>
                                                                         )}
+                                                                        <p className="text-sm text-red-500 dark:text-white w-full">
+                                                                            {errors.food && touched.food && errors.food}
+                                                                        </p>
+                                                                        
                                                                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                                                             Tipo de comida:
                                                                         </label>
@@ -743,6 +758,9 @@ export default function Myfoods() {
                                                                                 </option>
                                                                             )}
                                                                         </select>
+                                                                        <p className="text-sm text-red-500 dark:text-white w-full">
+                                                                            {errors.idTipoComida && touched.idTipoComida && errors.idTipoComida}
+                                                                        </p>
                                                                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                                                             Cantidad por porción:
                                                                         </label>
@@ -752,6 +770,9 @@ export default function Myfoods() {
                                                                             onChange={handleChange} onBlur={handleBlur}
                                                                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                                         />
+                                                                        <p className="text-sm text-red-500 dark:text-white w-full">
+                                                                            {errors.portion && touched.portion && errors.portion}
+                                                                        </p>
                                                                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                                                             Fecha:
                                                                         </label>
@@ -764,6 +785,9 @@ export default function Myfoods() {
                                                                             onBlur={handleBlur}
                                                                             defaultValue={values.created_at ? new Date(values.created_at).toISOString().split('T')[0] : ""}
                                                                         />
+                                                                        <p className="text-sm text-red-500 dark:text-white w-full">
+                                                                            {errors.created_at && touched.created_at && errors.created_at}
+                                                                        </p>
                                                                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                                                             Hora:
                                                                         </label>
@@ -776,6 +800,9 @@ export default function Myfoods() {
                                                                             onBlur={handleBlur}
                                                                             defaultValue={values.hour}
                                                                         />
+                                                                        <p className="text-sm text-red-500 dark:text-white w-full">
+                                                                            {errors.hour && touched.hour && errors.hour}
+                                                                        </p>
                                                                         <button
                                                                             type="submit"
                                                                             className="flex items-center justify-between bg-azulHover transition duration-300 ease-out hover:ease-out hover:bg-azul mt-4 px-7 py-1 rounded-lg text-white"
