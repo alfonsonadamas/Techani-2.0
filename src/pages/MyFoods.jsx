@@ -148,7 +148,8 @@ export default function Myfoods() {
     
             console.log("Hora formateada:", formattedHour);
             console.log("Fecha formateada:", formattedCreatedAt);
-    
+            console.log(idTipoComida,datameal[0].id);
+
             const listMeals = aliments.filter(
                 (aliment) =>
                     aliment.created_at === formattedCreatedAt &&
@@ -178,13 +179,17 @@ export default function Myfoods() {
             console.log("Lista de comidas filtradas por tipo y fecha:", listMealsForMealType);
             console.log("Lista de comidas filtradas por fecha:", listMealsForDate);
     
-            console.log(formattedHour,editMeals.hour,listMeals[0].hour);
+            // console.log(formattedHour,editMeals.hour,listMeals[0].hour);
             const isSameDate = editMeals.created_at === formattedCreatedAt;
-            const isSameMealType = idTipoComida == idActive;
-            const isSameHour = formattedHour == listMeals[0].hour;
-    
             console.log("¿Fecha igual?", isSameDate);
+            const isSameMealType = idTipoComida == idActive;
             console.log("¿Tipo de comida igual?", isSameMealType);
+            let isSameHour;
+            if(listMeals && listMeals.length > 0){
+                isSameHour = formattedHour == listMeals[0].hour;
+            }else{
+                isSameHour = false;
+            }
             console.log("¿Hora igual?", isSameHour);
     
             const existsInList = (list) =>
@@ -205,6 +210,7 @@ export default function Myfoods() {
                 if (error){
                     throw new Error(`Error al agregar el alimento: ${error.message}`);
                 }
+                deletemeal(editMeals.idAlimentos,false);
             };
     
             const sumPortionsAndRemove = async () => {
@@ -232,7 +238,7 @@ export default function Myfoods() {
             const changeHourAndAdjustMeals = async () => {
                 console.log("Acción: SE CAMBIA LA HORA Y SE AJUSTAN TODAS LAS COMIDAS DEL TIPO");
                 
-                await Promite.all(
+                await Promise.all(
                     listMealsForMealType.map(async (item) => {
                         const {error} = await supabase
                         .from("alimentos")
@@ -285,8 +291,15 @@ export default function Myfoods() {
                         console.log("Ruta: Hora diferente");
                         if (listMeals.length > 0) {
                             console.log("Ruta: Alimento existente en la lista");
-                            sumPortionsAndRemove();
-                            changeHourAndAdjustMeals();
+                            if(existsInList(listMeals)){
+                                console.log("Ruta: Alimento igual al editado. Se edita y se cambian las horas");
+                                edit();
+                                changeHourAndAdjustMeals();
+                            }else{
+                                console.log("Ruta: Alimento diferente. Sumando porciones y eliminando alimento del origen.");
+                                sumPortionsAndRemove();
+                                changeHourAndAdjustMeals();   
+                            }
                         } else {
                             console.log("Ruta: Alimento no existe. Añadiendo comida y ajustando horas.");
                             addMeal();
@@ -376,12 +389,12 @@ export default function Myfoods() {
                                 }
                             }
                         } else {
-                            console.log("Ruta: No existen alimentos en ese tipo de comida. Añadiendo comida.");
+                            console.log("Ruta: No existen alimentos en ese tipo de comida. Añadiendo comida y borrando original.");
                             addMeal();
                         }
                     }
                 } else {
-                    console.log("Ruta: No existen alimentos en esa fecha. Añadiendo comida.");
+                    console.log("Ruta: No existen alimentos en esa fecha. Añadiendo comida y eliminando origen.");
                     addMeal();
                 }
             }
