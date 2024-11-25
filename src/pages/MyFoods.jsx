@@ -492,7 +492,7 @@ export default function Myfoods() {
             .required("Este campo es requerido"),
         hour:Yup.string().required('La hora es obligatoria'),
         created_at:Yup.date().required("Este campo es requerido"),
-        portion:Yup.number().required("Este campo es requerido").min(1,"Debe ser positivo"),
+        portion:Yup.number().required("Este campo es requerido").min(1,"Debe ser positivo"), 
         idTipoComida:Yup.string().required("Este campo es requerido"),
     });
 
