@@ -32,6 +32,7 @@ export default function Profile() {
     phone: "",
   });
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showChangeDatPer, setShowChangeDatPer] = useState(false);
   const [showAdditionalData, setShowAdditionalData] = useState(false);
   const [showSupportingFamily, setShowSupportingFamily] = useState(false);
   const [showSupportingPhoto, setShowSupportingPhoto] = useState(false);
@@ -590,166 +591,101 @@ export default function Profile() {
         <SideBar />
         <ToastContainer />
         <div className="p-16 pt-16 sm:ml-64">
-          <Formik
-            initialValues={{ image: profile.avatar }}
-            enableReinitialize={true}
-            // validationSchema={}
-            onSubmit={submitFoto}
-          >
-            {({
-              handleSubmit,
-              handleBlur,
-              handleChange,
-              values,
-              errors,
-              touched,
-            }) => (
-              <form onSubmit={handleSubmit}>
-                <div className="flex flex-col items-center mb-8">
-                  <div className="relative">
-                    <img
-                      src={profile.picture} // Mostrar la vista previa en lugar de la imagen original
-                      alt="img_perfil"
-                      className="rounded-full border-4 border-blue-300 shadow-lg"
-                      width={200}
-                    />
-                    <label
-                      htmlFor="fileUpload"
-                      className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
-                    >
-                      <FaPencilAlt />
-                    </label>
-                    <input
-                      type="file"
-                      name="file"
-                      id="fileUpload"
-                      className="hidden"
-                      accept="image/jpeg,image/png"
-                      onChange={handleFileChange}
-                      onBlur={handleBlur}
-                    />
-                  </div>
-                  <div className="">
-                    <button
-                      type="submit"
-                      className={
-                        selectedFile
-                          ? "text-blue-500 underline hover:text-blue-600 mt-2"
-                          : "hidden"
-                      }
-                      disabled={!selectedFile}
-                    >
-                      Cambiar foto de perfil
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
-          </Formik>
-          <Formik
-            initialValues={{
-              fullName: profile.name,
-              email: profile.email,
-              birthday: profile.birthday,
-              phone: profile.phone,
-              password: "",
-            }}
-            enableReinitialize={true}
-            validationSchema={validationSchema}
-            onSubmit={onSubmit}
-          >
-            {({ handleSubmit, handleChange, values, errors, touched }) => (
-              <form onSubmit={handleSubmit}>
-                <div className="flex flex-wrap w-full">
-                  <div className="flex flex-col w-1/2 pr-2 mb-4">
-                    <label htmlFor="fullName" className="font-bold mb-2">
-                      Nombre
-                    </label>
-                    <input
-                      id="fullName"
-                      type="text"
-                      name="fullName"
-                      value={values.fullName}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.fullName && touched.fullName && (
-                      <div className="text-red-500 text-sm">
-                        {errors.fullName}
+          <div className="flex flex-row mt-10 mb-10 border border-gray-300 rounded-lg items-center justify-center">
+            <div className="w-1/3 items-center justify-center">
+              <Formik
+                initialValues={{ image: profile.avatar }}
+                enableReinitialize={true}
+                // validationSchema={}
+                onSubmit={submitFoto}
+              >
+                {({ handleSubmit, handleBlur }) => (
+                  <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col items-center mt-5 mb-8">
+                      <div className="relative">
+                        <img
+                          src={profile.picture} // Mostrar la vista previa en lugar de la imagen original
+                          alt="img_perfil"
+                          className="rounded-full border-4 border-blue-300 shadow-lg"
+                          width={200}
+                        />
+                        <label
+                          htmlFor="fileUpload"
+                          className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
+                        >
+                          <FaPencilAlt />
+                        </label>
+                        <input
+                          type="file"
+                          name="file"
+                          id="fileUpload"
+                          className="hidden "
+                          accept="image/jpeg,image/png"
+                          onChange={handleFileChange}
+                          onBlur={handleBlur}
+                        />
                       </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col w-1/2 pl-2 mb-4">
-                    <label htmlFor="email" className="font-bold mb-2">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      name="email"
-                      value={values.email}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.email && touched.email && (
-                      <div className="text-red-500 text-sm">{errors.email}</div>
-                    )}
-                  </div>
-                  <div className="flex flex-col w-1/2 pr-2 mb-4">
-                    <label htmlFor="birthday" className="font-bold mb-2">
-                      Fecha de Nacimiento
-                    </label>
-                    <input
-                      id="birthday"
-                      type="date"
-                      name="birthday"
-                      value={values.birthday}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.birthday && touched.birthday && (
-                      <div className="text-red-500 text-sm">
-                        {errors.birthday}
+                      <div className="">
+                        <button
+                          type="submit"
+                          className={
+                            selectedFile
+                              ? "text-blue-500 underline hover:text-blue-600 mt-2"
+                              : "hidden"
+                          }
+                          disabled={!selectedFile}
+                        >
+                          Cambiar foto de perfil
+                        </button>
                       </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col w-1/2 pl-2 mb-4">
-                    <label htmlFor="phone" className="font-bold mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      id="phone"
-                      type="text"
-                      name="phone"
-                      value={values.phone}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.phone && touched.phone && (
-                      <div className="text-red-500 text-sm">{errors.phone}</div>
-                    )}
-                  </div>
+                    </div>
+                  </form>
+                )}
+              </Formik>
+            </div>
+            <div className="flex flex-wrap w-2/3 justify-center items-center">
+              <div className="flex flex-col w-1/2 pr-2  justify-center">
+                <label className=" text-gray-600 text-sm mb-1">Nombre</label>
+                <h3 className="font-bold ">
+                  {profile.name || "Nombre no disponible"}
+                </h3>
+              </div>
 
-                  <div className="flex justify-end space-x-4 mt-8 w-full">
-                    <button
-                      type="submit"
-                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 shadow-md"
-                    >
-                      Guardar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={logout}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md"
-                    >
-                      Cerrar Sesión
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
-          </Formik>
-          <hr className="w-full my-8 border-gray-300" />
+              <div className="flex flex-col w-1/2 pl-2  justify-center">
+                <label className="text-gray-600 text-sm mb-1">Email</label>
+                <h3 className="font-bold ">
+                  {profile.email || "Email no disponible"}
+                </h3>
+              </div>
+              <div className="w-full h-4"></div>
+              <div className="flex flex-col w-1/2 pr-2  justify-center">
+                <label className="text-gray-600 text-sm mb-1">
+                  Fecha de Nacimiento
+                </label>
+                <h3 className="font-bold ">
+                  {profile.birthday || "Fecha no disponible"}
+                </h3>
+              </div>
+
+              <div className="flex flex-col w-1/2 pl-2  justify-center">
+                <label className="text-gray-600 text-sm mb-1">Teléfono</label>
+                <h3 className="font-bold ">
+                  {profile.phone || "Teléfono no disponible"}
+                </h3>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-5 mr-5 w-full">
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col w-full">
             <button
               type="button"
@@ -1414,6 +1350,144 @@ export default function Profile() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <hr className="w-full my-8 border-gray-300" />
+          <div className="flex flex-col w-full">
+            <button
+              type="button"
+              onClick={() => setShowChangeDatPer(!showChangeDatPer)}
+              className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
+            >
+              EDITAR DATOS DEL PERFIL{" "}
+              {showChangeDatPer ? <FaCaretUp /> : <FaCaretDown />}
+            </button>
+            {showChangeDatPer && (
+              <div className="flex justify-end mt-4 p-4 bg-white rounded shadow-md flex-col">
+                <div className=" flex flex-row justify-end"></div>
+
+                <div>
+                  <Formik
+                    initialValues={{
+                      fullName: profile.name,
+                      email: profile.email,
+                      birthday: profile.birthday,
+                      phone: profile.phone,
+                      password: "",
+                    }}
+                    enableReinitialize={true}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                  >
+                    {({
+                      handleSubmit,
+                      handleChange,
+                      values,
+                      errors,
+                      touched,
+                    }) => (
+                      <form onSubmit={handleSubmit}>
+                        <div className="flex flex-wrap w-full">
+                          <div className="flex flex-col w-1/2 pr-2 mb-4">
+                            <label
+                              htmlFor="fullName"
+                              className="font-bold mb-2"
+                            >
+                              Nombre
+                            </label>
+                            <input
+                              id="fullName"
+                              type="text"
+                              name="fullName"
+                              value={values.fullName}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.fullName && touched.fullName && (
+                              <div className="text-red-500 text-sm">
+                                {errors.fullName}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col w-1/2 pl-2 mb-4">
+                            <label htmlFor="email" className="font-bold mb-2">
+                              Email
+                            </label>
+                            <input
+                              id="email"
+                              type="email"
+                              name="email"
+                              value={values.email}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.email && touched.email && (
+                              <div className="text-red-500 text-sm">
+                                {errors.email}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col w-1/2 pr-2 mb-4">
+                            <label
+                              htmlFor="birthday"
+                              className="font-bold mb-2"
+                            >
+                              Fecha de Nacimiento
+                            </label>
+                            <input
+                              id="birthday"
+                              type="date"
+                              name="birthday"
+                              value={values.birthday}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.birthday && touched.birthday && (
+                              <div className="text-red-500 text-sm">
+                                {errors.birthday}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col w-1/2 pl-2 mb-4">
+                            <label htmlFor="phone" className="font-bold mb-2">
+                              Teléfono
+                            </label>
+                            <input
+                              id="phone"
+                              type="text"
+                              name="phone"
+                              value={values.phone}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.phone && touched.phone && (
+                              <div className="text-red-500 text-sm">
+                                {errors.phone}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex justify-end space-x-4 mt-8 w-full">
+                            <button
+                              type="submit"
+                              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 shadow-md"
+                            >
+                              Guardar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={logout}
+                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md"
+                            >
+                              Cerrar Sesión
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    )}
+                  </Formik>
                 </div>
               </div>
             )}
