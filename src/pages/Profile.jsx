@@ -699,8 +699,6 @@ export default function Profile() {
                       id="phone"
                       type="number"
                       name="phone"
-                      maxLength={10}
-                      max={10}
                       value={values.phone}
                       onChange={handleChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -1424,7 +1422,7 @@ export default function Profile() {
                   values,
                   errors,
                   touched,
-                  isSubmitting
+                  isSubmitting,
                 }) => (
                   <form onSubmit={handleSubmit}>
                     <div className="flex flex-wrap">
@@ -1513,7 +1511,7 @@ export default function Profile() {
                       <div className="flex justify-end w-full">
                         <button
                           type="submit"
-                          disabled= {isSubmitting}
+                          disabled={isSubmitting}
                           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
                           Guardar

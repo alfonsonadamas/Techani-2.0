@@ -26,11 +26,9 @@ export default function Files() {
       if (error && error.error === "Duplicate") {
         toast.error("El archivo ya existe");
       } else {
-        const { data, error } = supabase.storage
+        const { data } = supabase.storage
           .from("analisis_archivos")
           .getPublicUrl(`${user.id}/${file.name}`);
-        console.log("link:");
-        console.log(data.publicUrl, error);
 
         await supabase.from("analisisArchivos").insert({
           title: filename,

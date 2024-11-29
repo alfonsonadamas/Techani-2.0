@@ -2256,10 +2256,6 @@ input:checked + .toggle-bg{
   column-gap: 2.5rem;
 }
 
-.gap-x-28{
-  column-gap: 7rem;
-}
-
 .gap-y-2{
   row-gap: 0.5rem;
 }

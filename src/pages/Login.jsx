@@ -169,9 +169,7 @@ export default function Login() {
                     </button>
 
                     <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
+                      onClick={handleLoginFacebook}
                       className="bg-white hover:bg-slate-200 transition duration-300 ease-linear text-gray-700 font-semibold py-4 px-4 border border-gray-400 rounded shadow flex items-center justify-center disabled:opacity-20 disabled:cursor-default"
                       disabled={loading}
                     >
