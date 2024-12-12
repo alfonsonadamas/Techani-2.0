@@ -32,6 +32,7 @@ export default function Profile() {
     phone: "",
   });
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showChangeDatPer, setShowChangeDatPer] = useState(false);
   const [showAdditionalData, setShowAdditionalData] = useState(false);
   const [showSupportingFamily, setShowSupportingFamily] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
@@ -100,7 +101,16 @@ export default function Profile() {
     }, 5000);
 
     if (datosInsulina.length > 0) {
-      nomIns(datosInsulina[0].marcaInsulina);
+      const idNInsulina =
+        typeof datosInsulina[0].marcaInsulina === "object"
+          ? datosInsulina[0].marcaInsulina.id // Ajusta esto según la estructura de datos
+          : datosInsulina[0].marcaInsulina;
+
+      // Solo llama a la función si `idNInsulina` es un número
+      if (typeof idNInsulina === "number") {
+        nomIns(idNInsulina);
+      } else {
+      }
     }
   }, [user, profile]);
 
@@ -242,18 +252,49 @@ export default function Profile() {
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.from("datosAdicionales").insert([
+      // Verificar cuántos registros de insulina ya existen para este usuario
+      const { data: currentInsulinData, error: countError } = await supabase
+        .from("datosAdicionales")
+        .select("id")
+        .eq("uid", user.id);
+
+      if (countError) throw countError;
+
+      if (currentInsulinData.length >= 2) {
+        // Si ya hay 2 registros, muestra un toast y detiene el proceso
+        toast.error("No puedes agregar más de dos tipos de insulina.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Verificar si ya existe un registro con el mismo tipo de insulina
+      const { data: existingData, error: fetchError } = await supabase
+        .from("datosAdicionales")
+        .select("id")
+        .eq("uid", user.id)
+        .eq("tipoInsulina", tipoInsulina);
+
+      if (fetchError) throw fetchError;
+
+      if (existingData && existingData.length > 0) {
+        // Si ya existe un registro para el mismo tipo de insulina, muestra un error y detiene el proceso
+        toast.error("Ya tienes un registro para este tipo de insulina.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Si no existe un registro duplicado y el usuario tiene menos de 2 registros, realiza la inserción
+      const { data, error } = await supabase.from("datosAdicionales").insert([
         {
           marcaInsulina: marcaInsulina,
           uid: user.id,
           tipoInsulina: tipoInsulina,
         },
       ]);
-      if (error) {
-        throw error;
-      }
-      toast.success("Datos Adicionales Guardados");
 
+      if (error) throw error;
+
+      toast.success("Datos Adicionales Guardados");
       setAddTypeInsuline(false);
       veriInsulina();
     } catch (error) {
@@ -264,6 +305,7 @@ export default function Profile() {
       console.error(error);
     } finally {
       resetForm();
+      setSubmitting(false);
     }
   };
 
@@ -271,7 +313,14 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from("datosAdicionales")
-        .select()
+        .select(
+          `
+        *,
+        marcaInsulina (
+          nombreInsulina
+        )
+      `
+        )
         .eq("uid", user.id);
       if (error) throw error;
       setDatosInsulina(data);
@@ -294,15 +343,27 @@ export default function Profile() {
   };
 
   const nomIns = async (idNInsulina) => {
+    idNInsulina = Number(idNInsulina); // Convierte a número si es un string
+    if (isNaN(idNInsulina)) {
+      console.log("idNInsulina no es un número válido.");
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("marcaInsulina")
         .select("nombreInsulina")
         .eq("id", idNInsulina);
+
       if (error) throw error;
-      setNombreInsulina(data[0].nombreInsulina);
+
+      if (data && data.length > 0) {
+        setNombreInsulina(data[0].nombreInsulina);
+      } else {
+        console.log("No se encontró la insulina con el ID especificado.");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error en la consulta:", error.message);
     }
   };
 
@@ -416,7 +477,7 @@ export default function Profile() {
     familyName: Yup.string().required("El nombre es obligatorio"),
     familyPhone: Yup.number()
       .typeError("Solo se permiten numeros")
-      .min(1000000000, "El teléfono debe tener exactamente 10 dígitos")
+      .min(100000000, "El teléfono debe tener exactamente 10 dígitos")
       .required("El teléfono es obligatorio"),
     familyEmail: Yup.string()
       .email("Correo electrónico no válido")
@@ -526,168 +587,103 @@ export default function Profile() {
     return (
       <div>
         <SideBar />
+        <ToastContainer />
         <div className="p-16 pt-16 sm:ml-64">
-          <ToastContainer />
-          <Formik
-            initialValues={{ image: profile.avatar }}
-            enableReinitialize={true}
-            // validationSchema={}
-            onSubmit={submitFoto}
-          >
-            {({
-              handleSubmit,
-              handleBlur,
-              handleChange,
-              values,
-              errors,
-              touched,
-            }) => (
-              <form onSubmit={handleSubmit}>
-                <div className="flex flex-col items-center mb-8">
-                  <div className="relative">
-                    <img
-                      src={profile.picture} // Mostrar la vista previa en lugar de la imagen original
-                      alt="img_perfil"
-                      className="rounded-full border-4 border-blue-300 shadow-lg"
-                      width={200}
-                    />
-                    <label
-                      htmlFor="fileUpload"
-                      className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
-                    >
-                      <FaPencilAlt />
-                    </label>
-                    <input
-                      type="file"
-                      name="file"
-                      id="fileUpload"
-                      className="hidden"
-                      accept="image/jpeg,image/png"
-                      onChange={handleFileChange}
-                      onBlur={handleBlur}
-                    />
-                  </div>
-                  <div className="">
-                    <button
-                      type="submit"
-                      className={
-                        selectedFile
-                          ? "text-blue-500 underline hover:text-blue-600 mt-2"
-                          : "hidden"
-                      }
-                      disabled={!selectedFile}
-                    >
-                      Cambiar foto de perfil
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
-          </Formik>
-          <Formik
-            initialValues={{
-              fullName: profile.name,
-              email: profile.email,
-              birthday: profile.birthday,
-              phone: profile.phone,
-              password: "",
-            }}
-            enableReinitialize={true}
-            validationSchema={validationSchema}
-            onSubmit={onSubmit}
-          >
-            {({ handleSubmit, handleChange, values, errors, touched }) => (
-              <form onSubmit={handleSubmit}>
-                <div className="flex flex-wrap w-full">
-                  <div className="flex flex-col w-1/2 pr-2 mb-4">
-                    <label htmlFor="fullName" className="font-bold mb-2">
-                      Nombre
-                    </label>
-                    <input
-                      id="fullName"
-                      type="text"
-                      name="fullName"
-                      value={values.fullName}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.fullName && touched.fullName && (
-                      <div className="text-red-500 text-sm">
-                        {errors.fullName}
+          <div className="flex flex-row mt-10 mb-10 border border-gray-300 rounded-lg items-center justify-center">
+            <div className="w-1/3 items-center justify-center">
+              <Formik
+                initialValues={{ image: profile.avatar }}
+                enableReinitialize={true}
+                // validationSchema={}
+                onSubmit={submitFoto}
+              >
+                {({ handleSubmit, handleBlur }) => (
+                  <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col items-center mt-5 mb-8">
+                      <div className="relative">
+                        <img
+                          src={profile.picture} // Mostrar la vista previa en lugar de la imagen original
+                          alt="img_perfil"
+                          className="rounded-full border-4 border-blue-300 shadow-lg"
+                          width={200}
+                        />
+                        <label
+                          htmlFor="fileUpload"
+                          className="absolute bottom-0 right-0 bg-gray-200 p-2 rounded-full cursor-pointer transform translate-x-1/2 translate-y-1/2 shadow-lg"
+                        >
+                          <FaPencilAlt />
+                        </label>
+                        <input
+                          type="file"
+                          name="file"
+                          id="fileUpload"
+                          className="hidden "
+                          accept="image/jpeg,image/png"
+                          onChange={handleFileChange}
+                          onBlur={handleBlur}
+                        />
                       </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col w-1/2 pl-2 mb-4">
-                    <label htmlFor="email" className="font-bold mb-2">
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      name="email"
-                      value={values.email}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.email && touched.email && (
-                      <div className="text-red-500 text-sm">{errors.email}</div>
-                    )}
-                  </div>
-                  <div className="flex flex-col w-1/2 pr-2 mb-4">
-                    <label htmlFor="birthday" className="font-bold mb-2">
-                      Fecha de Nacimiento
-                    </label>
-                    <input
-                      id="birthday"
-                      type="date"
-                      name="birthday"
-                      value={values.birthday}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.birthday && touched.birthday && (
-                      <div className="text-red-500 text-sm">
-                        {errors.birthday}
+                      <div className="">
+                        <button
+                          type="submit"
+                          className={
+                            selectedFile
+                              ? "text-blue-500 underline hover:text-blue-600 mt-2"
+                              : "hidden"
+                          }
+                          disabled={!selectedFile}
+                        >
+                          Cambiar foto de perfil
+                        </button>
                       </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col w-1/2 pl-2 mb-4">
-                    <label htmlFor="phone" className="font-bold mb-2">
-                      Teléfono
-                    </label>
-                    <input
-                      id="phone"
-                      type="text"
-                      name="phone"
-                      value={values.phone}
-                      onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                    {errors.phone && touched.phone && (
-                      <div className="text-red-500 text-sm">{errors.phone}</div>
-                    )}
-                  </div>
+                    </div>
+                  </form>
+                )}
+              </Formik>
+            </div>
+            <div className="flex flex-wrap w-2/3 justify-center items-center">
+              <div className="flex flex-col w-1/2 pr-2  justify-center">
+                <label className=" text-gray-600 text-sm mb-1">Nombre</label>
+                <h3 className="font-bold ">
+                  {profile.name || "Nombre no disponible"}
+                </h3>
+              </div>
 
-                  <div className="flex justify-end space-x-4 mt-8 w-full">
-                    <button
-                      type="submit"
-                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 shadow-md"
-                    >
-                      Guardar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={logout}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md"
-                    >
-                      Cerrar Sesión
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
-          </Formik>
-          <hr className="w-full my-8 border-gray-300" />
+              <div className="flex flex-col w-1/2 pl-2  justify-center">
+                <label className="text-gray-600 text-sm mb-1">Email</label>
+                <h3 className="font-bold ">
+                  {profile.email || "Email no disponible"}
+                </h3>
+              </div>
+              <div className="w-full h-4"></div>
+              <div className="flex flex-col w-1/2 pr-2  justify-center">
+                <label className="text-gray-600 text-sm mb-1">
+                  Fecha de Nacimiento
+                </label>
+                <h3 className="font-bold ">
+                  {profile.birthday || "Fecha no disponible"}
+                </h3>
+              </div>
+
+              <div className="flex flex-col w-1/2 pl-2  justify-center">
+                <label className="text-gray-600 text-sm mb-1">Teléfono</label>
+                <h3 className="font-bold ">
+                  {profile.phone || "Teléfono no disponible"}
+                </h3>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-5 mr-5 w-full">
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col w-full">
             <button
               type="button"
@@ -835,67 +831,76 @@ export default function Profile() {
             </button>
             {showAdditionalData && (
               <div className="flex justify-end mt-4 p-4 bg-white rounded shadow-md flex-col">
-                <div className=" flex flex-row justify-center w-full">
-                  <div className=" flex flex-row w-2/3 ">
-                    {datosInsulina.map((item) => {
-                      return (
-                        <div className="flex flex-col w-full border-r-2 border-slate-800">
-                          <div className="justify-start items-start ml-10">
-                            <p className="text-sm text-neutral-500 mb-1">
-                              Tipo de insulina
-                            </p>
-                            <p className="font-bold text-base mb-4">
-                              {item.tipoInsulina}
-                            </p>
-                            <p className="text-sm text-neutral-600 mb-1">
-                              Nombre de la insulina utilizada:
-                            </p>
-                            <p className="font-bold text-base mb-5">
-                              {nombreInsulina}
-                            </p>
+                <div className="flex flex-row justify-center w-full">
+                  <div
+                    className={`flex flex-row justify-${
+                      datosInsulina.length + datoRango.length === 1
+                        ? "center"
+                        : "between"
+                    } w-full`}
+                  >
+                    {datosInsulina.map((item, index) => (
+                      <div
+                        key={index}
+                        className={`flex flex-col w-full px-4 ${
+                          index === 0 &&
+                          datoRango.length === 0 &&
+                          datosInsulina.length === 2
+                            ? "border-r-2 border-slate-800"
+                            : ""
+                        }`}
+                      >
+                        <div className="justify-start items-start ml-10">
+                          <p className="text-sm text-neutral-500 mb-1">
+                            Tipo de insulina
+                          </p>
+                          <p className="font-bold text-base mb-4">
+                            {item.tipoInsulina}
+                          </p>
+                          <p className="text-sm text-neutral-600 mb-1">
+                            Nombre de la insulina utilizada:
+                          </p>
+                          <p className="font-bold text-base mb-5">
+                            {item.marcaInsulina?.nombreInsulina || "N/A"}
+                          </p>
+                        </div>
+                        <div className="flex justify-center items-center mt-2">
+                          <button
+                            type="button"
+                            onClick={() => deleteDatosAdicionales(item.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {datoRango.length > 0 && (
+                      <div className="w-full flex flex-col items-center px-4">
+                        <h3 className="text-center text-sm text-neutral-600 mb-1 mt-3">
+                          Glucosa en Rango
+                        </h3>
+                        <div className="flex flex-row w-full justify-center items-center gap-x-10 mt-5">
+                          <div className="flex flex-col">
+                            <p>Bajo</p>
+                            <p className="font-bold">{datoRango[0].bajo}</p>
                           </div>
-                          <div className="flex flex-row justify-center items-center">
-                            <button
-                              type="button"
-                              onClick={() => deleteDatosAdicionales(item.id)}
-                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
-                            >
-                              Eliminar
-                            </button>
+                          <div className="flex flex-col">
+                            <p>Alto:</p>
+                            <p className="font-bold">{datoRango[0].alto}</p>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                  <div className="w-1/3 flex flex-row justify-center ">
-                    {datoRango.map((item) => {
-                      return (
-                        <div className="w-full justify-center">
-                          <h3 className="text-center text-sm text-neutral-600 mb-1 mt-3">
-                            Glucosa en Rango
-                          </h3>
-                          <div className="flex flex-row w-full justify-center items-center gap-x-28 mt-5">
-                            <div className="flex flex-col">
-                              <p>Bajo</p>
-                              <p className="font-bold">{item.bajo}</p>
-                            </div>
-                            <div className="">
-                              <p>Alto:</p>
-                              <p className="font-bold">{item.alto}</p>
-                            </div>
-                          </div>
-                          <div className="flex flex-row justify-center items-center mt-7">
-                            <button
-                              type="button"
-                              onClick={() => deleteRango(item.id)}
-                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center "
-                            >
-                              Eliminar
-                            </button>
-                          </div>
+                        <div className="flex flex-row justify-center items-center mt-7">
+                          <button
+                            type="button"
+                            onClick={() => deleteRango(datoRango[0].id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md text-center"
+                          >
+                            Eliminar
+                          </button>
                         </div>
-                      );
-                    })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -910,7 +915,7 @@ export default function Profile() {
                               onClick={() =>
                                 setAddTypeInsuline(!showAddTypeInsuline)
                               }
-                              className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                              className="flex items-center mt-4 space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                             >
                               <FaPlus></FaPlus>
                               <span>Agregar Insulina</span>
@@ -929,7 +934,7 @@ export default function Profile() {
                             onClick={() =>
                               setShowAddDataAditional(!showAddDataAditional)
                             }
-                            className="flex items-center space-x-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                            className="flex items-center space-x-1 mt-4 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                           >
                             <FaPlus></FaPlus>
                             <span>Agregar rango de glucosa</span>
@@ -1038,6 +1043,7 @@ export default function Profile() {
                               <button
                                 type="submit"
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                disabled={isSubmitting}
                               >
                                 Guardar
                               </button>
@@ -1128,6 +1134,7 @@ export default function Profile() {
                             <div className="flex justify-end mt-4">
                               <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                               >
                                 Guardar
@@ -1221,7 +1228,7 @@ export default function Profile() {
                               type="text"
                               name="familyPhone"
                               value={values.familyPhone}
-                              max={10}
+                              maxLength={10}
                               onChange={handleChange}
                               onBlur={handleBlur}
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -1345,6 +1352,144 @@ export default function Profile() {
               </div>
             )}
           </div>
+          <hr className="w-full my-8 border-gray-300" />
+          <div className="flex flex-col w-full">
+            <button
+              type="button"
+              onClick={() => setShowChangeDatPer(!showChangeDatPer)}
+              className="flex items-center justify-between bg-gray-200 px-4 py-2 rounded shadow-md"
+            >
+              EDITAR DATOS DEL PERFIL{" "}
+              {showChangeDatPer ? <FaCaretUp /> : <FaCaretDown />}
+            </button>
+            {showChangeDatPer && (
+              <div className="flex justify-end mt-4 p-4 bg-white rounded shadow-md flex-col">
+                <div className=" flex flex-row justify-end"></div>
+
+                <div>
+                  <Formik
+                    initialValues={{
+                      fullName: profile.name,
+                      email: profile.email,
+                      birthday: profile.birthday,
+                      phone: profile.phone,
+                      password: "",
+                    }}
+                    enableReinitialize={true}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                  >
+                    {({
+                      handleSubmit,
+                      handleChange,
+                      values,
+                      errors,
+                      touched,
+                    }) => (
+                      <form onSubmit={handleSubmit}>
+                        <div className="flex flex-wrap w-full">
+                          <div className="flex flex-col w-1/2 pr-2 mb-4">
+                            <label
+                              htmlFor="fullName"
+                              className="font-bold mb-2"
+                            >
+                              Nombre
+                            </label>
+                            <input
+                              id="fullName"
+                              type="text"
+                              name="fullName"
+                              value={values.fullName}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.fullName && touched.fullName && (
+                              <div className="text-red-500 text-sm">
+                                {errors.fullName}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col w-1/2 pl-2 mb-4">
+                            <label htmlFor="email" className="font-bold mb-2">
+                              Email
+                            </label>
+                            <input
+                              id="email"
+                              type="email"
+                              name="email"
+                              value={values.email}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.email && touched.email && (
+                              <div className="text-red-500 text-sm">
+                                {errors.email}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col w-1/2 pr-2 mb-4">
+                            <label
+                              htmlFor="birthday"
+                              className="font-bold mb-2"
+                            >
+                              Fecha de Nacimiento
+                            </label>
+                            <input
+                              id="birthday"
+                              type="date"
+                              name="birthday"
+                              value={values.birthday}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.birthday && touched.birthday && (
+                              <div className="text-red-500 text-sm">
+                                {errors.birthday}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col w-1/2 pl-2 mb-4">
+                            <label htmlFor="phone" className="font-bold mb-2">
+                              Teléfono
+                            </label>
+                            <input
+                              id="phone"
+                              type="text"
+                              name="phone"
+                              value={values.phone}
+                              onChange={handleChange}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            {errors.phone && touched.phone && (
+                              <div className="text-red-500 text-sm">
+                                {errors.phone}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex justify-end space-x-4 mt-8 w-full">
+                            <button
+                              type="submit"
+                              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 shadow-md"
+                            >
+                              Guardar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={logout}
+                              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md"
+                            >
+                              Cerrar Sesión
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    )}
+                  </Formik>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <Modal
           isOpen={modalIsOpen}
@@ -1371,6 +1516,7 @@ export default function Profile() {
                   values,
                   errors,
                   touched,
+                  isSubmitting,
                 }) => (
                   <form onSubmit={handleSubmit}>
                     <div className="flex flex-wrap">
@@ -1459,6 +1605,7 @@ export default function Profile() {
                       <div className="flex justify-end w-full">
                         <button
                           type="submit"
+                          disabled={isSubmitting}
                           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
                           Guardar

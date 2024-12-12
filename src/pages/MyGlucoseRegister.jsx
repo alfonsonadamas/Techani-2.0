@@ -5,7 +5,6 @@ import MyDocument from "../components/PdfGlucose";
 import descargaAll from "../assets/img/descargar azul.png";
 import descargar from "../assets/img/descargar.png";
 import pdf from "../assets/img/pdfimage.png";
-import trash from "../assets/img/basura.png";
 import { supabase } from "../config/supabase";
 import { useUserContext } from "../context/UserContext";
 import AllDocuments from "../components/AllDocuments";

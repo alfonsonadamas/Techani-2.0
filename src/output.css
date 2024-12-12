@@ -1903,6 +1903,10 @@ input:checked + .toggle-bg{
   width: 15%;
 }
 
+.w-\[18rem\]{
+  width: 18rem;
+}
+
 .w-\[230px\]{
   width: 230px;
 }
@@ -1926,18 +1930,6 @@ input:checked + .toggle-bg{
 
 .w-full{
   width: 100%;
-}
-
-.w-\[50rem\]{
-  width: 50rem;
-}
-
-.w-\[25rem\]{
-  width: 25rem;
-}
-
-.w-\[18rem\]{
-  width: 18rem;
 }
 
 .max-w-2xl{
@@ -2280,8 +2272,8 @@ input:checked + .toggle-bg{
   column-gap: 0.25rem;
 }
 
-.gap-x-28{
-  column-gap: 7rem;
+.gap-x-10{
+  column-gap: 2.5rem;
 }
 
 .gap-y-2{
@@ -2857,11 +2849,6 @@ input:checked + .toggle-bg{
 
 .bg-black\/20{
   background-color: rgb(0 0 0 / 0.2);
-}
-
-.bg-blue-100{
-  --tw-bg-opacity: 1;
-  background-color: rgb(225 239 254 / var(--tw-bg-opacity));
 }
 
 .bg-blue-200{
@@ -3802,11 +3789,6 @@ input:checked + .toggle-bg{
 .text-blue-500{
   --tw-text-opacity: 1;
   color: rgb(63 131 248 / var(--tw-text-opacity));
-}
-
-.text-blue-600{
-  --tw-text-opacity: 1;
-  color: rgb(28 100 242 / var(--tw-text-opacity));
 }
 
 .text-blue-700{
@@ -6645,11 +6627,6 @@ input:checked + .toggle-bg{
 
   .sm\:text-\[3vw\]{
     font-size: 3vw;
-  }
-
-  .sm\:text-sm{
-    font-size: 0.875rem;
-    line-height: 1.25rem;
   }
 
   .sm\:text-xs{

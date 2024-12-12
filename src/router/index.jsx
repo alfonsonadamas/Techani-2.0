@@ -13,6 +13,7 @@ import Alimentos from "../pages/Alimentos";
 import AlimentosRegister from "../pages/AlimentosRegister";
 import AllAlimentosRegister from "../pages/AllAlimentosRegister";
 import AllFoodsRegister from "../pages/AllFoodsRegister";
+import MyFoods from "../pages/MyFoods";
 
 import Exercise from "../pages/Exercise";
 import NewActivity from "../pages/NewActivity";
@@ -191,7 +192,17 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AllFoodsRegister />,
+            element: <MyFoods/>,
+          },
+        ],
+      },
+      {
+        path: "/myFood",
+        element: <LayoutPrivate />,
+        children: [
+          {
+            index: true,
+            element: <AllFoodsRegister/>,
           },
         ],
       },
