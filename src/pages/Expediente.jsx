@@ -55,7 +55,7 @@ export default function Expediente() {
       specificPregnancyProblem: values?.specificPregnancyProblem || '',
     }
     if (info.complicationsInPregnancy !== "si") {
-      info.specificPregnancyProblem = '';
+      info.specificPregnancyProblem = null;
     }
     if (updateInformacionPersonal === true) {
       const { data, error } = await supabase
@@ -171,6 +171,7 @@ export default function Expediente() {
     { setErrors, resetForm }
   ) => {
     // Crear el objeto info con valores del formulario
+    
     let info = {
       diabetesTreatment: values?.diabetesTreatment || null,
       insulinName: values?.insulinName || null,
@@ -263,36 +264,33 @@ export default function Expediente() {
     averageGlucose: Yup.number("El campo debe ser un número").positive("El campo debe ser un número positivo"),
   });
   const validationSchema3 = Yup.object({
-    diabetesTreatment: Yup.string()
-      .required("Campo obligatorio"),
+    diabetesTreatment: Yup.string(),
     insulinName: Yup.string()
       .nullable(), // Opcional
     insulinDose: Yup.number("El campo debe ser un número")
       .positive("Debe ser un número positivo")
       .nullable(), // Opcional
-    treatmentLocation: Yup.string()
-      .required("Campo obligatorio"),
-    hyperglycemiaAction: Yup.string()
-      .required("Campo obligatorio"),
+    treatmentLocation: Yup.string(),
+    hyperglycemiaAction: Yup.string(),
     hypoglycemiaAction: Yup.string()
-      .required("Campo obligatorio"),
+      ,
     otherMedications: Yup.string()
       .nullable(), // Opcional
     foodControl: Yup.string()
-      .required("Campo obligatorio"),
+      ,
     dailyWaterIntake: Yup.number("El campo debe ser un número")
       .positive("Debe ser un número positivo")
       .nullable(), // Opcional
     drugUse: Yup.string()
-      .required("Campo obligatorio"),
+      ,
     alcoholUse: Yup.string()
-      .required("Campo obligatorio"),
+      ,
     rightFootObservation: Yup.string()
       .nullable(), // Opcional
     leftFootObservation: Yup.string()
       .nullable(), // Opcional
     exercise: Yup.string()
-      .required("Campo obligatorio"),
+      ,
     exerciseType: Yup.string()
       .nullable(), // Opcional
     exerciseDuration: Yup.number("El campo debe ser un número")
@@ -427,7 +425,7 @@ export default function Expediente() {
               exercise: data[0]?.exercise || '',
               exerciseType: data[0]?.exerciseType || '',
               exerciseDuration: data[0]?.exerciseDuration || '',
-              exerciseFrequency: data[0]?.exerciseFrequency || '',
+              exerciseFrequency: data[0]?.exerciseFrequency || ''
             });
             setUpdateHabitsData(data[0] !== undefined);
             setIsLoading(false);
@@ -1334,7 +1332,8 @@ export default function Expediente() {
                       onChange={handleChange}
                       placeholder="Dosis"
                       className={`${inputStyle} w-1/3`}
-                      min="0"
+                      min={"0"}
+                      step={0.01}
                     />
                   </div>
                   <label className="font-semibold">Lugar de tratamiento actual</label>
@@ -1418,7 +1417,7 @@ export default function Expediente() {
 
                 {/* Otros medicamentos */}
                 <div className="col-span-5">
-                  <label className="font-normal text-sm">¿Qué otros medicamentos utiliza para cualquier otro padecimiento?</label>
+                  <label className="text-sm font-semibold mt-2">¿Qué otros medicamentos utiliza para cualquier otro padecimiento?</label>
                   <textarea
                     name="otherMedications"
                     value={values.otherMedications}
@@ -1471,7 +1470,8 @@ export default function Expediente() {
                     value={values.dailyWaterIntake}
                     onChange={handleChange}
                     className={inputStyle}
-                    min="0"
+                    min={"0"}
+                    step={0.01}
                   />
                   <label className="font-semibold mt-2">¿Consume alcohol?</label>
                   <select
